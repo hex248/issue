@@ -37,8 +37,17 @@ export async function updateIssue(id: number, updates: { title?: string; descrip
     return await db.update(Issue).set(updates).where(eq(Issue.id, id)).returning();
 }
 
+export async function getIssues() {
+    return await db.select().from(Issue);
+}
+
 export async function getIssuesByProject(projectId: number) {
     return await db.select().from(Issue).where(eq(Issue.projectId, projectId));
+}
+
+export async function getIssueByID(id: number) {
+    const [issue] = await db.select().from(Issue).where(eq(Issue.id, id));
+    return issue;
 }
 
 export async function getIssueByNumber(projectId: number, number: number) {

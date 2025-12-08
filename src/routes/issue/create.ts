@@ -1,5 +1,5 @@
 import type { BunRequest } from "bun";
-import { createIssue, getProjectByID, getProjectByBlob } from "../db/queries";
+import { createIssue, getProjectByID, getProjectByBlob } from "../../db/queries";
 
 // /issue/create?projectId=1&title=Testing&description=Description
 // OR
@@ -28,4 +28,3 @@ export default async function issueCreate(req: BunRequest) {
 
     return Response.json(issue);
 }
- 

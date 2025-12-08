@@ -1,5 +1,5 @@
 import type { BunRequest } from "bun";
-import { deleteIssue } from "../db/queries";
+import { deleteIssue } from "../../db/queries";
 
 // /issue/delete?id=1
 export default async function issueDelete(req: BunRequest) {

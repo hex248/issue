@@ -1,11 +1,11 @@
-import issueCreate from "./issueCreate";
-import issueDelete from "./issueDelete";
-import issues from "./issues";
-import issueUpdate from "./issueUpdate";
+import issueCreate from "./issue/create";
+import issueDelete from "./issue/delete";
+import issueUpdate from "./issue/update";
+import issuesInProject from "./issues/[projectBlob]";
 
 export const routes = {
     issueCreate,
     issueDelete,
-    issues,
     issueUpdate,
+    issuesInProject,
 };

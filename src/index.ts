@@ -14,7 +14,7 @@ const main = async () => {
             "/issue/create": routes.issueCreate,
             "/issue/update": routes.issueUpdate,
             "/issue/delete": routes.issueDelete,
-            "/issues/:projectId": routes.issues,
+            "/issues/:projectBlob": routes.issuesInProject,
         },
     });
 

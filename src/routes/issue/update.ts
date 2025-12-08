@@ -1,5 +1,5 @@
 import type { BunRequest } from "bun";
-import { updateIssue } from "../db/queries";
+import { updateIssue } from "../../db/queries";
 
 // /issue/update?id=1&title=Testing&description=Description
 export default async function issueUpdate(req: BunRequest) {
