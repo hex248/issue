@@ -1,46 +1,7 @@
 import { eq, sql, and } from "drizzle-orm";
-import { db } from "./client";
-import { Issue, Project, User } from "./schema";
+import { db } from "../client";
+import { Issue } from "../schema";
 
-// user related
-export async function createUser(name: string, username: string) {
-    const [user] = await db.insert(User).values({ name, username }).returning();
-    return user;
-}
-
-export async function getUserByUsername(username: string) {
-    const [user] = await db.select().from(User).where(eq(User.username, username));
-    return user;
-}
-
-// project related
-
-export async function createProject(blob: string, name: string, owner: typeof User.$inferSelect) {
-    const [project] = await db
-        .insert(Project)
-        .values({
-            blob,
-            name,
-            ownerId: owner.id,
-        })
-        .returning();
-    if (!project) {
-        throw new Error(`failed to create project ${name} with blob ${blob} for owner ${owner.username}`);
-    }
-    return project;
-}
-
-export async function getProjectByID(projectId: number) {
-    const [project] = await db.select().from(Project).where(eq(Project.id, projectId));
-    return project;
-}
-
-export async function getProjectByBlob(projectBlob: string) {
-    const [project] = await db.select().from(Project).where(eq(Project.blob, projectBlob));
-    return project;
-}
-
-// issue related
 export async function createIssue(projectId: number, title: string, description: string) {
     // prevents two issues with the same unique number
     return await db.transaction(async (tx) => {

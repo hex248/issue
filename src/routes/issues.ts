@@ -1,5 +1,5 @@
 import type { BunRequest } from "bun";
-import { getIssuesByProject, getProjectByBlob } from "../db/queries.js";
+import { getIssuesByProject, getProjectByBlob } from "../db/queries";
 
 export default async function issues(req: BunRequest<"/issues/:projectId">) {
     const { projectId } = req.params;
