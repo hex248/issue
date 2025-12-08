@@ -30,9 +30,14 @@ export async function createProject(blob: string, name: string, owner: typeof Us
     return project;
 }
 
+export async function getProjectByID(projectId: number) {
+    const [project] = await db.select().from(Project).where(eq(Project.id, projectId));
+    return project;
+}
+
 export async function getProjectByBlob(projectBlob: string) {
-    const [issue] = await db.select().from(Project).where(eq(Project.blob, projectBlob));
-    return issue;
+    const [project] = await db.select().from(Project).where(eq(Project.blob, projectBlob));
+    return project;
 }
 
 // issue related
