@@ -15,6 +15,7 @@ const main = async () => {
             "/issue/update": routes.issueUpdate,
             "/issue/delete": routes.issueDelete,
             "/issues/:projectBlob": routes.issuesInProject,
+            "/issues/all": routes.issues,
         },
     });
 
