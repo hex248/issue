@@ -68,8 +68,8 @@ export async function createIssue(projectId: number, title: string, description:
     });
 }
 
-export async function deleteIssue(projectId: number, number: number) {
-    return await db.delete(Issue).where(and(eq(Issue.projectId, projectId), eq(Issue.number, number)));
+export async function deleteIssue(id: number) {
+    return await db.delete(Issue).where(eq(Issue.id, id));
 }
 
 export async function updateIssue(id: number, updates: { title?: string; description?: string }) {
