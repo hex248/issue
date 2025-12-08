@@ -15,6 +15,13 @@
       "when": 1765146859966,
       "tag": "0001_short_silver_fox",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765149910114,
+      "tag": "0002_abnormal_fenris",
+      "breakpoints": true
     }
   ]
 }
