@@ -1,55 +1,85 @@
-import { CloudSync, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { IssueRecord } from "@issue/shared";
+import type { IssueRecord, ProjectRecord } from "@issue/shared";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 
-function Issue({ issue }: { issue: IssueRecord }) {
+function IssueRow({ issue }: { issue: IssueRecord }) {
     return (
-        <div className="w-sm p-4 border">
-            [{issue.id}] {issue.title}
-        </div>
+        <TableRow key={issue.id}>
+            <TableCell className="font-medium">{issue.id}</TableCell>
+            <TableCell>{issue.title}</TableCell>
+            <TableCell>{issue.description}</TableCell>
+        </TableRow>
     );
 }
 
 function Index() {
+    const [projects, setProjects] = useState<ProjectRecord[]>([]);
+    const projectsRef = useRef(false);
+
+    useEffect(() => {
+        if (projectsRef.current) return;
+        projectsRef.current = true;
+
+        fetch("http://localhost:3000/projects/all")
+            .then((res) => res.json())
+            .then((data: ProjectRecord[]) => {
+                setProjects(data);
+                console.log("fetched projects:", data);
+            })
+            .catch((err) => {
+                console.error("error fetching projects:", err);
+            });
+    }, []);
+
     const [issues, setIssues] = useState<IssueRecord[]>([]);
+    const issuesRef = useRef(false);
 
     const serverURL = import.meta.env.SERVER_URL?.trim() || "http://localhost:3000";
 
-    async function getIssues() {
-        const res = await fetch(`${serverURL}/issues/all`);
-        const data = await res.json();
-        setIssues(data);
-    }
+    useEffect(() => {
+        if (issuesRef.current) return;
+        issuesRef.current = true;
+
+        fetch(`${serverURL}/issues/all`)
+            .then((res) => res.json())
+            .then((data: IssueRecord[]) => {
+                setIssues(data);
+                console.log("fetched issues:", data);
+            })
+            .catch((err) => {
+                console.error("error fetching issues:", err);
+            });
+    }, []);
 
     return (
-        <main className="w-full h-[100vh] flex flex-col items-center justify-center gap-4 p-4">
-            <h1 className="text-3xl font-bold">Issue Project Manager</h1>
-
-            <div className="flex gap-2">
-                <Button onClick={getIssues} className={""}>
-                    {issues.length > 0 ? (
-                        <>
-                            re-fetch issues
-                            <RefreshCw />
-                        </>
-                    ) : (
-                        <>
-                            fetch issues
-                            <CloudSync />
-                        </>
-                    )}
-                </Button>
-                <Button variant="outline" linkTo={"/test"}>
-                    Go to Test Page
-                </Button>
+        <main className="w-full h-[100vh] flex flex-col items-start justify-start">
+            <div id={"issues-table"} className="w-[80%] border">
+                <Table>
+                    <TableCaption>All Issues</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">a</TableHead>
+                            <TableHead>a</TableHead>
+                            <TableHead>a</TableHead>
+                            <TableHead className="text-right">a</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {issues.map((issue) => (
+                            <IssueRow key={issue.id} issue={issue} />
+                        ))}
+                    </TableBody>
+                </Table>
             </div>
-
-            {issues.length > 0 && (
-                <pre className="w-2xl max-h-96 overflow-auto p-4 border bg-">
-                    {JSON.stringify(issues, null, 2)}
-                </pre>
-            )}
         </main>
     );
 }
