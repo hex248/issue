@@ -1,11 +1,11 @@
+import { CloudSync, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CloudSync, RefreshCw } from "lucide-react";
 
 function Issue({ issue }: { issue: any }) {
     return (
         <div className="w-sm p-4 border">
-            [{issue.id}] {issue.title}
+            import {Button} from "@/components/ui/button"; [{issue.id}] {issue.title}
         </div>
     );
 }
@@ -39,7 +39,9 @@ function Index() {
                         </>
                     )}
                 </Button>
-                    <Button variant="outline" linkTo={"/test"}>Go to Test Page</Button>
+                <Button variant="outline" linkTo={"/test"}>
+                    Go to Test Page
+                </Button>
             </div>
 
             {issues.length > 0 && (

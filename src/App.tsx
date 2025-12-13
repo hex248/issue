@@ -1,6 +1,5 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import Index from "./Index";
 import Test from "./Test";
 
