@@ -10,7 +10,7 @@ function Issue({ issue }: { issue: any }) {
     );
 }
 
-function Home() {
+function Index() {
     const [issues, setIssues] = useState([]);
 
     const serverURL = import.meta.env.SERVER_URL?.trim() || "http://localhost:3000";
@@ -23,20 +23,24 @@ function Home() {
 
     return (
         <main className="w-full h-[100vh] flex flex-col items-center justify-center gap-4 p-4">
-            <h1>Issue Project Manager</h1>
-            <Button onClick={getIssues} className={""}>
-                {issues.length > 0 ? (
-                    <>
-                        re-fetch issues
-                        <RefreshCw />
-                    </>
-                ) : (
-                    <>
-                        fetch issues
-                        <CloudSync />
-                    </>
-                )}
-            </Button>
+            <h1 className="text-3xl font-bold">Issue Project Manager</h1>
+
+            <div className="flex gap-2">
+                <Button onClick={getIssues} className={""}>
+                    {issues.length > 0 ? (
+                        <>
+                            re-fetch issues
+                            <RefreshCw />
+                        </>
+                    ) : (
+                        <>
+                            fetch issues
+                            <CloudSync />
+                        </>
+                    )}
+                </Button>
+                    <Button variant="outline" linkTo={"/test"}>Go to Test Page</Button>
+            </div>
 
             {issues.length > 0 && (
                 <>
@@ -52,4 +56,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default Index;
