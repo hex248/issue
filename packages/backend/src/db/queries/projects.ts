@@ -38,3 +38,27 @@ export async function getProjectByBlob(projectBlob: string) {
     const [project] = await db.select().from(Project).where(eq(Project.blob, projectBlob));
     return project;
 }
+
+export async function getProjectsByOwnerID(ownerId: number) {
+    const projects = await db.select().from(Project).where(eq(Project.ownerId, ownerId));
+    return projects;
+}
+
+export async function getAllProjects() {
+    const projects = await db.select().from(Project);
+    return projects;
+}
+
+export async function getProjectsWithOwners() {
+    const projectsWithOwners = await db.select().from(Project).leftJoin(User, eq(Project.ownerId, User.id));
+    return projectsWithOwners;
+}
+
+export async function getProjectWithOwnerByID(projectId: number) {
+    const [projectWithOwner] = await db
+        .select()
+        .from(Project)
+        .leftJoin(User, eq(Project.ownerId, User.id))
+        .where(eq(Project.id, projectId));
+    return projectWithOwner;
+}
