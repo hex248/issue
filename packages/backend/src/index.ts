@@ -89,6 +89,10 @@ const main = async () => {
             "/project/create": withCors(routes.projectCreate),
             "/project/update": withCors(routes.projectUpdate),
             "/project/delete": withCors(routes.projectDelete),
+            "/projects/by-owner": withCors(routes.projectsByOwner),
+            "/projects/all": withCors(routes.projectsAll),
+            "/projects/with-owners": withCors(routes.projectsWithOwners),
+            "/project/with-owner": withCors(routes.projectWithOwner),
         },
     });
 
