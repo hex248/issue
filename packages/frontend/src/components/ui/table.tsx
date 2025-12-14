@@ -39,7 +39,7 @@ function TableRow({
         <tr
             data-slot="table-row"
             className={cn(
-                "data-[state=selected]:bg-muted h-[24px] border-b",
+                "data-[state=selected]:bg-muted h-[25px] border-b",
                 hoverEffect && "hover:bg-muted/40",
                 className,
             )}
@@ -53,7 +53,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
         <th
             data-slot="table-head"
             className={cn(
-                "text-foreground px-2 h-[24px] text-left text-sm align-middle font-medium",
+                "text-foreground px-2 h-[25px] text-left text-sm align-middle font-medium",
                 "whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
                 className,
             )}
