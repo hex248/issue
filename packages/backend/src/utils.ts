@@ -19,6 +19,7 @@ export const createDemoData = async () => {
                 project.id,
                 `Issue ${i} in ${name}`,
                 `This is a description for issue ${i} in ${name}.`,
+                i % 2 === 0 ? user.id : undefined,
             );
         }
         issuesToCreate++;
