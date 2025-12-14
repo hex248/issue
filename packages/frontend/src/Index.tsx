@@ -78,18 +78,27 @@ function Index() {
             </div>
             {/* main body */}
             <div className="w-full h-full flex items-start justify-between pt-2 gap-2">
-                {/* issues list (table) */}
-                <IssuesTable
-                    issues={issues}
-                    columns={{ description: false }}
-                    issueSelectAction={setSelectedIssue}
-                    className="border w-full flex-shrink"
-                />
-                {/* issue detail pane */}
-                {selectedIssue && (
-                    <div className="border w-2xl">
-                        <IssueDetailPane issue={selectedIssue} close={() => setSelectedIssue(null)} />
-                    </div>
+                {selectedProject && issues.length > 0 && (
+                    <>
+                        {/* issues list (table) */}
+                        <IssuesTable
+                            project={selectedProject}
+                            issues={issues}
+                            columns={{ description: false }}
+                            issueSelectAction={setSelectedIssue}
+                            className="border w-full flex-shrink"
+                        />
+                        {/* issue detail pane */}
+                        {selectedIssue && (
+                            <div className="border w-2xl">
+                                <IssueDetailPane
+                                    project={selectedProject}
+                                    issue={selectedIssue}
+                                    close={() => setSelectedIssue(null)}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </main>

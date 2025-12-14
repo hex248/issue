@@ -1,25 +1,26 @@
-import type { IssueRecord } from "@issue/shared";
+import type { IssueRecord, ProjectRecord } from "@issue/shared";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn, issueID } from "@/lib/utils";
 
 export function IssuesTable({
+    project,
     issues,
     columns = {},
     issueSelectAction,
     className,
 }: {
+    project: ProjectRecord;
     issues: IssueRecord[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
     issueSelectAction?: (issue: IssueRecord) => void;
     className: string;
 }) {
-    if (issues.length === 0) return;
     return (
         <Table className={cn(className)}>
             <TableHeader>
                 <TableRow hoverEffect={false}>
                     {(columns.id == null || columns.id === true) && (
-                        <TableHead className="w-[1px] border-r">ID</TableHead>
+                        <TableHead className="text-right w-[1px] border-r">ID</TableHead>
                     )}
                     {(columns.title == null || columns.title === true) && <TableHead>Title</TableHead>}
                     {(columns.description == null || columns.description === true) && (
@@ -39,8 +40,8 @@ export function IssuesTable({
                         }}
                     >
                         {(columns.id == null || columns.id === true) && (
-                            <TableCell className="font-medium border-r">
-                                {String(issue.id).padStart(3, "0")}
+                            <TableCell className="font-medium border-r text-right">
+                                {issue.number.toString().padStart(3, "0")}
                             </TableCell>
                         )}
                         {(columns.title == null || columns.title === true) && (
