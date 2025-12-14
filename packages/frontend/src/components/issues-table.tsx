@@ -10,6 +10,7 @@ export function IssuesTable({
     columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
     issueSelectAction?: (issue: IssueRecord) => void;
 }) {
+    if (issues.length === 0) return;
     return (
         <Table>
             <TableHeader>
