@@ -4,9 +4,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export function IssuesTable({
     issues,
     columns = {},
+    issueSelectAction,
 }: {
     issues: IssueRecord[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
+    issueSelectAction?: (issue: IssueRecord) => void;
 }) {
     return (
         <Table>
@@ -25,7 +27,13 @@ export function IssuesTable({
             </TableHeader>
             <TableBody>
                 {issues.map((issue) => (
-                    <TableRow key={issue.id} className="cursor-pointer">
+                    <TableRow
+                        key={issue.id}
+                        className="cursor-pointer"
+                        onClick={() => {
+                            issueSelectAction?.(issue);
+                        }}
+                    >
                         {(columns.id == null || columns.id === true) && (
                             <TableCell className="font-medium border-r">
                                 {String(issue.id).padStart(3, "0")}
