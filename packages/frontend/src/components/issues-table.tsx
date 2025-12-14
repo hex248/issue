@@ -1,4 +1,4 @@
-import type { IssueResponse, ProjectRecord } from "@issue/shared";
+import type { IssueResponse, ProjectResponse } from "@issue/shared";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ export function IssuesTable({
     issueSelectAction,
     className,
 }: {
-    project: ProjectRecord;
+    project: ProjectResponse;
     issuesData: IssueResponse[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
     issueSelectAction?: (issue: IssueResponse) => void;

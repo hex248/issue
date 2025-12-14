@@ -22,6 +22,7 @@ export {
 } from "./schema";
 
 // Responses
-export {
+export type {
     IssueResponse,
+    ProjectResponse,
 } from "./schema"

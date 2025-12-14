@@ -1,12 +1,13 @@
-import type { IssueResponse, ProjectRecord } from "@issue/shared";
+import type { IssueResponse, ProjectResponse } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import SmallUserDisplay from "./components/small-user-display";
 
 function Index() {
-    const [selectedProject, setSelectedProject] = useState<ProjectRecord | null>(null);
-    const [projects, setProjects] = useState<ProjectRecord[]>([]);
+    const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
+    const [projects, setProjects] = useState<ProjectResponse[]>([]);
     const projectsRef = useRef(false);
 
     useEffect(() => {
@@ -15,7 +16,7 @@ function Index() {
 
         fetch("http://localhost:3000/projects/all")
             .then((res) => res.json())
-            .then((data: ProjectRecord[]) => {
+            .then((data: ProjectResponse[]) => {
                 setProjects(data);
             })
             .catch((err) => {
@@ -31,11 +32,10 @@ function Index() {
     useEffect(() => {
         if (!selectedProject) return;
 
-        fetch(`${serverURL}/issues/${selectedProject.blob}`)
+        fetch(`${serverURL}/issues/${selectedProject.Project.blob}`)
             .then((res) => res.json())
             .then((data: IssueResponse[]) => {
                 setIssues(data);
-                console.log(data);
             })
             .catch((err) => {
                 console.error("error fetching issues:", err);
@@ -45,7 +45,7 @@ function Index() {
     return (
         <main className="w-full h-full p-1">
             {/* header area */}
-            <div className="flex gap-2">
+            <div className="flex gap-4 items-center">
                 <Select
                     onValueChange={(value) => {
                         if (value === "NONE") {
@@ -53,7 +53,7 @@ function Index() {
                             setSelectedIssue(null);
                             setIssues([]);
                         }
-                        const project = projects.find((p) => p.id === Number(value));
+                        const project = projects.find((p) => p.Project.id === Number(value));
                         if (!project) {
                             // TODO: toast here
                             console.error(`NO PROJECT FOUND FOR ID: ${value}`);
@@ -65,20 +65,27 @@ function Index() {
                 >
                     <SelectTrigger className="h-8 lg:flex">
                         <SelectValue
-                            placeholder={selectedProject ? `P: ${selectedProject.name}` : "Select Project"}
+                            placeholder={
+                                selectedProject ? `P: ${selectedProject.Project.name}` : "Select Project"
+                            }
                         />
                     </SelectTrigger>
                     <SelectContent side="bottom" position="popper">
                         {projects.map((project) => (
-                            <SelectItem key={project.id} value={`${project.id}`}>
-                                {project.name}
+                            <SelectItem key={project.Project.id} value={`${project.Project.id}`}>
+                                {project.Project.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
+                {selectedProject && (
+                    <div className="flex items-center gap-2">
+                        Owner: <SmallUserDisplay user={selectedProject?.User} />
+                    </div>
+                )}
             </div>
             {/* main body */}
-            <div className="w-full h-full flex items-start justify-between pt-2 gap-2">
+            <div className="w-full h-full flex items-start justify-between pt-1 gap-2">
                 {selectedProject && issuesData.length > 0 && (
                     <>
                         {/* issues list (table) */}

@@ -65,3 +65,8 @@ export type IssueResponse = {
     Issue: IssueRecord;
     User?: UserRecord;
 };
+
+export type ProjectResponse = {
+    Project: ProjectRecord;
+    User: UserRecord;
+};
