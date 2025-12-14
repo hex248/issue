@@ -14,9 +14,9 @@ export function IssueDetailPane({
 }) {
     return (
         <div className="flex flex-col">
-            <div className="flex flex-row items-center justify-end border-b">
-                <span className="w-full px-0.5">
-                    <p className="text-sm w-fit px-0.75">{issueID(project.blob, issueData.Issue.number)}</p>
+            <div className="flex flex-row items-center justify-end border-b h-[25px]">
+                <span className="w-full">
+                    <p className="text-sm w-fit px-1">{issueID(project.blob, issueData.Issue.number)}</p>
                 </span>
 
                 <Button variant={"dummy"} onClick={close} className="px-0 py-0 w-6 h-6">

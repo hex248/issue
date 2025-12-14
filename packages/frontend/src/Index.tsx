@@ -43,7 +43,7 @@ function Index() {
     }, [selectedProject]);
 
     return (
-        <main className="w-full h-full p-2">
+        <main className="w-full h-full p-1">
             {/* header area */}
             <div className="flex gap-2">
                 <Select
