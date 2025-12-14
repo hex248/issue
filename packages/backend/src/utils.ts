@@ -7,18 +7,20 @@ export const createDemoData = async () => {
     }
 
     const projectNames = ["PROJ", "TEST", "SAMPLE"];
+    let issuesToCreate = 3;
     for (const name of projectNames) {
         const project = await createProject(name.slice(0, 4), name, user.id);
         if (!project) {
             throw new Error(`failed to create demo project: ${name}`);
         }
 
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= issuesToCreate; i++) {
             await createIssue(
                 project.id,
                 `Issue ${i} in ${name}`,
                 `This is a description for issue ${i} in ${name}.`,
             );
         }
+        issuesToCreate++;
     }
 };
