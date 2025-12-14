@@ -1,8 +1,13 @@
-import { eq, sql, and } from "drizzle-orm";
+import { Issue, User } from "@issue/shared";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../client";
-import { Issue } from "@issue/shared";
 
-export async function createIssue(projectId: number, title: string, description: string) {
+export async function createIssue(
+    projectId: number,
+    title: string,
+    description: string,
+    assigneeId?: number,
+) {
     // prevents two issues with the same unique number
     return await db.transaction(async (tx) => {
         // raw sql for speed
@@ -22,6 +27,7 @@ export async function createIssue(projectId: number, title: string, description:
                 title,
                 description,
                 number: nextNumber,
+                assigneeId,
             })
             .returning();
 
@@ -56,4 +62,12 @@ export async function getIssueByNumber(projectId: number, number: number) {
         .from(Issue)
         .where(and(eq(Issue.projectId, projectId), eq(Issue.number, number)));
     return issue;
+}
+
+export async function getIssuesWithAssigneeByProject(projectId: number) {
+    return await db
+        .select()
+        .from(Issue)
+        .where(eq(Issue.projectId, projectId))
+        .leftJoin(User, eq(Issue.assigneeId, User.id));
 }
