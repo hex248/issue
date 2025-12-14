@@ -1,4 +1,4 @@
-import type { IssueRecord, ProjectRecord } from "@issue/shared";
+import type { IssueResponse, ProjectRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
@@ -23,8 +23,8 @@ function Index() {
             });
     }, []);
 
-    const [selectedIssue, setSelectedIssue] = useState<IssueRecord | null>(null);
-    const [issues, setIssues] = useState<IssueRecord[]>([]);
+    const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
+    const [issuesData, setIssues] = useState<IssueResponse[]>([]);
 
     const serverURL = import.meta.env.SERVER_URL?.trim() || "http://localhost:3000";
 
@@ -33,8 +33,9 @@ function Index() {
 
         fetch(`${serverURL}/issues/${selectedProject.blob}`)
             .then((res) => res.json())
-            .then((data: IssueRecord[]) => {
+            .then((data: IssueResponse[]) => {
                 setIssues(data);
+                console.log(data);
             })
             .catch((err) => {
                 console.error("error fetching issues:", err);
@@ -78,12 +79,12 @@ function Index() {
             </div>
             {/* main body */}
             <div className="w-full h-full flex items-start justify-between pt-2 gap-2">
-                {selectedProject && issues.length > 0 && (
+                {selectedProject && issuesData.length > 0 && (
                     <>
                         {/* issues list (table) */}
                         <IssuesTable
                             project={selectedProject}
-                            issues={issues}
+                            issuesData={issuesData}
                             columns={{ description: false }}
                             issueSelectAction={setSelectedIssue}
                             className="border w-full flex-shrink"
@@ -93,7 +94,7 @@ function Index() {
                             <div className="border w-2xl">
                                 <IssueDetailPane
                                     project={selectedProject}
-                                    issue={selectedIssue}
+                                    issueData={selectedIssue}
                                     close={() => setSelectedIssue(null)}
                                 />
                             </div>

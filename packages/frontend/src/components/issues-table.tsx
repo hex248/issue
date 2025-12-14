@@ -1,18 +1,18 @@
-import type { IssueRecord, ProjectRecord } from "@issue/shared";
+import type { IssueResponse, ProjectRecord } from "@issue/shared";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { cn, issueID } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 export function IssuesTable({
     project,
-    issues,
+    issuesData,
     columns = {},
     issueSelectAction,
     className,
 }: {
     project: ProjectRecord;
-    issues: IssueRecord[];
+    issuesData: IssueResponse[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
-    issueSelectAction?: (issue: IssueRecord) => void;
+    issueSelectAction?: (issue: IssueResponse) => void;
     className: string;
 }) {
     return (
@@ -31,27 +31,27 @@ export function IssuesTable({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {issues.map((issue) => (
+                {issuesData.map((issueData) => (
                     <TableRow
-                        key={issue.id}
+                        key={issueData.Issue.id}
                         className="cursor-pointer"
                         onClick={() => {
-                            issueSelectAction?.(issue);
+                            issueSelectAction?.(issueData);
                         }}
                     >
                         {(columns.id == null || columns.id === true) && (
                             <TableCell className="font-medium border-r text-right">
-                                {issue.number.toString().padStart(3, "0")}
+                                {issueData.Issue.number.toString().padStart(3, "0")}
                             </TableCell>
                         )}
                         {(columns.title == null || columns.title === true) && (
-                            <TableCell>{issue.title}</TableCell>
+                            <TableCell>{issueData.Issue.title}</TableCell>
                         )}
                         {(columns.description == null || columns.description === true) && (
-                            <TableCell className="overflow-hide">{issue.description}</TableCell>
+                            <TableCell className="overflow-hide">{issueData.Issue.description}</TableCell>
                         )}
                         {(columns.assignee == null || columns.assignee === true) && (
-                            <TableCell className={"text-right"}>?</TableCell>
+                            <TableCell className={"text-right"}>{issueData.User?.id || "?"}</TableCell>
                         )}
                     </TableRow>
                 ))}

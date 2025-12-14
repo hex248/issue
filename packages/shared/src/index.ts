@@ -20,3 +20,8 @@ export {
     IssueSelectSchema,
     IssueInsertSchema,
 } from "./schema";
+
+// Responses
+export {
+    IssueResponse,
+} from "./schema"

@@ -58,3 +58,10 @@ export type ProjectInsert = z.infer<typeof ProjectInsertSchema>;
 
 export type IssueRecord = z.infer<typeof IssueSelectSchema>;
 export type IssueInsert = z.infer<typeof IssueInsertSchema>;
+
+// Responses
+
+export type IssueResponse = {
+    Issue: IssueRecord;
+    User?: UserRecord;
+};
