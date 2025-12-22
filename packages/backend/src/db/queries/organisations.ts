@@ -1,5 +1,5 @@
 import { Organisation, OrganisationMember } from "@issue/shared";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../client";
 
 export async function createOrganisation(name: string, slug: string, description?: string) {
@@ -42,4 +42,51 @@ export async function getOrganisationsByUserId(userId: number) {
         .where(eq(OrganisationMember.userId, userId))
         .innerJoin(Organisation, eq(OrganisationMember.organisationId, Organisation.id));
     return organisations;
+}
+
+export async function updateOrganisation(
+    organisationId: number,
+    updates: { name?: string; description?: string; slug?: string },
+) {
+    const [organisation] = await db
+        .update(Organisation)
+        .set(updates)
+        .where(eq(Organisation.id, organisationId))
+        .returning();
+    return organisation;
+}
+
+export async function deleteOrganisation(organisationId: number) {
+    // Delete all organisation members first
+    await db.delete(OrganisationMember).where(eq(OrganisationMember.organisationId, organisationId));
+    // Delete the organisation
+    await db.delete(Organisation).where(eq(Organisation.id, organisationId));
+}
+
+export async function getOrganisationMembers(organisationId: number) {
+    const members = await db
+        .select()
+        .from(OrganisationMember)
+        .where(eq(OrganisationMember.organisationId, organisationId))
+        .innerJoin(Organisation, eq(OrganisationMember.organisationId, Organisation.id));
+    return members;
+}
+
+export async function removeOrganisationMember(organisationId: number, userId: number) {
+    await db
+        .delete(OrganisationMember)
+        .where(
+            and(eq(OrganisationMember.organisationId, organisationId), eq(OrganisationMember.userId, userId)),
+        );
+}
+
+export async function updateOrganisationMemberRole(organisationId: number, userId: number, role: string) {
+    const [member] = await db
+        .update(OrganisationMember)
+        .set({ role })
+        .where(
+            and(eq(OrganisationMember.organisationId, organisationId), eq(OrganisationMember.userId, userId)),
+        )
+        .returning();
+    return member;
 }
