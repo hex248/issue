@@ -80,7 +80,7 @@ function Index() {
                                     {project.Project.name}
                                 </SelectItem>
                             ))}
-                            {/* {projects.length === 0 && <>No projects</>} */}
+                            {projects.length === 0 && <>No projects</>}
                         </SelectContent>
                     </Select>
                     {selectedProject && (
