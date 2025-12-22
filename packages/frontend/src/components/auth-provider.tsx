@@ -1,6 +1,7 @@
 import type { UserRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
-import LogInForm from "./login-form";
+import Loading from "@/components/loading";
+import LogInForm from "@/components/login-form";
 
 type AuthProviderProps = {
     children: React.ReactNode;
@@ -48,5 +49,9 @@ export function Auth({ children }: AuthProviderProps) {
             </div>
         );
 
-    return <>loading...</>;
+    return (
+        <Loading>
+            <span className="text-xs px-2 py-1 bg-input">Understanding your authentication state</span>
+        </Loading>
+    );
 }
