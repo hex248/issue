@@ -1,6 +1,6 @@
 import { integer, pgTable, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import type { z } from "zod";
 
 export const User = pgTable("User", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -11,11 +11,35 @@ export const User = pgTable("User", {
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
+export const Organisation = pgTable("Organisation", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 256 }).notNull(),
+    description: varchar({ length: 1024 }),
+    slug: varchar({ length: 64 }).notNull().unique(),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+    updatedAt: timestamp({ withTimezone: false }).defaultNow(),
+});
+
+export const OrganisationMember = pgTable("OrganisationMember", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    organisationId: integer()
+        .notNull()
+        .references(() => Organisation.id),
+    userId: integer()
+        .notNull()
+        .references(() => User.id),
+    role: varchar({ length: 32 }).notNull(),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+});
+
 export const Project = pgTable("Project", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     blob: varchar({ length: 4 }).notNull(),
     name: varchar({ length: 256 }).notNull(),
-    ownerId: integer()
+    organisationId: integer()
+        .notNull()
+        .references(() => Organisation.id),
+    creatorId: integer()
         .notNull()
         .references(() => User.id),
 });
@@ -46,6 +70,12 @@ export const Issue = pgTable(
 export const UserSelectSchema = createSelectSchema(User);
 export const UserInsertSchema = createInsertSchema(User);
 
+export const OrganisationSelectSchema = createSelectSchema(Organisation);
+export const OrganisationInsertSchema = createInsertSchema(Organisation);
+
+export const OrganisationMemberSelectSchema = createSelectSchema(OrganisationMember);
+export const OrganisationMemberInsertSchema = createInsertSchema(OrganisationMember);
+
 export const ProjectSelectSchema = createSelectSchema(Project);
 export const ProjectInsertSchema = createInsertSchema(Project);
 
@@ -55,6 +85,12 @@ export const IssueInsertSchema = createInsertSchema(Issue);
 // Types
 export type UserRecord = z.infer<typeof UserSelectSchema>;
 export type UserInsert = z.infer<typeof UserInsertSchema>;
+
+export type OrganisationRecord = z.infer<typeof OrganisationSelectSchema>;
+export type OrganisationInsert = z.infer<typeof OrganisationInsertSchema>;
+
+export type OrganisationMemberRecord = z.infer<typeof OrganisationMemberSelectSchema>;
+export type OrganisationMemberInsert = z.infer<typeof OrganisationMemberInsertSchema>;
 
 export type ProjectRecord = z.infer<typeof ProjectSelectSchema>;
 export type ProjectInsert = z.infer<typeof ProjectInsertSchema>;
@@ -71,5 +107,6 @@ export type IssueResponse = {
 
 export type ProjectResponse = {
     Project: ProjectRecord;
-    User: UserRecord;
+    Organisation: OrganisationRecord;
+    Creator: UserRecord;
 };
