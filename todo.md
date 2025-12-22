@@ -1,4 +1,3 @@
-- make the login form submittable by pressing return
 - user settings/profile page
 - organisations system
 - create organisation

@@ -136,81 +136,94 @@ export default function LogInForm() {
         setError("");
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (mode === "login") {
+            logIn();
+        } else {
+            register();
+        }
+    };
+
     return (
         <div>
-            <div
-                className={cn(
-                    "flex flex-col gap-2 items-center border p-6 pb-4",
-                    error !== "" && "border-destructive",
-                )}
-            >
-                <span className="text-xl mb-2">{capitalise(mode)}</span>
+            <form onSubmit={handleSubmit}>
+                <div
+                    className={cn(
+                        "flex flex-col gap-2 items-center border p-6 pb-4",
+                        error !== "" && "border-destructive",
+                    )}
+                >
+                    <span className="text-xl mb-2">{capitalise(mode)}</span>
 
-                {mode === "register" && (
+                    {mode === "register" && (
+                        <Field
+                            label="Full Name"
+                            onChange={(e) => {
+                                if (e.target.value !== "") setNameInvalid("");
+                                else setNameInvalid("Cannot be empty");
+                                setName(e.target.value);
+                            }}
+                            invalidMessage={nameInvalid}
+                        />
+                    )}
                     <Field
-                        label="Full Name"
+                        label="Username"
                         onChange={(e) => {
-                            if (e.target.value !== "") setNameInvalid("");
-                            else setNameInvalid("Cannot be empty");
-                            setName(e.target.value);
+                            if (e.target.value !== "") setUsernameInvalid("");
+                            else setUsernameInvalid("Cannot be empty");
+                            setUsername(e.target.value);
                         }}
-                        invalidMessage={nameInvalid}
+                        invalidMessage={usernameInvalid}
                     />
-                )}
-                <Field
-                    label="Username"
-                    onChange={(e) => {
-                        if (e.target.value !== "") setUsernameInvalid("");
-                        else setUsernameInvalid("Cannot be empty");
-                        setUsername(e.target.value);
-                    }}
-                    invalidMessage={usernameInvalid}
-                />
-                <Field
-                    label="Password"
-                    onChange={(e) => {
-                        if (e.target.value !== "") setPasswordInvalid("");
-                        else setPasswordInvalid("Cannot be empty");
-                        setPassword(e.target.value);
-                    }}
-                    invalidMessage={passwordInvalid}
-                    hidden={true}
-                />
+                    <Field
+                        label="Password"
+                        onChange={(e) => {
+                            if (e.target.value !== "") setPasswordInvalid("");
+                            else setPasswordInvalid("Cannot be empty");
+                            setPassword(e.target.value);
+                        }}
+                        invalidMessage={passwordInvalid}
+                        hidden={true}
+                    />
 
-                {mode === "login" ? (
-                    <>
-                        <Button variant={"outline"} onClick={logIn} type={"submit"}>
-                            Log in
-                        </Button>
-                        <Button
-                            className="text-xs hover:underline p-0"
-                            variant={"dummy"}
-                            onClick={() => {
-                                setMode("register");
-                                resetForm();
-                            }}
-                        >
-                            I don't have an account
-                        </Button>
-                    </>
-                ) : (
-                    <>
-                        <Button variant={"outline"} onClick={register} type={"submit"}>
-                            Register
-                        </Button>
-                        <Button
-                            className="text-xs hover:underline p-0"
-                            variant={"dummy"}
-                            onClick={() => {
-                                setMode("login");
-                                resetForm();
-                            }}
-                        >
-                            I already have an account
-                        </Button>
-                    </>
-                )}
-            </div>
+                    {mode === "login" ? (
+                        <>
+                            <Button variant={"outline"} type={"submit"}>
+                                Log in
+                            </Button>
+                            <Button
+                                className="text-xs hover:underline p-0"
+                                variant={"dummy"}
+                                type="button"
+                                onClick={() => {
+                                    setMode("register");
+                                    resetForm();
+                                }}
+                            >
+                                I don't have an account
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant={"outline"} type={"submit"}>
+                                Register
+                            </Button>
+                            <Button
+                                className="text-xs hover:underline p-0"
+                                variant={"dummy"}
+                                type="button"
+                                onClick={() => {
+                                    setMode("login");
+                                    resetForm();
+                                }}
+                            >
+                                I already have an account
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </form>
             <div className="flex items-end justify-end w-full text-xs -mb-4">
                 {error !== "" ? (
                     <Label className="text-destructive text-sm">{error}</Label>
