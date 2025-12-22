@@ -14,3 +14,7 @@ export function getAuthHeaders(): Headers {
     if (!token) return new Headers();
     return new Headers({ Authorization: `Bearer ${token}` });
 }
+
+export function capitalise(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
