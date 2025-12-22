@@ -1,7 +1,7 @@
 - user settings/profile page
-- organisations system
 - create organisation
 - create project
 - create issue
 - add user(s) to project
 - replace "no projects" text with create project button
+- rename Project.blob to Project.key

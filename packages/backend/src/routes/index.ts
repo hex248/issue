@@ -6,6 +6,15 @@ import issueDelete from "./issue/delete";
 import issueUpdate from "./issue/update";
 import issuesInProject from "./issues/[projectBlob]";
 import issues from "./issues/all";
+import organisationAddMember from "./organisation/add-member";
+import organisationById from "./organisation/by-id";
+import organisationByUser from "./organisation/by-user";
+import organisationCreate from "./organisation/create";
+import organisationDelete from "./organisation/delete";
+import organisationMembers from "./organisation/members";
+import organisationRemoveMember from "./organisation/remove-member";
+import organisationUpdate from "./organisation/update";
+import organisationUpdateMemberRole from "./organisation/update-member-role";
 import projectsAll from "./project/all";
 import projectsByCreator from "./project/by-creator";
 import projectCreate from "./project/create";
@@ -21,6 +30,16 @@ export const routes = {
 
     issuesInProject,
     issues,
+
+    organisationCreate,
+    organisationById,
+    organisationByUser,
+    organisationUpdate,
+    organisationDelete,
+    organisationAddMember,
+    organisationMembers,
+    organisationRemoveMember,
+    organisationUpdateMemberRole,
 
     projectCreate,
     projectUpdate,

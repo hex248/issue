@@ -23,6 +23,16 @@ const main = async () => {
             "/issues/:projectBlob": withCors(withAuth(routes.issuesInProject)),
             "/issues/all": withCors(withAuth(routes.issues)),
 
+            "/organisation/create": withCors(withAuth(routes.organisationCreate)),
+            "/organisation/by-id": withCors(withAuth(routes.organisationById)),
+            "/organisation/by-user": withCors(withAuth(routes.organisationByUser)),
+            "/organisation/update": withCors(withAuth(routes.organisationUpdate)),
+            "/organisation/delete": withCors(withAuth(routes.organisationDelete)),
+            "/organisation/add-member": withCors(withAuth(routes.organisationAddMember)),
+            "/organisation/members": withCors(withAuth(routes.organisationMembers)),
+            "/organisation/remove-member": withCors(withAuth(routes.organisationRemoveMember)),
+            "/organisation/update-member-role": withCors(withAuth(routes.organisationUpdateMemberRole)),
+
             "/project/create": withCors(withAuth(routes.projectCreate)),
             "/project/update": withCors(withAuth(routes.projectUpdate)),
             "/project/delete": withCors(withAuth(routes.projectDelete)),
