@@ -69,7 +69,7 @@ export default function LogInForm() {
                     const data = await res.json();
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", data.user);
-                    window.location.href = "/";
+                    window.location.href = "";
                 }
                 // unauthorized
                 else if (res.status === 401) {

@@ -5,7 +5,7 @@ export default function LogOutButton() {
     const logOut = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/";
+        window.location.href = "";
     };
 
     return (

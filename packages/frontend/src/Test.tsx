@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import LogOutButton from "./components/log-out-button";
 
 function Test() {
     return (
@@ -9,6 +10,7 @@ function Test() {
             <div className="flex gap-4">
                 <Button linkTo="/">go back to "/"</Button>
             </div>
+            <LogOutButton />
         </main>
     );
 }
