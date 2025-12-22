@@ -4,8 +4,8 @@ import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAuthHeaders } from "@/lib/utils";
 import LogOutButton from "./components/log-out-button";
-import { getAuthHeaders } from "./lib/utils";
 
 function Index() {
     const serverURL = import.meta.env.SERVER_URL?.trim() || "http://localhost:3000";
@@ -20,7 +20,7 @@ function Index() {
         if (projectsRef.current) return;
         projectsRef.current = true;
 
-        fetch(`${serverURL}/projects/all`, { headers: getAuthHeaders() })
+        fetch(`${serverURL}/projects/by-owner?ownerId=${user.id}`, { headers: getAuthHeaders() })
             .then((res) => res.json())
             .then((data: ProjectResponse[]) => {
                 setProjects(data);
@@ -28,7 +28,7 @@ function Index() {
             .catch((err) => {
                 console.error("error fetching projects:", err);
             });
-    }, []);
+    }, [user.id]);
 
     const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
     const [issuesData, setIssues] = useState<IssueResponse[]>([]);
