@@ -11,7 +11,9 @@
         "db:push": "npx drizzle-kit push"
     },
     "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
         "@types/bun": "latest",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/pg": "^8.15.6",
         "drizzle-kit": "^0.31.8",
         "tsx": "^4.21.0"
@@ -21,8 +23,10 @@
     },
     "dependencies": {
         "@issue/shared": "workspace:*",
+        "bcrypt": "^6.0.0",
         "dotenv": "^17.2.3",
         "drizzle-orm": "^0.45.0",
+        "jsonwebtoken": "^9.0.3",
         "pg": "^8.16.3"
     },
     "engines": {
