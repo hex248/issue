@@ -2,7 +2,7 @@ import { type ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { capitalise, cn, getAuthHeaders } from "@/lib/utils";
+import { capitalise, cn } from "@/lib/utils";
 
 function Field({
     label = "label",
@@ -63,7 +63,7 @@ export default function LogInForm() {
 
         fetch(`${serverURL}/auth/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+            headers: { "Content-Type": "application/json" },
 
             body: JSON.stringify({ username, password }),
         })
@@ -72,7 +72,7 @@ export default function LogInForm() {
                     setError("");
                     const data = await res.json();
                     localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", data.user);
+                    localStorage.setItem("user", JSON.stringify(data.user));
                     window.location.href = "";
                 }
                 // unauthorized
@@ -104,7 +104,7 @@ export default function LogInForm() {
 
         fetch(`${serverURL}/auth/register`, {
             method: "POST",
-            headers: { "Content-type": "application/json" },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 name,
                 username,
@@ -116,7 +116,7 @@ export default function LogInForm() {
                     setError("");
                     const data = await res.json();
                     localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", data.user);
+                    localStorage.setItem("user", JSON.stringify(data.user));
                     window.location.href = "";
                 }
                 // bad request (probably a bad user input)
