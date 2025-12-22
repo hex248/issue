@@ -1,4 +1,4 @@
-import { integer, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { integer, pgTable, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -6,6 +6,9 @@ export const User = pgTable("User", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 256 }).notNull(),
     username: varchar({ length: 32 }).notNull().unique(),
+    passwordHash: varchar({ length: 255 }).notNull(),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+    updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
 export const Project = pgTable("Project", {

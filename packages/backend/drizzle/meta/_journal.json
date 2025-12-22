@@ -29,6 +29,13 @@
       "when": 1765748942767,
       "tag": "0003_steady_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766365630065,
+      "tag": "0004_slow_demogoblin",
+      "breakpoints": true
     }
   ]
 }
