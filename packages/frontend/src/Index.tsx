@@ -6,12 +6,13 @@ import SmallUserDisplay from "@/components/small-user-display";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAuthHeaders } from "@/lib/utils";
 import LogOutButton from "./components/log-out-button";
-import Loading from "./components/loading";
 
 function Index() {
     const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
 
     const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
+
+    const [projectSelectOpen, setProjectSelectOpen] = useState(false);
 
     const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
     const [projects, setProjects] = useState<ProjectResponse[]>([]);
@@ -50,8 +51,8 @@ function Index() {
     return (
         <main className="w-full h-full p-1">
             {/* header area */}
-            <div className="flex gap-4 items-center justify-between">
-                <div className="flex gap-4 items-center">
+            <div className="flex gap-12 items-center justify-between">
+                <div className="flex gap-2 items-center">
                     <Select
                         onValueChange={(value) => {
                             if (value === "NONE") {
@@ -67,8 +68,9 @@ function Index() {
                             setSelectedProject(project);
                             setSelectedIssue(null);
                         }}
+                        onOpenChange={setProjectSelectOpen}
                     >
-                        <SelectTrigger className="h-8 lg:flex">
+                        <SelectTrigger className="h-8 lg:flex" isOpen={projectSelectOpen}>
                             <SelectValue
                                 placeholder={
                                     selectedProject ? `P: ${selectedProject.Project.name}` : "Select Project"

@@ -20,8 +20,10 @@ function SelectTrigger({
     className,
     size = "default",
     children,
+    isOpen,
     ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+    isOpen?: boolean;
     size?: "sm" | "default";
 }) {
     return (
@@ -46,7 +48,10 @@ function SelectTrigger({
         >
             {children}
             <SelectPrimitive.Icon asChild>
-                <ChevronDownIcon className="size-4 opacity-50" />
+                <ChevronDownIcon
+                    className="size-4 opacity-50"
+                    style={{ rotate: isOpen ? "180deg" : "0deg" }}
+                />
             </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
     );
@@ -73,7 +78,7 @@ function SelectContent({
                     "origin-(--radix-select-content-transform-origin) overflow-x-hidden",
                     "overflow-y-auto border shadow-md",
                     position === "popper" &&
-                        "data-[side=bottom]:translate-y-1 data-[side=bottom]:-translate-x-0.5 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 data-[side=top]:-translate-x-0.5",
+                        "data-[side=bottom]:translate-y-1 data-[side=bottom]:-translate-x-1.5 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 data-[side=top]:-translate-x-0.5",
                     className,
                 )}
                 position={position}
