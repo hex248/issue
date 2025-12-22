@@ -7,12 +7,12 @@ import issueUpdate from "./issue/update";
 import issuesInProject from "./issues/[projectBlob]";
 import issues from "./issues/all";
 import projectsAll from "./project/all";
-import projectsByOwner from "./project/by-owner";
+import projectsByCreator from "./project/by-creator";
 import projectCreate from "./project/create";
 import projectDelete from "./project/delete";
 import projectUpdate from "./project/update";
-import projectWithOwner from "./project/with-owner";
-import projectsWithOwners from "./project/with-owners";
+import projectWithCreator from "./project/with-creator";
+import projectsWithCreators from "./project/with-creators";
 
 export const routes = {
     issueCreate,
@@ -25,10 +25,10 @@ export const routes = {
     projectCreate,
     projectUpdate,
     projectDelete,
-    projectsByOwner,
+    projectsByCreator,
     projectsAll,
-    projectsWithOwners,
-    projectWithOwner,
+    projectsWithCreators,
+    projectWithCreator,
 
     authRegister,
     authLogin,

@@ -22,7 +22,7 @@ function Index() {
         if (projectsRef.current) return;
         projectsRef.current = true;
 
-        fetch(`${serverURL}/projects/by-owner?ownerId=${user.id}`, { headers: getAuthHeaders() })
+        fetch(`${serverURL}/projects/by-creator?creatorId=${user.id}`, { headers: getAuthHeaders() })
             .then((res) => res.json())
             .then((data: ProjectResponse[]) => {
                 setProjects(data);
@@ -88,7 +88,7 @@ function Index() {
                     </Select>
                     {selectedProject && (
                         <div className="flex items-center gap-2">
-                            Owner: <SmallUserDisplay user={selectedProject?.User} />
+                            Creator: <SmallUserDisplay user={selectedProject?.User} />
                         </div>
                     )}
                 </div>

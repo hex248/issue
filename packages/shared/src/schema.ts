@@ -108,5 +108,5 @@ export type IssueResponse = {
 export type ProjectResponse = {
     Project: ProjectRecord;
     Organisation: OrganisationRecord;
-    Creator: UserRecord;
+    User: UserRecord;
 };

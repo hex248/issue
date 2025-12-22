@@ -1,16 +1,17 @@
 import type { BunRequest } from "bun";
-import { createProject, getUserById, getProjectByBlob } from "../../db/queries";
+import { createProject, getProjectByBlob, getUserById } from "../../db/queries";
 
-// /project/create?blob=BLOB&name=Testing&ownerId=1
+// /project/create?blob=BLOB&name=Testing&creatorId=1&organisationId=1
 export default async function projectCreate(req: BunRequest) {
     const url = new URL(req.url);
     const blob = url.searchParams.get("blob");
     const name = url.searchParams.get("name");
-    const ownerId = url.searchParams.get("ownerId");
+    const creatorId = url.searchParams.get("creatorId");
+    const organisationId = url.searchParams.get("organisationId");
 
-    if (!blob || !name || !ownerId) {
+    if (!blob || !name || !creatorId || !organisationId) {
         return new Response(
-            `missing parameters: ${!blob ? "blob " : ""}${!name ? "name " : ""}${!ownerId ? "ownerId" : ""}`,
+            `missing parameters: ${!blob ? "blob " : ""}${!name ? "name " : ""}${!creatorId ? "creatorId " : ""}${!organisationId ? "organisationId" : ""}`,
             { status: 400 },
         );
     }
@@ -21,12 +22,12 @@ export default async function projectCreate(req: BunRequest) {
         return new Response(`project with blob ${blob} already exists`, { status: 400 });
     }
 
-    const owner = await getUserById(parseInt(ownerId, 10));
-    if (!owner) {
-        return new Response(`owner with id ${ownerId} not found`, { status: 404 });
+    const creator = await getUserById(parseInt(creatorId, 10));
+    if (!creator) {
+        return new Response(`creator with id ${creatorId} not found`, { status: 404 });
     }
 
-    const project = await createProject(blob, name, owner.id);
+    const project = await createProject(blob, name, creator.id, parseInt(organisationId, 10));
 
     return Response.json(project);
 }

@@ -1,10 +1,14 @@
 // Drizzle tables
-export { User, Project, Issue } from "./schema";
+export { User, Project, Issue, Organisation, OrganisationMember } from "./schema";
 
 // Types
 export type {
     UserRecord,
     UserInsert,
+    OrganisationRecord,
+    OrganisationInsert,
+    OrganisationMemberRecord,
+    OrganisationMemberInsert,
     ProjectRecord,
     ProjectInsert,
     IssueRecord,
@@ -15,6 +19,10 @@ export type {
 export {
     UserSelectSchema,
     UserInsertSchema,
+    OrganisationSelectSchema,
+    OrganisationInsertSchema,
+    OrganisationMemberSelectSchema,
+    OrganisationMemberInsertSchema,
     ProjectSelectSchema,
     ProjectInsertSchema,
     IssueSelectSchema,
@@ -25,4 +33,4 @@ export {
 export type {
     IssueResponse,
     ProjectResponse,
-} from "./schema"
+} from "./schema";

@@ -2,13 +2,14 @@ import { Issue, Project, User } from "@issue/shared";
 import { eq } from "drizzle-orm";
 import { db } from "../client";
 
-export async function createProject(blob: string, name: string, ownerId: number) {
+export async function createProject(blob: string, name: string, creatorId: number, organisationId: number) {
     const [project] = await db
         .insert(Project)
         .values({
             blob,
             name,
-            ownerId,
+            creatorId,
+            organisationId,
         })
         .returning();
     return project;
@@ -16,7 +17,7 @@ export async function createProject(blob: string, name: string, ownerId: number)
 
 export async function updateProject(
     projectId: number,
-    updates: { blob?: string; name?: string; ownerId?: number },
+    updates: { blob?: string; name?: string; creatorId?: number; organisationId?: number },
 ) {
     const [project] = await db.update(Project).set(updates).where(eq(Project.id, projectId)).returning();
     return project;
@@ -39,13 +40,13 @@ export async function getProjectByBlob(projectBlob: string) {
     return project;
 }
 
-export async function getProjectsByOwnerID(ownerId: number) {
-    const projectsWithOwners = await db
+export async function getProjectsByCreatorID(creatorId: number) {
+    const projectsWithCreators = await db
         .select()
         .from(Project)
-        .where(eq(Project.ownerId, ownerId))
-        .leftJoin(User, eq(Project.ownerId, User.id));
-    return projectsWithOwners;
+        .where(eq(Project.creatorId, creatorId))
+        .leftJoin(User, eq(Project.creatorId, User.id));
+    return projectsWithCreators;
 }
 
 export async function getAllProjects() {
@@ -53,16 +54,19 @@ export async function getAllProjects() {
     return projects;
 }
 
-export async function getProjectsWithOwners() {
-    const projectsWithOwners = await db.select().from(Project).leftJoin(User, eq(Project.ownerId, User.id));
-    return projectsWithOwners;
-}
-
-export async function getProjectWithOwnerByID(projectId: number) {
-    const [projectWithOwner] = await db
+export async function getProjectsWithCreators() {
+    const projectsWithCreators = await db
         .select()
         .from(Project)
-        .leftJoin(User, eq(Project.ownerId, User.id))
+        .leftJoin(User, eq(Project.creatorId, User.id));
+    return projectsWithCreators;
+}
+
+export async function getProjectWithCreatorByID(projectId: number) {
+    const [projectWithCreator] = await db
+        .select()
+        .from(Project)
+        .leftJoin(User, eq(Project.creatorId, User.id))
         .where(eq(Project.id, projectId));
-    return projectWithOwner;
+    return projectWithCreator;
 }

@@ -1,8 +1,8 @@
 import type { BunRequest } from "bun";
 import { getProjectsWithCreators } from "../../db/queries";
 
-// /projects/all
-export default async function projectsAll(req: BunRequest) {
+// /projects/with-creators
+export default async function projectsWithCreators(req: BunRequest) {
     const projects = await getProjectsWithCreators();
 
     return Response.json(projects);

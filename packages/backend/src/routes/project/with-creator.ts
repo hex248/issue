@@ -1,8 +1,8 @@
 import type { BunRequest } from "bun";
-import { getProjectWithOwnerByID } from "../../db/queries";
+import { getProjectWithCreatorByID } from "../../db/queries";
 
-// /project/with-owner?id=1
-export default async function projectWithOwnerByID(req: BunRequest) {
+// /project/with-creator?id=1
+export default async function projectWithCreatorByID(req: BunRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
 
@@ -15,10 +15,10 @@ export default async function projectWithOwnerByID(req: BunRequest) {
         return new Response("project id must be an integer", { status: 400 });
     }
 
-    const projectWithOwner = await getProjectWithOwnerByID(projectId);
-    if (!projectWithOwner || !projectWithOwner.Project) {
+    const projectWithCreator = await getProjectWithCreatorByID(projectId);
+    if (!projectWithCreator || !projectWithCreator.Project) {
         return new Response(`project with id ${id} not found`, { status: 404 });
     }
 
-    return Response.json(projectWithOwner);
+    return Response.json(projectWithCreator);
 }

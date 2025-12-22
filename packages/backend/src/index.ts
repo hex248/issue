@@ -26,10 +26,10 @@ const main = async () => {
             "/project/create": withCors(withAuth(routes.projectCreate)),
             "/project/update": withCors(withAuth(routes.projectUpdate)),
             "/project/delete": withCors(withAuth(routes.projectDelete)),
-            "/projects/by-owner": withCors(withAuth(routes.projectsByOwner)),
+            "/projects/by-creator": withCors(withAuth(routes.projectsByCreator)),
             "/projects/all": withCors(withAuth(routes.projectsAll)),
-            "/projects/with-owners": withCors(withAuth(routes.projectsWithOwners)),
-            "/project/with-owner": withCors(withAuth(routes.projectWithOwner)),
+            "/projects/with-creators": withCors(withAuth(routes.projectsWithCreators)),
+            "/project/with-creator": withCors(withAuth(routes.projectWithCreator)),
         },
     });
 

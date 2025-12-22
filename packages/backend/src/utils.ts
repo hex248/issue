@@ -1,5 +1,11 @@
 import { hashPassword } from "./auth/utils";
-import { createIssue, createProject, createUser } from "./db/queries";
+import {
+    createIssue,
+    createOrganisation,
+    createOrganisationMember,
+    createProject,
+    createUser,
+} from "./db/queries";
 
 export const createDemoData = async () => {
     const passwordHash = await hashPassword("changeme");
@@ -8,10 +14,23 @@ export const createDemoData = async () => {
         throw new Error("failed to create demo user");
     }
 
+    // create demo organisation
+    const organisation = await createOrganisation(
+        "Demo Organisation",
+        "demo-org",
+        "A demo organisation for testing",
+    );
+    if (!organisation) {
+        throw new Error("failed to create demo organisation");
+    }
+
+    // add user as owner of the organisation
+    await createOrganisationMember(organisation.id, user.id, "owner");
+
     const projectNames = ["PROJ", "TEST", "SAMPLE"];
     let issuesToCreate = 3;
     for (const name of projectNames) {
-        const project = await createProject(name.slice(0, 4), name, user.id);
+        const project = await createProject(name.slice(0, 4), name, user.id, organisation.id);
         if (!project) {
             throw new Error(`failed to create demo project: ${name}`);
         }
