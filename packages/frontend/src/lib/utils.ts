@@ -9,10 +9,10 @@ export function issueID(blob: string, num: number) {
     return `${blob}-${num.toString().padStart(3, "0")}`;
 }
 
-export function getAuthHeaders(): Headers {
+export function getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem("token");
-    if (!token) return new Headers();
-    return new Headers({ Authorization: `Bearer ${token}` });
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
 }
 
 export function capitalise(str: string) {
