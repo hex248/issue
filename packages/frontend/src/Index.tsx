@@ -6,6 +6,7 @@ import SmallUserDisplay from "@/components/small-user-display";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAuthHeaders } from "@/lib/utils";
 import LogOutButton from "./components/log-out-button";
+import Loading from "./components/loading";
 
 function Index() {
     const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";

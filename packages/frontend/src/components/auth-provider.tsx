@@ -51,9 +51,5 @@ export function Auth({ children }: AuthProviderProps) {
             </div>
         );
 
-    return (
-        <Loading>
-            <span className="text-xs px-2 py-1 bg-input">Understanding your authentication state</span>
-        </Loading>
-    );
+    return <Loading message={"Understanding your authentication state"} />;
 }
