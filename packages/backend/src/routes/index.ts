@@ -17,6 +17,7 @@ import organisationUpdate from "./organisation/update";
 import organisationUpdateMemberRole from "./organisation/update-member-role";
 import projectsAll from "./project/all";
 import projectsByCreator from "./project/by-creator";
+import projectsByOrganisation from "./project/by-organisation";
 import projectCreate from "./project/create";
 import projectDelete from "./project/delete";
 import projectUpdate from "./project/update";
@@ -45,6 +46,7 @@ export const routes = {
     projectUpdate,
     projectDelete,
     projectsByCreator,
+    projectsByOrganisation,
     projectsAll,
     projectsWithCreators,
     projectWithCreator,

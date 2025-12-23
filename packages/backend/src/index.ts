@@ -37,6 +37,7 @@ const main = async () => {
             "/project/update": withCors(withAuth(routes.projectUpdate)),
             "/project/delete": withCors(withAuth(routes.projectDelete)),
             "/projects/by-creator": withCors(withAuth(routes.projectsByCreator)),
+            "/projects/by-organisation": withCors(withAuth(routes.projectsByOrganisation)),
             "/projects/all": withCors(withAuth(routes.projectsAll)),
             "/projects/with-creators": withCors(withAuth(routes.projectsWithCreators)),
             "/project/with-creator": withCors(withAuth(routes.projectWithCreator)),
