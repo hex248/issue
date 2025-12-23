@@ -1,4 +1,4 @@
-import type { IssueResponse, ProjectResponse, UserRecord } from "@issue/shared";
+import type { IssueResponse, OrganisationResponse, ProjectResponse, UserRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
@@ -12,29 +12,59 @@ function Index() {
 
     const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
 
-    const [projectSelectOpen, setProjectSelectOpen] = useState(false);
+    const organisationsRef = useRef(false);
+    const [organisations, setOrganisations] = useState<OrganisationResponse[]>([]);
+    const [organisationSelectOpen, setOrganisationSelectOpen] = useState(false);
+    const [selectedOrganisation, setSelectedOrganisation] = useState<OrganisationResponse | null>(null);
 
-    const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
     const [projects, setProjects] = useState<ProjectResponse[]>([]);
-    const projectsRef = useRef(false);
+    const [projectSelectOpen, setProjectSelectOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
+
+    const [issues, setIssues] = useState<IssueResponse[]>([]);
+    const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
 
     useEffect(() => {
-        if (projectsRef.current) return;
-        projectsRef.current = true;
+        if (organisationsRef.current) return;
+        organisationsRef.current = true;
 
-        fetch(`${serverURL}/projects/by-creator?creatorId=${user.id}`, { headers: getAuthHeaders() })
+        fetch(`${serverURL}/organisation/by-user?userId=${user.id}`, { headers: getAuthHeaders() })
+            .then((res) => res.json())
+            .then((data: Array<OrganisationResponse>) => {
+                setOrganisations(data);
+            })
+            .catch((err) => {
+                console.error("error fetching organisations:", err);
+            });
+    }, [user.id]);
+
+    // fetch projects when organisation is selected
+    useEffect(() => {
+        setProjects([]);
+        setSelectedProject(null);
+        setSelectedIssue(null);
+        setIssues([]);
+        if (!selectedOrganisation) {
+            return;
+        }
+
+        fetch(
+            `${serverURL}/projects/by-organisation?organisationId=${selectedOrganisation.Organisation.id}`,
+            {
+                headers: getAuthHeaders(),
+            },
+        )
             .then((res) => res.json())
             .then((data: ProjectResponse[]) => {
                 setProjects(data);
             })
             .catch((err) => {
                 console.error("error fetching projects:", err);
+                setProjects([]);
             });
-    }, [user.id]);
+    }, [selectedOrganisation]);
 
-    const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
-    const [issuesData, setIssues] = useState<IssueResponse[]>([]);
-
+    // fetch issues when project is selected
     useEffect(() => {
         if (!selectedProject) return;
 
@@ -53,43 +83,86 @@ function Index() {
             {/* header area */}
             <div className="flex gap-12 items-center justify-between">
                 <div className="flex gap-2 items-center">
+                    {/* organisation selection */}
                     <Select
+                        value={`${selectedOrganisation?.Organisation.id}`}
                         onValueChange={(value) => {
                             if (value === "NONE") {
-                                setSelectedProject(null);
-                                setSelectedIssue(null);
-                                setIssues([]);
-                            }
-                            const project = projects.find((p) => p.Project.id === Number(value));
-                            if (!project) {
-                                console.error(`NO PROJECT FOUND FOR ID: ${value}`);
+                                setSelectedOrganisation(null);
                                 return;
                             }
-                            setSelectedProject(project);
-                            setSelectedIssue(null);
+                            const organisation = organisations.find(
+                                (o) => o.Organisation.id === Number(value),
+                            );
+                            if (!organisation) {
+                                console.error(`NO ORGANISATION FOUND FOR ID: ${value}`);
+                                return;
+                            }
+                            setSelectedOrganisation(organisation);
                         }}
-                        onOpenChange={setProjectSelectOpen}
+                        onOpenChange={setOrganisationSelectOpen}
                     >
-                        <SelectTrigger className="h-8 lg:flex" isOpen={projectSelectOpen}>
+                        <SelectTrigger className="h-8 lg:flex" isOpen={organisationSelectOpen}>
                             <SelectValue
                                 placeholder={
-                                    selectedProject ? `P: ${selectedProject.Project.name}` : "Select Project"
+                                    selectedOrganisation
+                                        ? `O: ${selectedOrganisation.Organisation.name}`
+                                        : "Select Organisation"
                                 }
                             />
                         </SelectTrigger>
                         <SelectContent side="bottom" position="popper">
-                            {projects.map((project) => (
-                                <SelectItem key={project.Project.id} value={`${project.Project.id}`}>
-                                    {project.Project.name}
+                            {organisations.map((organisation) => (
+                                <SelectItem
+                                    key={organisation.Organisation.id}
+                                    value={`${organisation.Organisation.id}`}
+                                >
+                                    {organisation.Organisation.name}
                                 </SelectItem>
                             ))}
-                            {projects.length === 0 && <>No projects</>}
+                            {organisations.length === 0 && <>No organisations</>}
                         </SelectContent>
                     </Select>
-                    {selectedProject && (
-                        <div className="flex items-center gap-2">
-                            Creator: <SmallUserDisplay user={selectedProject?.User} />
-                        </div>
+
+                    {/* project selection - only shown when organisation is selected */}
+                    {selectedOrganisation && (
+                        <Select
+                            value={`${selectedProject?.Project.id}`}
+                            onValueChange={(value) => {
+                                if (value === "NONE") {
+                                    setSelectedProject(null);
+                                    setSelectedIssue(null);
+                                    setIssues([]);
+                                    return;
+                                }
+                                const project = projects.find((p) => p.Project.id === Number(value));
+                                if (!project) {
+                                    console.error(`NO PROJECT FOUND FOR ID: ${value}`);
+                                    return;
+                                }
+                                setSelectedProject(project);
+                                setSelectedIssue(null);
+                            }}
+                            onOpenChange={setProjectSelectOpen}
+                        >
+                            <SelectTrigger className="h-8 lg:flex" isOpen={projectSelectOpen}>
+                                <SelectValue
+                                    placeholder={
+                                        selectedProject
+                                            ? `P: ${selectedProject.Project.name}`
+                                            : "Select Project"
+                                    }
+                                />
+                            </SelectTrigger>
+                            <SelectContent side="bottom" position="popper">
+                                {projects.map((project) => (
+                                    <SelectItem key={project.Project.id} value={`${project.Project.id}`}>
+                                        {project.Project.name}
+                                    </SelectItem>
+                                ))}
+                                {projects.length === 0 && <>No projects in this organisation</>}
+                            </SelectContent>
+                        </Select>
                     )}
                 </div>
 
@@ -102,12 +175,12 @@ function Index() {
             </div>
             {/* main body */}
             <div className="w-full h-full flex items-start justify-between pt-1 gap-2">
-                {selectedProject && issuesData.length > 0 && (
+                {selectedProject && issues.length > 0 && (
                     <>
                         {/* issues list (table) */}
                         <IssuesTable
                             project={selectedProject}
-                            issuesData={issuesData}
+                            issuesData={issues}
                             columns={{ description: false }}
                             issueSelectAction={setSelectedIssue}
                             className="border w-full flex-shrink"
