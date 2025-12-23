@@ -1,4 +1,5 @@
 import type { IssueResponse, ProjectResponse } from "@issue/shared";
+import Avatar from "@/components/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,9 @@ export function IssuesTable({
                             <TableCell className="overflow-hide">{issueData.Issue.description}</TableCell>
                         )}
                         {(columns.assignee == null || columns.assignee === true) && (
-                            <TableCell className={"text-right"}>{issueData.User?.id || "?"}</TableCell>
+                            <TableCell className={"w-[0px] text-center px-1 py-0"}>
+                                {issueData.User ? <Avatar user={issueData.User} size={6} /> : "?"}
+                            </TableCell>
                         )}
                     </TableRow>
                 ))}
