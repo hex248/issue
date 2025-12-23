@@ -1,4 +1,4 @@
-import { Issue, Project, User } from "@issue/shared";
+import { Issue, Organisation, Project, User } from "@issue/shared";
 import { eq } from "drizzle-orm";
 import { db } from "../client";
 
@@ -69,4 +69,14 @@ export async function getProjectWithCreatorByID(projectId: number) {
         .leftJoin(User, eq(Project.creatorId, User.id))
         .where(eq(Project.id, projectId));
     return projectWithCreator;
+}
+
+export async function getProjectsByOrganisationId(organisationId: number) {
+    const projects = await db
+        .select()
+        .from(Project)
+        .where(eq(Project.organisationId, organisationId))
+        .leftJoin(User, eq(Project.creatorId, User.id))
+        .leftJoin(Organisation, eq(Project.organisationId, Organisation.id));
+    return projects;
 }
