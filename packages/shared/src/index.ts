@@ -33,4 +33,5 @@ export {
 export type {
     IssueResponse,
     ProjectResponse,
+    OrganisationResponse,
 } from "./schema";

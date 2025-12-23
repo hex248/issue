@@ -110,3 +110,8 @@ export type ProjectResponse = {
     Organisation: OrganisationRecord;
     User: UserRecord;
 };
+
+export type OrganisationResponse = {
+    Organisation: OrganisationRecord;
+    OrganisationMember: OrganisationMemberRecord;
+};
