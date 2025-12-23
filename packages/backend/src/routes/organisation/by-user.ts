@@ -1,8 +1,8 @@
-import type { BunRequest } from "bun";
+import type { AuthedRequest } from "../../auth/middleware";
 import { getOrganisationsByUserId, getUserById } from "../../db/queries";
 
 // /organisation/by-user?userId=1
-export default async function organisationsByUser(req: BunRequest) {
+export default async function organisationsByUser(req: AuthedRequest) {
     const url = new URL(req.url);
     const userId = url.searchParams.get("userId");
 
@@ -13,6 +13,11 @@ export default async function organisationsByUser(req: BunRequest) {
     const userIdNumber = Number(userId);
     if (!Number.isInteger(userIdNumber)) {
         return new Response("userId must be an integer", { status: 400 });
+    }
+
+    // Users can only view their own organisations
+    if (req.userId !== userIdNumber) {
+        return new Response("Access denied: you can only view your own organisations", { status: 403 });
     }
 
     const user = await getUserById(userIdNumber);
