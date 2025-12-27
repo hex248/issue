@@ -68,6 +68,7 @@ function SelectContent({
         <SelectPrimitive.Portal>
             <SelectPrimitive.Content
                 data-slot="select-content"
+                data-align={align}
                 className={cn(
                     "bg-popover text-popover-foreground",
                     "data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95",
@@ -79,6 +80,7 @@ function SelectContent({
                     "overflow-y-auto border shadow-md",
                     position === "popper" &&
                         "data-[side=bottom]:translate-y-1 data-[side=bottom]:-translate-x-1.5 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 data-[side=top]:-translate-x-0.5",
+                    position === "popper" && align === "start" && "data-[side=bottom]:-translate-x-0",
                     className,
                 )}
                 position={position}
