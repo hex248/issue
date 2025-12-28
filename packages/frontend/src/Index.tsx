@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
+import LogOutButton from "@/components/log-out-button";
 import SmallUserDisplay from "@/components/small-user-display";
 import {
     DropdownMenu,
@@ -198,6 +199,10 @@ function Index() {
                                 <Link to="/settings/organisations" className="p-0 text-end">
                                     My Organisations
                                 </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="flex items-end justify-end p-0 m-0">
+                                <LogOutButton noStyle />
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
