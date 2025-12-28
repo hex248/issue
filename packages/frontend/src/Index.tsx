@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAuthHeaders } from "@/lib/utils";
+import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "./components/ui/resizable";
 
 function Index() {
     const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
@@ -211,26 +212,39 @@ function Index() {
             {/* main body */}
             <div className="w-full h-full flex items-start justify-between pt-1 gap-1">
                 {selectedProject && issues.length > 0 && (
-                    <>
-                        {/* issues list (table) */}
-                        <IssuesTable
-                            project={selectedProject}
-                            issuesData={issues}
-                            columns={{ description: false }}
-                            issueSelectAction={setSelectedIssue}
-                            className="border w-full flex-shrink"
-                        />
+                    <ResizablePanelGroup>
+                        <ResizablePanel id={"left"} minSize={400}>
+                            {/* issues list (table) */}
+                            <IssuesTable
+                                project={selectedProject}
+                                issuesData={issues}
+                                columns={{ description: false }}
+                                issueSelectAction={setSelectedIssue}
+                                className="border w-full flex-shrink"
+                            />
+                        </ResizablePanel>
+
                         {/* issue detail pane */}
                         {selectedIssue && (
-                            <div className="border w-2xl">
-                                <IssueDetailPane
-                                    project={selectedProject}
-                                    issueData={selectedIssue}
-                                    close={() => setSelectedIssue(null)}
-                                />
-                            </div>
+                            <>
+                                <ResizableSeparator />
+                                <ResizablePanel
+                                    id={"right"}
+                                    defaultSize={"30%"}
+                                    minSize={360}
+                                    maxSize={"60%"}
+                                >
+                                    <div className="border">
+                                        <IssueDetailPane
+                                            project={selectedProject}
+                                            issueData={selectedIssue}
+                                            close={() => setSelectedIssue(null)}
+                                        />
+                                    </div>
+                                </ResizablePanel>
+                            </>
                         )}
-                    </>
+                    </ResizablePanelGroup>
                 )}
             </div>
 
