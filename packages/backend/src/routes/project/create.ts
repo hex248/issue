@@ -16,9 +16,9 @@ export default async function projectCreate(req: BunRequest) {
         );
     }
 
-    // check if project with blob already exists
+    // check if project with blob already exists in the organisation
     const existingProject = await getProjectByBlob(blob);
-    if (existingProject) {
+    if (existingProject?.organisationId === parseInt(organisationId, 10)) {
         return new Response(`project with blob ${blob} already exists`, { status: 400 });
     }
 
