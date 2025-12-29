@@ -4,7 +4,6 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -19,10 +18,15 @@ const slugify = (value: string) =>
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+/, "")
-        .replace(/-+$/, "")
         .replace(/-{2,}/g, "-");
 
-export function CreateOrganisation() {
+export function CreateOrganisation({
+    trigger,
+    completeAction,
+}: {
+    trigger?: React.ReactNode;
+    completeAction?: () => void | Promise<void>;
+}) {
     const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
 
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
@@ -106,7 +110,12 @@ export function CreateOrganisation() {
             }
 
             setOpen(false);
-            window.location.reload();
+            reset();
+            try {
+                await completeAction?.();
+            } catch (actionErr) {
+                console.error(actionErr);
+            }
         } catch (err) {
             console.error(err);
             setError("failed to create organisation");
@@ -117,7 +126,7 @@ export function CreateOrganisation() {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <Button variant="outline">Create Organisation</Button>
+                {trigger || <Button variant="outline">Create Organisation</Button>}
             </DialogTrigger>
 
             <DialogContent className={cn("w-md", error && "border-destructive")}>
