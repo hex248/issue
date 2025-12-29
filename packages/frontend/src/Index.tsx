@@ -1,6 +1,9 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import type { IssueResponse, OrganisationResponse, ProjectResponse, UserRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { CreateOrganisation } from "@/components/create-organisation";
+import { CreateProject } from "@/components/create-project";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
 import LogOutButton from "@/components/log-out-button";
@@ -13,8 +16,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { getAuthHeaders } from "@/lib/utils";
+import { Button } from "./components/ui/button";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "./components/ui/resizable";
 
 function Index() {
@@ -34,20 +45,54 @@ function Index() {
     const [issues, setIssues] = useState<IssueResponse[]>([]);
     const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
 
+    const refetchOrganisations = async () => {
+        try {
+            const res = await fetch(`${serverURL}/organisation/by-user?userId=${user.id}`, {
+                headers: getAuthHeaders(),
+            });
+            const data = (await res.json()) as Array<OrganisationResponse>;
+
+            setOrganisations(data);
+
+            // attempt to retain selected organisation (avoid re-fetching projects and issues)
+            setSelectedOrganisation((prev) => {
+                if (!prev) return data[0] || null;
+                const stillExists = data.find((o) => o.Organisation.id === prev.Organisation.id);
+                return stillExists || data[0] || null;
+            });
+        } catch (err) {
+            console.error("error fetching organisations:", err);
+        }
+    };
+
     useEffect(() => {
         if (organisationsRef.current) return;
         organisationsRef.current = true;
-
-        fetch(`${serverURL}/organisation/by-user?userId=${user.id}`, { headers: getAuthHeaders() })
-            .then((res) => res.json())
-            .then((data: Array<OrganisationResponse>) => {
-                setOrganisations(data);
-                setSelectedOrganisation(data[0] || null);
-            })
-            .catch((err) => {
-                console.error("error fetching organisations:", err);
-            });
+        void refetchOrganisations();
     }, [user.id]);
+
+    const refetchProjects = async (organisationId: number) => {
+        try {
+            const res = await fetch(
+                `${serverURL}/projects/by-organisation?organisationId=${organisationId}`,
+                {
+                    headers: getAuthHeaders(),
+                },
+            );
+
+            const data = (await res.json()) as ProjectResponse[];
+            setProjects(data);
+
+            setSelectedProject((prev) => {
+                if (!prev) return data[0] || null;
+                const stillExists = data.find((p) => p.Project.id === prev.Project.id);
+                return stillExists || data[0] || null;
+            });
+        } catch (err) {
+            console.error("error fetching projects:", err);
+            setProjects([]);
+        }
+    };
 
     // fetch projects when organisation is selected
     useEffect(() => {
@@ -59,20 +104,7 @@ function Index() {
             return;
         }
 
-        fetch(
-            `${serverURL}/projects/by-organisation?organisationId=${selectedOrganisation.Organisation.id}`,
-            {
-                headers: getAuthHeaders(),
-            },
-        )
-            .then((res) => res.json())
-            .then((data: ProjectResponse[]) => {
-                setProjects(data);
-            })
-            .catch((err) => {
-                console.error("error fetching projects:", err);
-                setProjects([]);
-            });
+        void refetchProjects(selectedOrganisation.Organisation.id);
     }, [selectedOrganisation]);
 
     // fetch issues when project is selected
@@ -90,9 +122,7 @@ function Index() {
     }, [selectedProject]);
 
     useEffect(() => {
-        if (projects.length > 0) {
-            setSelectedProject(projects[0]);
-        }
+        setSelectedProject((prev) => prev || projects[0] || null);
     }, [projects]);
 
     return (
@@ -137,7 +167,16 @@ function Index() {
                                     {organisation.Organisation.name}
                                 </SelectItem>
                             ))}
-                            {organisations.length === 0 && <>No organisations</>}
+
+                            {organisations.length > 0 && <SelectSeparator />}
+                            <CreateOrganisation
+                                trigger={
+                                    <Button variant="ghost" className={"w-full"} size={"sm"}>
+                                        Create Organisation
+                                    </Button>
+                                }
+                                completeAction={refetchOrganisations}
+                            />
                         </SelectContent>
                     </Select>
 
@@ -177,7 +216,24 @@ function Index() {
                                         {project.Project.name}
                                     </SelectItem>
                                 ))}
-                                {projects.length === 0 && <>No projects in this organisation</>}
+                                {projects.length > 0 && <SelectSeparator />}
+                                <CreateProject
+                                    organisationId={selectedOrganisation?.Organisation.id}
+                                    trigger={
+                                        <Button
+                                            size={"sm"}
+                                            variant="ghost"
+                                            className={"w-full"}
+                                            disabled={!selectedOrganisation?.Organisation.id}
+                                        >
+                                            Create Project
+                                        </Button>
+                                    }
+                                    completeAction={async () => {
+                                        if (!selectedOrganisation) return;
+                                        await refetchProjects(selectedOrganisation.Organisation.id);
+                                    }}
+                                />
                             </SelectContent>
                         </Select>
                     )}
