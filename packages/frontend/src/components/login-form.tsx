@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,26 +7,33 @@ import { capitalise, cn } from "@/lib/utils";
 function Field({
     label = "label",
     onChange = () => {},
+    onBlur,
     invalidMessage = "",
     hidden = false,
 }: {
     label: string;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    onBlur?: () => void;
     invalidMessage?: string;
     hidden?: boolean;
 }) {
     return (
         <div className="flex flex-col gap-1">
             <div className="flex items-end justify-between w-full text-xs">
-                <Label className="flex items-center text-sm">{label}</Label>
+                <Label htmlFor="org-slug" className="flex items-center text-sm">
+                    {label}
+                </Label>
             </div>
             <Input
+                id="org-slug"
                 placeholder={label}
                 onChange={onChange}
+                onBlur={onBlur}
+                name={label}
                 aria-invalid={invalidMessage !== ""}
                 type={hidden ? "password" : "text"}
             />
-            <div className="flex items-end justify-end w-full text-xs -mb-4">
+            <div className="flex items-end justify-end w-full text-xs -mb-0 -mt-1">
                 {invalidMessage !== "" ? (
                     <Label className="text-destructive text-sm">{invalidMessage}</Label>
                 ) : (
@@ -43,21 +50,31 @@ export default function LogInForm() {
     const [mode, setMode] = useState<"login" | "register">("login");
 
     const [name, setName] = useState("");
-    const [nameInvalid, setNameInvalid] = useState("");
     const [username, setUsername] = useState("");
-    const [usernameInvalid, setUsernameInvalid] = useState("");
     const [password, setPassword] = useState("");
-    const [passwordInvalid, setPasswordInvalid] = useState("");
+
+    const [nameTouched, setNameTouched] = useState(false);
+    const [usernameTouched, setUsernameTouched] = useState(false);
+    const [passwordTouched, setPasswordTouched] = useState(false);
+    const [submitAttempted, setSubmitAttempted] = useState(false);
+
     const [error, setError] = useState("");
 
+    const nameInvalid = useMemo(
+        () => ((nameTouched || submitAttempted) && name.trim() === "" ? "Cannot be empty" : ""),
+        [nameTouched, submitAttempted, name],
+    );
+    const usernameInvalid = useMemo(
+        () => ((usernameTouched || submitAttempted) && username.trim() === "" ? "Cannot be empty" : ""),
+        [usernameTouched, submitAttempted, username],
+    );
+    const passwordInvalid = useMemo(
+        () => ((passwordTouched || submitAttempted) && password.trim() === "" ? "Cannot be empty" : ""),
+        [passwordTouched, submitAttempted, password],
+    );
+
     const logIn = () => {
-        if (username === "" || password === "") {
-            if (username === "") {
-                setUsernameInvalid("Cannot be empty");
-            }
-            if (password === "") {
-                setPasswordInvalid("Cannot be empty");
-            }
+        if (username.trim() === "" || password.trim() === "") {
             return;
         }
 
@@ -89,16 +106,7 @@ export default function LogInForm() {
     };
 
     const register = () => {
-        if (name === "" || username === "" || password === "") {
-            if (name === "") {
-                setNameInvalid("Cannot be empty");
-            }
-            if (username === "") {
-                setUsernameInvalid("Cannot be empty");
-            }
-            if (password === "") {
-                setPasswordInvalid("Cannot be empty");
-            }
+        if (name.trim() === "" || username.trim() === "" || password.trim() === "") {
             return;
         }
 
@@ -134,10 +142,16 @@ export default function LogInForm() {
 
     const resetForm = () => {
         setError("");
+        setSubmitAttempted(false);
+
+        setNameTouched(false);
+        setUsernameTouched(false);
+        setPasswordTouched(false);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setSubmitAttempted(true);
         if (mode === "login") {
             logIn();
         } else {
@@ -159,30 +173,21 @@ export default function LogInForm() {
                     {mode === "register" && (
                         <Field
                             label="Full Name"
-                            onChange={(e) => {
-                                if (e.target.value !== "") setNameInvalid("");
-                                else setNameInvalid("Cannot be empty");
-                                setName(e.target.value);
-                            }}
+                            onChange={(e) => setName(e.target.value)}
+                            onBlur={() => setNameTouched(true)}
                             invalidMessage={nameInvalid}
                         />
                     )}
                     <Field
                         label="Username"
-                        onChange={(e) => {
-                            if (e.target.value !== "") setUsernameInvalid("");
-                            else setUsernameInvalid("Cannot be empty");
-                            setUsername(e.target.value);
-                        }}
+                        onChange={(e) => setUsername(e.target.value)}
+                        onBlur={() => setUsernameTouched(true)}
                         invalidMessage={usernameInvalid}
                     />
                     <Field
                         label="Password"
-                        onChange={(e) => {
-                            if (e.target.value !== "") setPasswordInvalid("");
-                            else setPasswordInvalid("Cannot be empty");
-                            setPassword(e.target.value);
-                        }}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => setPasswordTouched(true)}
                         invalidMessage={passwordInvalid}
                         hidden={true}
                     />
