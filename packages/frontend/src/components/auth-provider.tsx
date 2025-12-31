@@ -2,6 +2,7 @@ import type { UserRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
 import Loading from "@/components/loading";
 import LogInForm from "@/components/login-form";
+import { getServerURL } from "@/lib/utils";
 
 type AuthProviderProps = {
     children: React.ReactNode;
@@ -9,8 +10,6 @@ type AuthProviderProps = {
 };
 
 export function Auth({ children }: AuthProviderProps) {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const [loggedIn, setLoggedIn] = useState<boolean>();
     const fetched = useRef(false);
 
@@ -21,7 +20,7 @@ export function Auth({ children }: AuthProviderProps) {
         if (!token) {
             return setLoggedIn(false);
         }
-        fetch(`${serverURL}/auth/me`, {
+        fetch(`${getServerURL()}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(async (res) => {

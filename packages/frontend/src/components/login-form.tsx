@@ -3,7 +3,7 @@ import { type ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { capitalise, cn } from "@/lib/utils";
+import { capitalise, cn, getServerURL } from "@/lib/utils";
 
 function Field({
     label = "label",
@@ -46,8 +46,6 @@ function Field({
 }
 
 export default function LogInForm() {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const [mode, setMode] = useState<"login" | "register">("login");
 
     const [name, setName] = useState("");
@@ -79,7 +77,7 @@ export default function LogInForm() {
             return;
         }
 
-        fetch(`${serverURL}/auth/login`, {
+        fetch(`${getServerURL()}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
 
@@ -111,7 +109,7 @@ export default function LogInForm() {
             return;
         }
 
-        fetch(`${serverURL}/auth/register`, {
+        fetch(`${getServerURL()}/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

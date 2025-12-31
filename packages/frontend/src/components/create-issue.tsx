@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn, getAuthHeaders } from "@/lib/utils";
+import { cn, getAuthHeaders, getServerURL } from "@/lib/utils";
 
 export function CreateIssue({
     projectId,
@@ -21,8 +21,6 @@ export function CreateIssue({
     trigger?: React.ReactNode;
     completeAction?: (issueId: number) => void | Promise<void>;
 }) {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
 
     const [open, setOpen] = useState(false);
@@ -90,7 +88,7 @@ export function CreateIssue({
         setSubmitting(true);
 
         try {
-            const url = new URL(`${serverURL}/issue/create`);
+            const url = new URL(`${getServerURL()}/issue/create`);
             url.searchParams.set("projectId", `${projectId}`);
             url.searchParams.set("title", title.trim());
             url.searchParams.set("description", description.trim());

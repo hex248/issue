@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn, getAuthHeaders } from "@/lib/utils";
+import { cn, getAuthHeaders, getServerURL } from "@/lib/utils";
 
 const slugify = (value: string) =>
     value
@@ -27,8 +27,6 @@ export function CreateOrganisation({
     trigger?: React.ReactNode;
     completeAction?: (organisationId: number) => void | Promise<void>;
 }) {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
 
     const [open, setOpen] = useState(false);
@@ -90,7 +88,7 @@ export function CreateOrganisation({
 
         setSubmitting(true);
         try {
-            const url = new URL(`${serverURL}/organisation/create`);
+            const url = new URL(`${getServerURL()}/organisation/create`);
             url.searchParams.set("name", name.trim());
             url.searchParams.set("slug", slug.trim());
             url.searchParams.set("userId", `${userId}`);

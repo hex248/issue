@@ -2,9 +2,7 @@ import type { OrganisationResponse, UserRecord } from "@issue/shared";
 import { useCallback, useEffect, useState } from "react";
 import { OrganisationSelect } from "@/components/organisation-select";
 import { SettingsPageLayout } from "@/components/settings-page-layout";
-import { getAuthHeaders } from "@/lib/utils";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
+import { getAuthHeaders, getServerURL } from "@/lib/utils";
 
 function Organisations() {
     const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
@@ -15,7 +13,7 @@ function Organisations() {
     const refetchOrganisations = useCallback(
         async (options?: { selectOrganisationId?: number }) => {
             try {
-                const res = await fetch(`${SERVER_URL}/organisation/by-user?userId=${user.id}`, {
+                const res = await fetch(`${getServerURL()}/organisation/by-user?userId=${user.id}`, {
                     headers: getAuthHeaders(),
                 });
 

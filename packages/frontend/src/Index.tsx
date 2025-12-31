@@ -17,12 +17,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getAuthHeaders } from "@/lib/utils";
+import { getAuthHeaders, getServerURL } from "@/lib/utils";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "./components/ui/resizable";
 
 function Index() {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
 
     const organisationsRef = useRef(false);
@@ -37,7 +35,7 @@ function Index() {
 
     const refetchOrganisations = async (options?: { selectOrganisationId?: number }) => {
         try {
-            const res = await fetch(`${serverURL}/organisation/by-user?userId=${user.id}`, {
+            const res = await fetch(`${getServerURL()}/organisation/by-user?userId=${user.id}`, {
                 headers: getAuthHeaders(),
             });
             const data = (await res.json()) as Array<OrganisationResponse>;
@@ -77,7 +75,7 @@ function Index() {
     const refetchProjects = async (organisationId: number, options?: { selectProjectId?: number }) => {
         try {
             const res = await fetch(
-                `${serverURL}/projects/by-organisation?organisationId=${organisationId}`,
+                `${getServerURL()}/projects/by-organisation?organisationId=${organisationId}`,
                 {
                     headers: getAuthHeaders(),
                 },
@@ -126,7 +124,7 @@ function Index() {
 
     const refetchIssues = async (projectKey: string) => {
         try {
-            const res = await fetch(`${serverURL}/issues/${projectKey}`, {
+            const res = await fetch(`${getServerURL()}/issues/${projectKey}`, {
                 headers: getAuthHeaders(),
             });
             const data = (await res.json()) as IssueResponse[];

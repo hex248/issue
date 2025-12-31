@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn, getAuthHeaders } from "@/lib/utils";
+import { cn, getAuthHeaders, getServerURL } from "@/lib/utils";
 
 const keyify = (value: string) =>
     value
@@ -27,8 +27,6 @@ export function CreateProject({
     trigger?: React.ReactNode;
     completeAction?: (projectId: number) => void | Promise<void>;
 }) {
-    const serverURL = import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:3000";
-
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
 
     const [open, setOpen] = useState(false);
@@ -96,7 +94,7 @@ export function CreateProject({
 
         setSubmitting(true);
         try {
-            const url = new URL(`${serverURL}/project/create`);
+            const url = new URL(`${getServerURL()}/project/create`);
             url.searchParams.set("key", key);
             url.searchParams.set("name", name.trim());
             url.searchParams.set("creatorId", `${userId}`);
