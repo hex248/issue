@@ -17,14 +17,9 @@ export async function byUser({
 
     if (!res.ok) {
         const error = await res.text();
-        onError?.(error || `failed to create organisation (${res.status})`);
+        onError?.(error || `failed to get organisations (${res.status})`);
     } else {
         const data = await res.json();
-        if (!data.id) {
-            onError?.(`failed to create organisation (${res.status})`);
-            return;
-        }
-
         onSuccess?.(data, res);
     }
 }
