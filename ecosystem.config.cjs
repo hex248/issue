@@ -1,15 +1,12 @@
 const path = require("node:path");
 
-const backendPort = Number(process.env.BACKEND_PORT || 3000);
-const frontendPort = Number(process.env.FRONTEND_PORT || 1420);
-
 module.exports = {
     apps: [
         {
             name: "issue-backend",
             cwd: path.join(__dirname, "packages", "backend"),
             script: "bun",
-            args: `src/index.ts --PORT=${backendPort}`,
+            args: "dev",
             interpreter: "none",
             exec_mode: "fork",
             instances: 1,
@@ -24,7 +21,7 @@ module.exports = {
             name: "issue-frontend",
             cwd: path.join(__dirname, "packages", "frontend"),
             script: "bun",
-            args: `run preview -- --host 0.0.0.0 --port ${frontendPort}`,
+            args: "dev",
             interpreter: "none",
             exec_mode: "fork",
             instances: 1,
