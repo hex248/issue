@@ -12,6 +12,7 @@ const main = async () => {
         port: Number(PORT),
         routes: {
             "/": withCors(() => new Response(`title: eussi\ndev-mode: ${DEV}\nport: ${PORT}`)),
+            "/health": withCors(() => new Response("OK")),
 
             "/auth/register": withCors(routes.authRegister),
             "/auth/login": withCors(routes.authLogin),
