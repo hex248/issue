@@ -1,3 +1,3 @@
-export { byUsername } from "./byUsername";
-export { update } from "./update";
-export { uploadAvatar } from "./uploadAvatar";
+export { byUsername } from "@/lib/server/user/byUsername";
+export { update } from "@/lib/server/user/update";
+export { uploadAvatar } from "@/lib/server/user/uploadAvatar";

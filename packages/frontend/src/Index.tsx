@@ -8,6 +8,7 @@ import { IssuesTable } from "@/components/issues-table";
 import LogOutButton from "@/components/log-out-button";
 import { OrganisationSelect } from "@/components/organisation-select";
 import { ProjectSelect } from "@/components/project-select";
+import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
 import { issue, organisation, project } from "@/lib/server";
-import { ServerConfigurationDialog } from "./components/server-configuration-dialog";
 
 function Index() {
     const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;

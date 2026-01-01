@@ -1,7 +1,7 @@
-export * as issue from "./issue";
-export * as organisation from "./organisation";
-export * as project from "./project";
-export * as user from "./user";
+export * as issue from "@/lib/server/issue";
+export * as organisation from "@/lib/server/organisation";
+export * as project from "@/lib/server/project";
+export * as user from "@/lib/server/user";
 
 export type ServerQueryInput = {
     onSuccess?: (data: any, res: Response) => void;

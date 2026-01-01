@@ -1,6 +1,6 @@
 import { type ChangeEvent, useMemo, useState } from "react";
-import { Input } from "./input";
-import { Label } from "./label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function Field({
     label,
