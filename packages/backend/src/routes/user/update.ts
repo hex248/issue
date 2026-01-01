@@ -3,7 +3,7 @@ import type { AuthedRequest } from "../../auth/middleware";
 import { hashPassword } from "../../auth/utils";
 import { getUserById } from "../../db/queries";
 
-// /user/update?id=1&name=NewName&password=NewPassword
+// /user/update?id=1&name=NewName&password=NewPassword&avatarURL=...
 export default async function update(req: AuthedRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
@@ -18,13 +18,14 @@ export default async function update(req: AuthedRequest) {
 
     const name = url.searchParams.get("name") || undefined;
     const password = url.searchParams.get("password") || undefined;
+    const avatarURL = url.searchParams.get("avatarURL") || undefined;
     let passwordHash: string | undefined;
     if (password !== undefined) {
         passwordHash = await hashPassword(password);
     }
 
     const { updateById } = await import("../../db/queries/users");
-    const updatedUser = await updateById(user.id, { name, passwordHash });
+    const updatedUser = await updateById(user.id, { name, passwordHash, avatarURL });
 
     if (!updatedUser) {
         return new Response("failed to update user", { status: 500 });

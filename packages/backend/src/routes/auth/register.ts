@@ -21,7 +21,7 @@ export default async function register(req: BunRequest) {
         return new Response("invalid request body", { status: 400 });
     }
 
-    const { name, username, password } = body as Record<string, unknown>;
+    const { name, username, password, avatarURL } = body as Record<string, unknown>;
 
     if (!isNonEmptyString(name) || !isNonEmptyString(username) || !isNonEmptyString(password)) {
         return new Response("name, username, and password are required", { status: 400 });
@@ -41,7 +41,7 @@ export default async function register(req: BunRequest) {
     }
 
     const passwordHash = await hashPassword(password);
-    const user = await createUser(name, username, passwordHash);
+    const user = await createUser(name, username, passwordHash, avatarURL as string | undefined);
     if (!user) {
         return new Response("failed to create user", { status: 500 });
     }
