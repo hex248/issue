@@ -1,4 +1,3 @@
-- user settings/profile page
 - org settings
 - add/invite user(s) to org
 - issues
@@ -6,3 +5,4 @@
   - issue assignee
   - deadline
 - time tracking (linked to issues or standalone)
+- user avatars
