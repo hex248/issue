@@ -1,24 +1,12 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import type { IssueResponse, OrganisationResponse, ProjectResponse, UserRecord } from "@issue/shared";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { CreateIssue } from "@/components/create-issue";
+import Header from "@/components/header";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
 import { IssuesTable } from "@/components/issues-table";
-import LogOutButton from "@/components/log-out-button";
 import { OrganisationSelect } from "@/components/organisation-select";
 import { ProjectSelect } from "@/components/project-select";
-import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
-import SmallUserDisplay from "@/components/small-user-display";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
 import { issue, organisation, project } from "@/lib/server";
 
@@ -160,9 +148,9 @@ function Index() {
     }, [selectedProject]);
 
     return (
-        <main className="w-full h-full p-1">
+        <main className="w-full h-screen flex flex-col">
             {/* header area */}
-            <div className="flex gap-12 items-center justify-between">
+            <Header user={user}>
                 <div className="flex gap-1 items-center">
                     {/* organisation selection */}
                     <OrganisationSelect
@@ -202,48 +190,9 @@ function Index() {
                         />
                     )}
                 </div>
-
-                <div className="flex gap-1 items-center">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="text-sm">
-                            <SmallUserDisplay user={user} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align={"end"}>
-                            <DropdownMenuLabel className="text-end">Settings</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <Link to="/settings/account" className="p-0 text-end">
-                                    My Account
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <Link to="/settings/organisations" className="p-0 text-end">
-                                    My Organisations
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <ServerConfigurationDialog
-                                    trigger={
-                                        <Button
-                                            variant="ghost"
-                                            className="flex w-full gap-2 items-center justify-end text-end px-2 py-1 m-0 h-auto"
-                                            title="Server Configuration"
-                                        >
-                                            Server Configuration
-                                        </Button>
-                                    }
-                                />
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="flex items-end justify-end p-0 m-0">
-                                <LogOutButton noStyle className={"flex w-full justify-end"} />
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </div>
+            </Header>
             {/* main body */}
-            <div className="w-full h-full flex items-start justify-between pt-1 gap-1">
+            <div className="w-full h-full flex items-start justify-between p-1 gap-1">
                 {selectedProject && issues.length > 0 && (
                     <ResizablePanelGroup>
                         <ResizablePanel id={"left"} minSize={400}>
