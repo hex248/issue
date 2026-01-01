@@ -5,17 +5,22 @@ export async function update({
     id,
     name,
     password,
+    avatarURL,
     onSuccess,
     onError,
 }: {
     id: number;
     name: string;
     password: string;
+    avatarURL?: string;
 } & ServerQueryInput) {
     const url = new URL(`${getServerURL()}/user/update`);
     url.searchParams.set("id", `${id}`);
     url.searchParams.set("name", name.trim());
     url.searchParams.set("password", password.trim());
+    if (avatarURL) {
+        url.searchParams.set("avatarURL", avatarURL);
+    }
 
     const res = await fetch(url.toString(), {
         headers: getAuthHeaders(),
