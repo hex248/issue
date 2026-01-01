@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -176,10 +177,11 @@ export default function LogInForm() {
             <form onSubmit={handleSubmit}>
                 <div
                     className={cn(
-                        "flex flex-col gap-2 items-center border p-6 pb-4",
+                        "relative flex flex-col gap-2 items-center border p-6 pb-4",
                         error !== "" && "border-destructive",
                     )}
                 >
+                    <ServerConfigurationDialog />
                     <span className="text-xl mb-2">{capitalise(mode)}</span>
 
                     {mode === "register" && (

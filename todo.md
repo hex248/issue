@@ -6,4 +6,3 @@
   - issue assignee
   - deadline
 - time tracking (linked to issues or standalone)
-- store backend/server URL in localstorage (can be changed in user settings). this will be used in substitution of VITE_SERVER_URL (use VITE_SERVER_URL as the default. this way, the frontend releases can ship with eussi.ob248.com, but dev can keep localhost backend)

@@ -146,3 +146,10 @@
 .font-700 {
     font-weight: 700;
 }
+
+.noselect {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
