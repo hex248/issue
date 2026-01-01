@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectSeparator,
     SelectTrigger,
     SelectValue,
@@ -40,20 +42,23 @@ export function OrganisationSelect({
             onOpenChange={setOpen}
         >
             <SelectTrigger className="text-sm" isOpen={open}>
-                <SelectValue
-                    placeholder={
-                        selectedOrganisation ? `O: ${selectedOrganisation.Organisation.name}` : placeholder
-                    }
-                />
+                <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent side="bottom" position="popper">
-                {organisations.map((organisation) => (
-                    <SelectItem key={organisation.Organisation.id} value={`${organisation.Organisation.id}`}>
-                        {organisation.Organisation.name}
-                    </SelectItem>
-                ))}
+                <SelectGroup>
+                    <SelectLabel>Organisations</SelectLabel>
+                    {organisations.map((organisation) => (
+                        <SelectItem
+                            key={organisation.Organisation.id}
+                            value={`${organisation.Organisation.id}`}
+                        >
+                            {organisation.Organisation.name}
+                        </SelectItem>
+                    ))}
 
-                {organisations.length > 0 && <SelectSeparator />}
+                    {organisations.length > 0 && <SelectSeparator />}
+                </SelectGroup>
+
                 <CreateOrganisation
                     trigger={
                         <Button variant="ghost" className={"w-full"} size={"sm"}>

@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectSeparator,
     SelectTrigger,
     SelectValue,
@@ -42,17 +44,18 @@ export function ProjectSelect({
             onOpenChange={setOpen}
         >
             <SelectTrigger className="text-sm" isOpen={open}>
-                <SelectValue
-                    placeholder={selectedProject ? `P: ${selectedProject.Project.name}` : placeholder}
-                />
+                <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent side="bottom" position="popper" align={"start"}>
-                {projects.map((project) => (
-                    <SelectItem key={project.Project.id} value={`${project.Project.id}`}>
-                        {project.Project.name}
-                    </SelectItem>
-                ))}
-                {projects.length > 0 && <SelectSeparator />}
+                <SelectGroup>
+                    <SelectLabel>Projects</SelectLabel>
+                    {projects.map((project) => (
+                        <SelectItem key={project.Project.id} value={`${project.Project.id}`}>
+                            {project.Project.name}
+                        </SelectItem>
+                    ))}
+                    {projects.length > 0 && <SelectSeparator />}
+                </SelectGroup>
                 <CreateProject
                     organisationId={organisationId}
                     trigger={

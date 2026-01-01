@@ -1,3 +1,4 @@
+import { Edit } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ export function UploadAvatar({
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [showEdit, setShowEdit] = useState(false);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -40,9 +42,23 @@ export function UploadAvatar({
     };
 
     return (
-        <div className={cn("flex items-center gap-4", className)}>
+        <div className={cn("flex flex-col items-center gap-4", className)}>
             {avatarURL && (
-                <img src={avatarURL} alt="Avatar" className="w-16 h-16 rounded-full border object-cover" />
+                <Button
+                    variant="dummy"
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    onMouseOver={() => setShowEdit(true)}
+                    onMouseOut={() => setShowEdit(false)}
+                    className="w-24 h-24 rounded-full border-1 p-0 relative overflow-hidden"
+                >
+                    <img src={avatarURL} alt="Avatar" className={cn("rounded-full")} />
+                    {showEdit && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                            <Edit className="size-6 text-white drop-shadow-md" />
+                        </div>
+                    )}
+                </Button>
             )}
             <input
                 type="file"
@@ -51,14 +67,17 @@ export function UploadAvatar({
                 accept="image/png,image/jpeg,image/webp,image/gif"
                 className="hidden"
             />
-            <Button
-                variant="outline"
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-            >
-                {uploading ? "Uploading..." : label || avatarURL ? "Change Avatar" : "Upload Avatar"}
-            </Button>
+
+            {!avatarURL && (
+                <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                >
+                    {uploading ? "Uploading..." : label || avatarURL ? "Change Avatar" : "Upload Avatar"}
+                </Button>
+            )}
             {error && <Label className="text-destructive text-sm">{error}</Label>}
         </div>
     );
