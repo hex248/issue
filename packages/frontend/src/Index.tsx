@@ -29,6 +29,7 @@ function Index() {
                 userId: user.id,
                 onSuccess: (data) => {
                     const organisations = data as OrganisationResponse[];
+                    organisations.sort((a, b) => a.Organisation.name.localeCompare(b.Organisation.name));
                     setOrganisations(organisations);
 
                     let selected: OrganisationResponse | null = null;
@@ -77,6 +78,7 @@ function Index() {
                 organisationId,
                 onSuccess: (data) => {
                     const projects = data as ProjectResponse[];
+                    projects.sort((a, b) => a.Project.name.localeCompare(b.Project.name));
                     setProjects(projects);
 
                     let selected: ProjectResponse | null = null;
@@ -131,6 +133,7 @@ function Index() {
                 projectId: selectedProject?.Project.id || 0,
                 onSuccess: (data) => {
                     const issues = data as IssueResponse[];
+                    issues.reverse(); // newest at the bottom, but if the order has been rearranged, respect that
                     setIssues(issues);
                 },
                 onError: (error) => {
