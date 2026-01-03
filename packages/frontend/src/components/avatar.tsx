@@ -1,4 +1,5 @@
 import { UserRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const FALLBACK_COLOURS = [
     "bg-red-500",
@@ -58,7 +59,15 @@ export default function Avatar({
 
     return (
         <div
-            className={`flex items-center justify-center rounded-full text-white font-medium select-none ${name && "border"} ${!avatarURL && backgroundClass} w-${size || 6} h-${size || 6}`}
+            className={cn(
+                "flex items-center justify-center rounded-full",
+                "text-white font-medium select-none",
+                name && "border",
+                !avatarURL && backgroundClass,
+                "transition-colors",
+                `w-${size || 6}`,
+                `h-${size || 6}`,
+            )}
         >
             {avatarURL ? (
                 <img
@@ -69,7 +78,7 @@ export default function Avatar({
             ) : name ? (
                 <span className={textClass}>{getInitials(name)}</span>
             ) : (
-                <UserRound size={size ? size * 2 + 2 : 14} />
+                <UserRound className={"size-10"} />
             )}
         </div>
     );
