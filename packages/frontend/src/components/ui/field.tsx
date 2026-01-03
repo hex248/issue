@@ -11,6 +11,7 @@ export function Field({
     submitAttempted,
     placeholder,
     error,
+    tabIndex,
 }: {
     label: string;
     value?: string;
@@ -20,12 +21,13 @@ export function Field({
     submitAttempted?: boolean;
     placeholder?: string;
     error?: string;
+    tabIndex?: number;
 }) {
     const [internalTouched, setInternalTouched] = useState(false);
     const isTouched = submitAttempted || internalTouched;
 
     const invalidMessage = useMemo(() => {
-        if (!isTouched) {
+        if (!isTouched && value === "") {
             return "";
         }
         return validate?.(value) ?? "";
@@ -42,11 +44,15 @@ export function Field({
                 id={label}
                 placeholder={placeholder ?? label}
                 value={value}
-                onChange={onChange}
+                onChange={(e) => {
+                    onChange(e);
+                    setInternalTouched(true);
+                }}
                 onBlur={() => setInternalTouched(true)}
                 name={label}
                 aria-invalid={error !== undefined || invalidMessage !== ""}
                 type={hidden ? "password" : "text"}
+                tabIndex={tabIndex}
             />
             <div className="flex items-end justify-end w-full text-xs mb-0 -mt-1">
                 {error || invalidMessage !== "" ? (

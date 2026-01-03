@@ -19,12 +19,14 @@ export function OrganisationSelect({
     onSelectedOrganisationChange,
     onCreateOrganisation,
     placeholder = "Select Organisation",
+    contentClass,
 }: {
     organisations: OrganisationResponse[];
     selectedOrganisation: OrganisationResponse | null;
     onSelectedOrganisationChange: (organisation: OrganisationResponse | null) => void;
     onCreateOrganisation?: (organisationId: number) => void | Promise<void>;
     placeholder?: string;
+    contentClass?: string;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -44,7 +46,7 @@ export function OrganisationSelect({
             <SelectTrigger className="text-sm" isOpen={open}>
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent side="bottom" position="popper">
+            <SelectContent side="bottom" position="popper" className={contentClass}>
                 <SelectGroup>
                     <SelectLabel>Organisations</SelectLabel>
                     {organisations.map((organisation) => (

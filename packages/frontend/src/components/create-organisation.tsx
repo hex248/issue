@@ -61,9 +61,8 @@ export function CreateOrganisation({
         setError(null);
         setSubmitAttempted(true);
 
-        if (name.trim() === "" || slug.trim() === "") {
-            return;
-        }
+        if (name.trim() === "" || name.trim().length > 16) return;
+        if (slug.trim() === "" || slug.trim().length > 16) return;
 
         if (!userId) {
             setError("you must be logged in to create an organisation");
@@ -122,7 +121,13 @@ export function CreateOrganisation({
                                     setSlug(slugify(nextName));
                                 }
                             }}
-                            validate={(v) => (v.trim() === "" ? "Cannot be empty" : undefined)}
+                            validate={(v) =>
+                                v.trim() === ""
+                                    ? "Cannot be empty"
+                                    : v.trim().length > 16
+                                      ? "Too long (16 character limit)"
+                                      : undefined
+                            }
                             submitAttempted={submitAttempted}
                             placeholder="Demo Organisation"
                         />
@@ -133,7 +138,13 @@ export function CreateOrganisation({
                                 setSlug(slugify(e.target.value));
                                 setSlugManuallyEdited(true);
                             }}
-                            validate={(v) => (v.trim() === "" ? "Cannot be empty" : undefined)}
+                            validate={(v) =>
+                                v.trim() === ""
+                                    ? "Cannot be empty"
+                                    : v.trim().length > 16
+                                      ? "Too long (16 character limit)"
+                                      : undefined
+                            }
                             submitAttempted={submitAttempted}
                             placeholder="demo-organisation"
                         />
@@ -166,8 +177,10 @@ export function CreateOrganisation({
                                 type="submit"
                                 disabled={
                                     submitting ||
-                                    (name.trim() === "" && submitAttempted) ||
-                                    (slug.trim() === "" && submitAttempted)
+                                    name.trim() === "" ||
+                                    name.trim().length > 16 ||
+                                    slug.trim() === "" ||
+                                    slug.trim().length > 16
                                 }
                             >
                                 {submitting ? "Creating..." : "Create"}
