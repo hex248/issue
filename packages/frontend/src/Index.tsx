@@ -22,6 +22,8 @@ import {
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
 import { issue, organisation, project } from "@/lib/server";
 
+const BREATHING_ROOM = 1;
+
 function Index() {
     const userData = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
 
@@ -174,10 +176,10 @@ function Index() {
     }, [selectedProject]);
 
     return (
-        <main className="w-full h-screen flex flex-col">
+        <main className={`w-full h-screen flex flex-col gap-${BREATHING_ROOM} p-${BREATHING_ROOM}`}>
             {/* header area */}
-            <div className="flex gap-12 items-center justify-between p-1">
-                <div className="flex gap-1 items-center">
+            <div className="flex gap-12 items-center justify-between">
+                <div className={`flex gap-${BREATHING_ROOM} items-center`}>
                     {/* organisation selection */}
                     <OrganisationSelect
                         organisations={organisations}
@@ -220,7 +222,7 @@ function Index() {
                         />
                     )}
                 </div>
-                <div className="flex gap-1 items-center">
+                <div className={`flex gap-${BREATHING_ROOM} items-center`}>
                     <DropdownMenu>
                         <DropdownMenuTrigger className="text-sm">
                             <SmallUserDisplay user={user} />
@@ -246,7 +248,7 @@ function Index() {
                                     trigger={
                                         <Button
                                             variant="ghost"
-                                            className="flex w-full gap-2 items-center justify-end text-end px-2 py-1 m-0 h-auto"
+                                            className="flex w-full items-center justify-end text-end px-2 py-1 m-0 h-auto"
                                             title="Server Configuration"
                                         >
                                             Server Configuration
@@ -264,7 +266,7 @@ function Index() {
             </div>
 
             {/* main body */}
-            <div className="w-full h-full flex items-start justify-between p-1 gap-1">
+            <div className={`w-full h-full flex items-start justify-between gap-${BREATHING_ROOM}`}>
                 {selectedProject && issues.length > 0 && (
                     <ResizablePanelGroup>
                         <ResizablePanel id={"left"} minSize={400}>
