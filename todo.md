@@ -1,8 +1,11 @@
+- landing/marketing page
+- logo/favicon
 - org settings
 - sprints
 - issues
   - deadline
   - comments
   - status
+    - predefined statuses are added to organisation by default. list of statuses can be edited by owner/admin (maybe this should be on projects rather than organisations?)
   - sprints
 - time tracking (linked to issues or standalone)
