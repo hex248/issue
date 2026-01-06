@@ -41,7 +41,10 @@ export async function deleteIssue(id: number) {
     return await db.delete(Issue).where(eq(Issue.id, id));
 }
 
-export async function updateIssue(id: number, updates: { title?: string; description?: string }) {
+export async function updateIssue(
+    id: number,
+    updates: { title?: string; description?: string; assigneeId?: number | null },
+) {
     return await db.update(Issue).set(updates).where(eq(Issue.id, id)).returning();
 }
 

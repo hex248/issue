@@ -1,8 +1,6 @@
 - org settings
 - sprints
 - issues
-  - issue creator
-  - issue assignee
   - deadline
   - comments
   - status

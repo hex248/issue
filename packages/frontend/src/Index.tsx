@@ -278,7 +278,7 @@ function Index() {
                         </ResizablePanel>
 
                         {/* issue detail pane */}
-                        {selectedIssue && (
+                        {selectedIssue && selectedOrganisation && (
                             <>
                                 <ResizableSeparator />
                                 <ResizablePanel
@@ -291,7 +291,9 @@ function Index() {
                                         <IssueDetailPane
                                             project={selectedProject}
                                             issueData={selectedIssue}
+                                            organisationId={selectedOrganisation.Organisation.id}
                                             close={() => setSelectedIssue(null)}
+                                            onIssueUpdate={refetchIssues}
                                         />
                                     </div>
                                 </ResizablePanel>
