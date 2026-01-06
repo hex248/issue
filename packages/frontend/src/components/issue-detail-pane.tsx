@@ -1,7 +1,6 @@
 import type { IssueResponse, OrganisationMemberResponse, ProjectResponse } from "@issue/shared";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import Avatar from "@/components/avatar";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -25,6 +24,7 @@ export function IssueDetailPane({
     const [assigneeId, setAssigneeId] = useState<string>(
         issueData.Issue.assigneeId?.toString() ?? "unassigned",
     );
+    const [assigneeSelectOpen, setAssigneeSelectOpen] = useState(false);
 
     useEffect(() => {
         setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
@@ -73,14 +73,20 @@ export function IssueDetailPane({
                 </Button>
             </div>
 
-            <div className="flex flex-col w-full p-2 py-1 gap-2">
+            <div className="flex flex-col w-full p-2 py-2 gap-2">
                 <h1 className="text-md">{issueData.Issue.title}</h1>
-                <p className="text-sm">{issueData.Issue.description}</p>
+                {issueData.Issue.description !== "" && (
+                    <p className="text-sm">{issueData.Issue.description}</p>
+                )}
 
                 <div className="flex items-center gap-2">
                     <span className="text-sm">Assignee:</span>
-                    <Select value={assigneeId} onValueChange={handleAssigneeChange}>
-                        <SelectTrigger size="sm" className="w-fit">
+                    <Select
+                        value={assigneeId}
+                        onValueChange={handleAssigneeChange}
+                        onOpenChange={setAssigneeSelectOpen}
+                    >
+                        <SelectTrigger className="w-fit p-0 px-2 py-2" isOpen={assigneeSelectOpen}>
                             <SelectValue placeholder="Select assignee">
                                 {assigneeId === "unassigned"
                                     ? "Unassigned"
@@ -88,30 +94,21 @@ export function IssueDetailPane({
                                           const member = members.find(
                                               (m) => m.User.id.toString() === assigneeId,
                                           );
+                                          const className = "p-0 py-2 text-sm";
                                           if (member) {
                                               return (
-                                                  <>
-                                                      <Avatar
-                                                          name={member.User.name}
-                                                          username={member.User.username}
-                                                          avatarURL={member.User.avatarURL}
-                                                          textClass="text-xs"
-                                                      />
-                                                      {member.User.name}
-                                                  </>
+                                                  <SmallUserDisplay
+                                                      user={member.User}
+                                                      className={className}
+                                                  />
                                               );
                                           }
                                           if (issueData.Assignee) {
                                               return (
-                                                  <>
-                                                      <Avatar
-                                                          name={issueData.Assignee.name}
-                                                          username={issueData.Assignee.username}
-                                                          avatarURL={issueData.Assignee.avatarURL}
-                                                          textClass="text-xs"
-                                                      />
-                                                      {issueData.Assignee.name}
-                                                  </>
+                                                  <SmallUserDisplay
+                                                      user={issueData.Assignee}
+                                                      className={className}
+                                                  />
                                               );
                                           }
                                           return null;
@@ -126,23 +123,17 @@ export function IssueDetailPane({
                             <SelectItem value="unassigned">Unassigned</SelectItem>
                             {members.map((member) => (
                                 <SelectItem key={member.User.id} value={member.User.id.toString()}>
-                                    <Avatar
-                                        name={member.User.name}
-                                        username={member.User.username}
-                                        avatarURL={member.User.avatarURL}
-                                        textClass="text-xs"
-                                    />
-                                    {member.User.name}
+                                    <SmallUserDisplay user={member.User} className="p-0" />
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
-            </div>
 
-            <div className="flex items-center gap-2 px-2 py-1 border-t text-sm text-muted-foreground">
-                Created by:
-                <SmallUserDisplay user={issueData.Creator} />
+                <div className="flex items-center gap-2">
+                    <span className="text-sm">Created by:</span>
+                    <SmallUserDisplay user={issueData.Creator} className={"text-sm"} />
+                </div>
             </div>
         </div>
     );

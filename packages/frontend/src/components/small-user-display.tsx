@@ -1,9 +1,10 @@
 import type { UserRecord } from "@issue/shared";
 import Avatar from "@/components/avatar";
+import { cn } from "@/lib/utils";
 
-export default function SmallUserDisplay({ user }: { user: UserRecord }) {
+export default function SmallUserDisplay({ user, className }: { user: UserRecord; className?: string }) {
     return (
-        <div className="flex gap-2 items-center">
+        <div className={cn("flex gap-2 items-center", className)}>
             <Avatar
                 name={user.name}
                 username={user.username}
