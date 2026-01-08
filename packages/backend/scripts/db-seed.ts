@@ -108,9 +108,13 @@ async function seed() {
         console.log("adding organisation members...");
         await db.insert(OrganisationMember).values([
             { organisationId: u1o1.id, userId: u1.id, role: "owner" },
+            { organisationId: u1o1.id, userId: u2.id, role: "member" },
             { organisationId: u1o2.id, userId: u1.id, role: "owner" },
+            { organisationId: u1o2.id, userId: u2.id, role: "member" },
             { organisationId: u2o1.id, userId: u2.id, role: "owner" },
+            { organisationId: u2o1.id, userId: u1.id, role: "member" },
             { organisationId: u2o2.id, userId: u2.id, role: "owner" },
+            { organisationId: u2o2.id, userId: u1.id, role: "member" },
         ]);
 
         console.log("added organisation members");
