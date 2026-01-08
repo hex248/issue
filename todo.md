@@ -7,6 +7,7 @@
 - issues
   - deadline
   - comments
+    - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
   - status
     - predefined statuses are added to organisation by default. list of statuses can be edited by owner/admin (maybe this should be on projects rather than organisations?)
   - sprints
@@ -14,3 +15,4 @@
 - user preferences
   - "assign to me by default" option for new issues
 - add support for gif avatars (if its a gif, just check size, reject if too big and skip the canvas step otherwise)
+- org member role promotion/demotion
