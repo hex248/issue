@@ -13,3 +13,4 @@
 - time tracking (linked to issues or standalone)
 - user preferences
   - "assign to me by default" option for new issues
+- add support for gif avatars (if its a gif, just check size, reject if too big and skip the canvas step otherwise)
