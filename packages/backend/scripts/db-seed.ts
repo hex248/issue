@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { Issue, Organisation, OrganisationMember, Project, User } from "@issue/shared";
 import bcrypt from "bcrypt";
+import { drizzle } from "drizzle-orm/node-postgres";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -18,50 +18,52 @@ const db = drizzle({
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10);
 
-const issueTitles = [
-    "Fix login redirect loop",
-    "Add pagination to user list",
-    "Update dependencies to latest versions",
-    "Refactor authentication middleware",
-    "Add unit tests for payment service",
-    "Fix memory leak in websocket handler",
-    "Implement password reset flow",
-    "Add caching for API responses",
-    "Fix date formatting in reports",
-    "Add export to CSV feature",
-    "Improve error messages for form validation",
-    "Fix race condition in queue processor",
-    "Add dark mode support",
-    "Optimize database queries for dashboard",
-    "Fix broken image uploads on Safari",
-    "Add rate limiting to public endpoints",
-    "Implement user activity logging",
-    "Fix timezone handling in scheduler",
-    "Add search functionality to admin panel",
-    "Refactor legacy billing code",
-    "Fix email template rendering",
-    "Add webhook retry mechanism",
-    "Improve loading states across app",
-    "Fix notification preferences not saving",
-    "Add bulk delete for archived items",
-    "Fix SSO integration with Okta",
-    "Add two-factor authentication",
-    "Fix scroll position reset on navigation",
-    "Implement lazy loading for images",
-    "Add audit log for sensitive actions",
-    "Fix PDF generation timeout",
-    "Add keyboard shortcuts for common actions",
-];
-
-const issueDescriptions = [
-    "Users are reporting this issue in production. Need to investigate and fix.",
-    "This has been requested by several customers. Should be straightforward to implement.",
-    "Low priority but would improve developer experience.",
-    "Blocking other work. Please prioritize.",
-    "Follow-up from the security audit.",
-    "Performance improvement that could reduce server costs.",
-    "Part of the Q1 roadmap.",
-    "Tech debt that we should address soon.",
+const issues = [
+    {
+        title: "Fix login redirect loop",
+        description: "Users are getting stuck in a redirect loop after login.",
+    },
+    {
+        title: "Add pagination to user list",
+        description: "The user list loads all users at once, causing slow performance.",
+    },
+    { title: "Update dependencies", description: "Several packages have security updates available." },
+    { title: "Refactor auth middleware", description: "Current implementation is hard to maintain." },
+    { title: "Add unit tests for payments", description: "Payment service has no test coverage." },
+    {
+        title: "Fix memory leak in websocket",
+        description: "Memory usage grows over time with active connections.",
+    },
+    { title: "Implement password reset", description: "Users currently can't reset forgotten passwords." },
+    { title: "Add API response caching", description: "Frequently accessed endpoints should be cached." },
+    { title: "Fix date formatting", description: "Dates display incorrectly in some timezones." },
+    { title: "Add CSV export", description: "Users want to export their data to CSV." },
+    { title: "Improve form validation errors", description: "Error messages are not clear enough." },
+    { title: "Fix race condition in queue", description: "Jobs occasionally process twice." },
+    { title: "Add dark mode", description: "Users have requested a dark theme option." },
+    { title: "Optimize dashboard queries", description: "Dashboard takes too long to load." },
+    { title: "Fix image uploads on Safari", description: "Upload fails silently on Safari browsers." },
+    { title: "Add rate limiting", description: "API endpoints need protection from abuse." },
+    { title: "Implement activity logging", description: "Need to track user actions for audit purposes." },
+    { title: "Fix timezone handling", description: "Scheduled tasks run at wrong times." },
+    { title: "Add admin search", description: "Admin panel needs search functionality." },
+    { title: "Refactor billing code", description: "Legacy billing code needs cleanup." },
+    { title: "Fix email templates", description: "Some email clients render templates incorrectly." },
+    { title: "Add webhook retries", description: "Failed webhooks should retry automatically." },
+    { title: "Improve loading states", description: "Users don't know when content is loading." },
+    { title: "Fix notification settings", description: "Preference changes don't persist." },
+    { title: "Add bulk delete", description: "Users want to delete multiple items at once." },
+    { title: "Fix SSO integration", description: "SSO login fails intermittently." },
+    { title: "Add two-factor auth", description: "Security requirement for enterprise users." },
+    { title: "Fix scroll position", description: "Page scrolls to top on navigation." },
+    { title: "Implement lazy loading", description: "Images should load as user scrolls." },
+    { title: "Add audit logging", description: "Need to log sensitive operations." },
+    { title: "Fix PDF export timeout", description: "Large reports timeout during export." },
+    { title: "Add keyboard shortcuts", description: "Power users want keyboard navigation." },
+    { title: "Fix mobile layout", description: "Layout breaks on small screens." },
+    { title: "Add file preview", description: "Users want to preview files before download." },
+    { title: "Fix session expiry", description: "Users get logged out unexpectedly." },
+    { title: "Add batch processing", description: "Need to process large datasets efficiently." },
 ];
 
 async function seed() {
@@ -80,8 +82,10 @@ async function seed() {
             ])
             .returning();
 
-        const u1 = users[0]!;
-        const u2 = users[1]!;
+        if (users.length < 2 || !users[0] || !users[1]) {
+            throw new Error("failed to create users");
+        }
+        const [u1, u2] = users;
 
         console.log(`created ${users.length} users`);
 
@@ -90,31 +94,31 @@ async function seed() {
         const orgs = await db
             .insert(Organisation)
             .values([
-                { name: "u1o1", slug: "u1o1", description: "User 1 organisation 1" },
-                { name: "u1o2", slug: "u1o2", description: "User 1 organisation 2" },
-                { name: "u2o1", slug: "u2o1", description: "User 2 organisation 1" },
-                { name: "u2o2", slug: "u2o2", description: "User 2 organisation 2" },
+                { name: "Acme Corp", slug: "acme", description: "Enterprise software solutions" },
+                { name: "Startup Labs", slug: "startup-labs", description: "Innovation hub" },
+                { name: "Tech Solutions", slug: "tech-solutions", description: "IT consulting services" },
+                { name: "Digital Agency", slug: "digital-agency", description: "Web and mobile development" },
             ])
             .returning();
 
-        const u1o1 = orgs[0]!;
-        const u1o2 = orgs[1]!;
-        const u2o1 = orgs[2]!;
-        const u2o2 = orgs[3]!;
+        const [acme, startupLabs, techSolutions, digitalAgency] = orgs;
+        if (!acme || !startupLabs || !techSolutions || !digitalAgency) {
+            throw new Error("failed to create organisations");
+        }
 
         console.log(`created ${orgs.length} organisations`);
 
-        // add members to organisations
+        // add members to organisations (both users are members of all orgs)
         console.log("adding organisation members...");
         await db.insert(OrganisationMember).values([
-            { organisationId: u1o1.id, userId: u1.id, role: "owner" },
-            { organisationId: u1o1.id, userId: u2.id, role: "member" },
-            { organisationId: u1o2.id, userId: u1.id, role: "owner" },
-            { organisationId: u1o2.id, userId: u2.id, role: "member" },
-            { organisationId: u2o1.id, userId: u2.id, role: "owner" },
-            { organisationId: u2o1.id, userId: u1.id, role: "member" },
-            { organisationId: u2o2.id, userId: u2.id, role: "owner" },
-            { organisationId: u2o2.id, userId: u1.id, role: "member" },
+            { organisationId: acme.id, userId: u1.id, role: "owner" },
+            { organisationId: acme.id, userId: u2.id, role: "member" },
+            { organisationId: startupLabs.id, userId: u1.id, role: "owner" },
+            { organisationId: startupLabs.id, userId: u2.id, role: "member" },
+            { organisationId: techSolutions.id, userId: u2.id, role: "owner" },
+            { organisationId: techSolutions.id, userId: u1.id, role: "member" },
+            { organisationId: digitalAgency.id, userId: u2.id, role: "owner" },
+            { organisationId: digitalAgency.id, userId: u1.id, role: "member" },
         ]);
 
         console.log("added organisation members");
@@ -124,49 +128,52 @@ async function seed() {
         const projects = await db
             .insert(Project)
             .values([
-                { key: "11P1", name: "u1o1p1", organisationId: u1o1.id, creatorId: u1.id },
-                { key: "11P2", name: "u1o1p2", organisationId: u1o1.id, creatorId: u1.id },
-                { key: "12P1", name: "u1o2p1", organisationId: u1o2.id, creatorId: u1.id },
-                { key: "12P2", name: "u1o2p2", organisationId: u1o2.id, creatorId: u1.id },
-                { key: "21P1", name: "u2o1p1", organisationId: u2o1.id, creatorId: u2.id },
-                { key: "21P2", name: "u2o1p2", organisationId: u2o1.id, creatorId: u2.id },
-                { key: "22P1", name: "u2o2p1", organisationId: u2o2.id, creatorId: u2.id },
-                { key: "22P2", name: "u2o2p2", organisationId: u2o2.id, creatorId: u2.id },
+                { key: "WEB", name: "Website Redesign", organisationId: acme.id, creatorId: u1.id },
+                { key: "API", name: "API Platform", organisationId: acme.id, creatorId: u1.id },
+                { key: "APP", name: "Mobile App", organisationId: startupLabs.id, creatorId: u1.id },
+                { key: "DASH", name: "Dashboard", organisationId: startupLabs.id, creatorId: u1.id },
+                { key: "CRM", name: "CRM System", organisationId: techSolutions.id, creatorId: u2.id },
+                { key: "ERP", name: "ERP Module", organisationId: techSolutions.id, creatorId: u2.id },
+                { key: "SHOP", name: "E-commerce Site", organisationId: digitalAgency.id, creatorId: u2.id },
+                { key: "CMS", name: "Content Platform", organisationId: digitalAgency.id, creatorId: u2.id },
             ])
             .returning();
 
         console.log(`created ${projects.length} projects`);
 
-        // create 0-4 issues per project
+        // create 3-6 issues per project
         console.log("creating issues...");
         const allUsers = [u1, u2];
         const issueValues = [];
-        let issueTitleIndex = 0;
+        let issueIndex = 0;
 
         for (const project of projects) {
-            const numIssues = Math.floor(Math.random() * 5); // 0-4 issues
+            const numIssues = Math.floor(Math.random() * 4) + 3; // 3-6 issues
             for (let i = 1; i <= numIssues; i++) {
-                const creator = allUsers[Math.floor(Math.random() * allUsers.length)]!;
+                const creator = allUsers[Math.floor(Math.random() * allUsers.length)];
+                if (!creator) {
+                    throw new Error("failed to select issue creator");
+                }
                 const assignee =
-                    Math.random() > 0.3 ? allUsers[Math.floor(Math.random() * allUsers.length)] : null;
-                const title = issueTitles[issueTitleIndex % issueTitles.length]!;
-                const description = issueDescriptions[Math.floor(Math.random() * issueDescriptions.length)]!;
-                issueTitleIndex++;
+                    Math.random() > 0.25 ? allUsers[Math.floor(Math.random() * allUsers.length)] : null;
+                const issue = issues[issueIndex % issues.length];
+                if (!issue) {
+                    throw new Error("failed to select issue");
+                }
+                issueIndex++;
 
                 issueValues.push({
                     projectId: project.id,
                     number: i,
-                    title,
-                    description,
+                    title: issue.title,
+                    description: issue.description,
                     creatorId: creator.id,
                     assigneeId: assignee?.id ?? null,
                 });
             }
         }
 
-        if (issueValues.length > 0) {
-            await db.insert(Issue).values(issueValues);
-        }
+        await db.insert(Issue).values(issueValues);
 
         console.log(`created ${issueValues.length} issues`);
 
