@@ -45,7 +45,7 @@ export function UserSelect({
             <SelectContent
                 side="bottom"
                 position="popper"
-                className="data-[side=bottom]:translate-y-1 data-[side=bottom]:translate-x-0.25"
+                className="data-[side=bottom]:translate-y-1 data-[side=bottom]:translate-x-1"
             >
                 <SelectItem value="unassigned">Unassigned</SelectItem>
                 {users.map((user) => (
