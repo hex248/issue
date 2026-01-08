@@ -1,4 +1,4 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client } from "bun";
 
 const s3Endpoint = process.env.S3_ENDPOINT;
 const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID;
@@ -12,11 +12,9 @@ if (!s3Endpoint || !s3AccessKeyId || !s3SecretAccessKey || !s3BucketName) {
 
 export const s3Client = new S3Client({
     endpoint: s3Endpoint,
-    region: "auto",
-    credentials: {
-        accessKeyId: s3AccessKeyId,
-        secretAccessKey: s3SecretAccessKey,
-    },
+    bucket: s3BucketName,
+    accessKeyId: s3AccessKeyId,
+    secretAccessKey: s3SecretAccessKey,
 });
 
 export const bucketName = s3BucketName;
