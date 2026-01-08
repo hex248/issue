@@ -21,10 +21,16 @@ function SelectTrigger({
     size = "default",
     children,
     isOpen,
+    label,
+    hasValue,
+    labelPosition = "top",
     ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
     isOpen?: boolean;
     size?: "sm" | "default";
+    label?: string;
+    hasValue?: boolean;
+    labelPosition?: "top" | "bottom";
 }) {
     return (
         <SelectPrimitive.Trigger
@@ -35,7 +41,7 @@ function SelectTrigger({
                 "[&_svg:not([class*='text-'])]:text-muted-foreground",
                 "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
                 "aria-invalid:border-destructive dark:hover:bg-muted/40",
-                "flex w-fit items-center justify-between gap-2 border",
+                "relative flex w-fit items-center justify-between gap-2 border",
                 "bg-transparent px-3 py-2 text-sm whitespace-nowrap",
                 "shadow-xs outline-none disabled:cursor-not-allowed",
                 "disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8",
@@ -46,6 +52,16 @@ function SelectTrigger({
             )}
             {...props}
         >
+            {label && hasValue && (
+                <span
+                    className={cn(
+                        "text-muted-foreground bg-background absolute left-0.5 px-1 text-[9px] leading-none",
+                        labelPosition === "top" ? "-top-1" : "-bottom-1",
+                    )}
+                >
+                    {label}
+                </span>
+            )}
             {children}
             <SelectPrimitive.Icon asChild>
                 <ChevronDownIcon

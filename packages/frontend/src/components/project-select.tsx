@@ -20,6 +20,7 @@ export function ProjectSelect({
     onSelectedProjectChange,
     onCreateProject,
     placeholder = "Select Project",
+    labelPosition = "top",
 }: {
     projects: ProjectResponse[];
     selectedProject: ProjectResponse | null;
@@ -27,6 +28,7 @@ export function ProjectSelect({
     onSelectedProjectChange: (project: ProjectResponse | null) => void;
     onCreateProject?: (projectId: number) => void | Promise<void>;
     placeholder?: string;
+    labelPosition?: "top" | "bottom";
 }) {
     const [open, setOpen] = useState(false);
 
@@ -43,7 +45,13 @@ export function ProjectSelect({
             }}
             onOpenChange={setOpen}
         >
-            <SelectTrigger className="text-sm" isOpen={open}>
+            <SelectTrigger
+                className="text-sm"
+                isOpen={open}
+                label="Project"
+                hasValue={!!selectedProject}
+                labelPosition={labelPosition}
+            >
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent side="bottom" position="popper" align={"start"}>
