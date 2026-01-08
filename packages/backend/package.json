@@ -2,6 +2,9 @@
     "name": "@issue/backend",
     "version": "0.1.0",
     "type": "module",
+    "engines": {
+	"bun": "1.3.4"
+    },
     "scripts": {
         "dev": "bun --watch src/index.ts --dev --PORT=3000",
         "start": "bun src/index.ts --PORT=3000",
