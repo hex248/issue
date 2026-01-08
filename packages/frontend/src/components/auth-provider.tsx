@@ -1,4 +1,5 @@
 import type { UserRecord } from "@issue/shared";
+import { AlertTriangle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Loading from "@/components/loading";
 import LogInForm from "@/components/login-form";
@@ -48,6 +49,18 @@ export function Auth({ children }: AuthProviderProps) {
     if (loggedIn === false)
         return (
             <div className="flex flex-col items-center justify-center gap-4 w-full h-[100vh]">
+                {/* under construction warning */}
+                <div className="flex flex-col border p-4 items-center border-border/50 bg-border/10 rounded-md gap-2 max-w-sm">
+                    <AlertTriangle className="w-16 h-16 text-yellow-500" strokeWidth={1.5} />
+                    <p className="text-center text-sm text-muted-foreground font-500">
+                        This application is currently under construction. Your data is very likely to be lost
+                        at some point.
+                        <pre> </pre>
+                        <p className="font-700 border-b border-yellow-500/50">
+                            It is not recommended for production use.
+                        </p>
+                    </p>
+                </div>
                 <LogInForm />
             </div>
         );
