@@ -295,47 +295,40 @@ function Index() {
             </div>
 
             {/* main body */}
-            <div className={`w-full h-full flex items-start justify-between gap-${BREATHING_ROOM}`}>
-                {selectedProject && issues.length > 0 && (
-                    <ResizablePanelGroup>
-                        <ResizablePanel id={"left"} minSize={400}>
-                            {/* issues list (table) */}
-                            <IssuesTable
-                                issuesData={issues}
-                                columns={{ description: false }}
-                                issueSelectAction={(issue) => {
-                                    if (issue.Issue.id === selectedIssue?.Issue.id) setSelectedIssue(null);
-                                    else setSelectedIssue(issue);
-                                }}
-                                className="border w-full flex-shrink"
-                            />
-                        </ResizablePanel>
+            {selectedProject && issues.length > 0 && (
+                <ResizablePanelGroup className={`flex-1`}>
+                    <ResizablePanel id={"left"} minSize={400}>
+                        {/* issues list (table) */}
+                        <IssuesTable
+                            issuesData={issues}
+                            columns={{ description: false }}
+                            issueSelectAction={(issue) => {
+                                if (issue.Issue.id === selectedIssue?.Issue.id) setSelectedIssue(null);
+                                else setSelectedIssue(issue);
+                            }}
+                            className="border w-full flex-shrink"
+                        />
+                    </ResizablePanel>
 
-                        {/* issue detail pane */}
-                        {selectedIssue && selectedOrganisation && (
-                            <>
-                                <ResizableSeparator />
-                                <ResizablePanel
-                                    id={"right"}
-                                    defaultSize={"30%"}
-                                    minSize={360}
-                                    maxSize={"60%"}
-                                >
-                                    <div className="border">
-                                        <IssueDetailPane
-                                            project={selectedProject}
-                                            issueData={selectedIssue}
-                                            members={members}
-                                            close={() => setSelectedIssue(null)}
-                                            onIssueUpdate={refetchIssues}
-                                        />
-                                    </div>
-                                </ResizablePanel>
-                            </>
-                        )}
-                    </ResizablePanelGroup>
-                )}
-            </div>
+                    {/* issue detail pane */}
+                    {selectedIssue && selectedOrganisation && (
+                        <>
+                            <ResizableSeparator />
+                            <ResizablePanel id={"right"} defaultSize={"30%"} minSize={360} maxSize={"60%"}>
+                                <div className="border">
+                                    <IssueDetailPane
+                                        project={selectedProject}
+                                        issueData={selectedIssue}
+                                        members={members}
+                                        close={() => setSelectedIssue(null)}
+                                        onIssueUpdate={refetchIssues}
+                                    />
+                                </div>
+                            </ResizablePanel>
+                        </>
+                    )}
+                </ResizablePanelGroup>
+            )}
 
             {/* <LogOutButton /> */}
         </main>
