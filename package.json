@@ -14,6 +14,7 @@
         "dev:frontend:tauri": "bun --filter @issue/frontend tauri",
         "dev:backend": "bun --filter @issue/backend dev",
         "dev": "concurrently -n FRONTEND,BACKEND -c blue,green \"bun dev:frontend\" \"bun dev:backend\"",
-        "dev:desktop": "concurrently -n TAURI,BACKEND -c magenta,green \"bun dev:frontend:tauri\" \"bun dev:backend\""
+        "dev:desktop": "concurrently -n TAURI,BACKEND -c magenta,green \"bun dev:frontend:tauri\" \"bun dev:backend\"",
+        "reset-and-seed": "bun --filter @issue/backend db:reset && bun --filter @issue/backend db:seed"
     }
 }

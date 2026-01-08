@@ -1,8 +1,6 @@
-import { User } from "@issue/shared";
 import { withAuth, withCors } from "./auth/middleware";
-import { db, testDB } from "./db/client";
+import { testDB } from "./db/client";
 import { routes } from "./routes";
-import { createDemoData } from "./utils";
 
 const DEV = process.argv.find((arg) => ["--dev", "--developer", "-d"].includes(arg.toLowerCase())) != null;
 const PORT = process.argv.find((arg) => arg.toLowerCase().startsWith("--port="))?.split("=")[1] || 0;
@@ -54,15 +52,6 @@ const main = async () => {
 
     console.log(`eussi (issue server) listening on ${server.url}`);
     await testDB();
-
-    if (DEV) {
-        const users = await db.select().from(User);
-        if (users.length === 0) {
-            console.log("creating demo data...");
-            await createDemoData();
-            console.log("demo data created");
-        }
-    }
 };
 
 main();
