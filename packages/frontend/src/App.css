@@ -125,6 +125,10 @@
     body {
         @apply bg-background text-foreground;
     }
+    ::selection {
+        background-color: var(--personality);
+        color: var(--background);
+    }
 }
 
 * {
