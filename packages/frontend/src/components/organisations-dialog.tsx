@@ -53,11 +53,12 @@ function OrganisationsDialog({
                 organisationId: selectedOrganisation.Organisation.id,
                 onSuccess: (data) => {
                     const members = data as OrganisationMemberResponse[];
+                    const roleOrder: Record<string, number> = { owner: 0, admin: 1, member: 2 };
                     members.sort((a, b) => {
-                        const nameCompare = a.User.name.localeCompare(b.User.name);
-                        return nameCompare !== 0
-                            ? nameCompare
-                            : b.OrganisationMember.role.localeCompare(a.OrganisationMember.role);
+                        const roleA = roleOrder[a.OrganisationMember.role] ?? 3;
+                        const roleB = roleOrder[b.OrganisationMember.role] ?? 3;
+                        if (roleA !== roleB) return roleA - roleB;
+                        return a.User.name.localeCompare(b.User.name);
                     });
                     setMembers(members);
                 },
