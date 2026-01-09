@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Avatar from "@/components/avatar";
 import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
+import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -20,6 +21,7 @@ const DEMO_USERS = [
 export default function LogInForm() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { setUser } = useSession();
 
     const [loginDetailsOpen, setLoginDetailsOpen] = useState(false);
     const [showWarning, setShowWarning] = useState(() => {
@@ -51,7 +53,7 @@ export default function LogInForm() {
                     setError("");
                     const data = await res.json();
                     setCsrfToken(data.csrfToken);
-                    localStorage.setItem("user", JSON.stringify(data.user));
+                    setUser(data.user);
                     const next = searchParams.get("next") || "/app";
                     navigate(next, { replace: true });
                 }
@@ -89,7 +91,7 @@ export default function LogInForm() {
                     setError("");
                     const data = await res.json();
                     setCsrfToken(data.csrfToken);
-                    localStorage.setItem("user", JSON.stringify(data.user));
+                    setUser(data.user);
                     const next = searchParams.get("next") || "/app";
                     navigate(next, { replace: true });
                 }

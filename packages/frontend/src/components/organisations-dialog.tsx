@@ -1,9 +1,10 @@
-import type { OrganisationMemberResponse, OrganisationResponse, UserRecord } from "@issue/shared";
+import type { OrganisationMemberResponse, OrganisationResponse } from "@issue/shared";
 import { Plus, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { AddMemberDialog } from "@/components/add-member-dialog";
 import { OrganisationSelect } from "@/components/organisation-select";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -23,7 +24,7 @@ function OrganisationsDialog({
     setSelectedOrganisation: (organisation: OrganisationResponse | null) => void;
     refetchOrganisations: (options?: { selectOrganisationId?: number }) => Promise<void>;
 }) {
-    const user = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
+    const { user } = useAuthenticatedSession();
 
     const [open, setOpen] = useState(false);
     const [members, setMembers] = useState<OrganisationMemberResponse[]>([]);

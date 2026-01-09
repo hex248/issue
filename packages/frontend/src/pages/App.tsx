@@ -16,6 +16,7 @@ import { OrganisationSelect } from "@/components/organisation-select";
 import OrganisationsDialog from "@/components/organisations-dialog";
 import { ProjectSelect } from "@/components/project-select";
 import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,10 +31,8 @@ import { issue, organisation, project } from "@/lib/server";
 
 const BREATHING_ROOM = 1;
 
-function Index() {
-    const userData = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
-
-    const [user, setUser] = useState<UserRecord>(userData);
+export default function App() {
+    const { user } = useAuthenticatedSession();
 
     const organisationsRef = useRef(false);
     const [organisations, setOrganisations] = useState<OrganisationResponse[]>([]);
@@ -46,11 +45,6 @@ function Index() {
     const [selectedIssue, setSelectedIssue] = useState<IssueResponse | null>(null);
 
     const [members, setMembers] = useState<UserRecord[]>([]);
-
-    const refetchUser = async () => {
-        const userData = JSON.parse(localStorage.getItem("user") || "{}") as UserRecord;
-        setUser(userData);
-    };
 
     const refetchOrganisations = async (options?: { selectOrganisationId?: number }) => {
         try {
@@ -260,11 +254,7 @@ function Index() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align={"end"}>
                             <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <AccountDialog
-                                    onUpdate={async () => {
-                                        refetchUser();
-                                    }}
-                                />
+                                <AccountDialog />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild className="flex items-end justify-end">
                                 <OrganisationsDialog
@@ -334,5 +324,3 @@ function Index() {
         </main>
     );
 }
-
-export default Index;

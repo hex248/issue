@@ -1,6 +1,6 @@
-import type { UserRecord } from "@issue/shared";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { UploadAvatar } from "@/components/upload-avatar";
 import { user } from "@/lib/server";
 
-function AccountDialog({ onUpdate, trigger }: { onUpdate?: () => void; trigger?: ReactNode }) {
+function AccountDialog({ trigger }: { trigger?: ReactNode }) {
+    const { user: currentUser, setUser } = useAuthenticatedSession();
+
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
@@ -16,24 +18,18 @@ function AccountDialog({ onUpdate, trigger }: { onUpdate?: () => void; trigger?:
     const [avatarURL, setAvatarUrl] = useState<string | null>(null);
     const [error, setError] = useState("");
     const [submitAttempted, setSubmitAttempted] = useState(false);
-    const [userId, setUserId] = useState<number | null>(null);
 
     useEffect(() => {
         if (!open) return;
 
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-            const user = JSON.parse(userStr) as UserRecord;
-            setName(user.name);
-            setUsername(user.username);
-            setUserId(user.id);
-            setAvatarUrl(user.avatarURL || null);
-        }
+        setName(currentUser.name);
+        setUsername(currentUser.username);
+        setAvatarUrl(currentUser.avatarURL || null);
 
         setPassword("");
         setError("");
         setSubmitAttempted(false);
-    }, [open]);
+    }, [open, currentUser]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,21 +39,15 @@ function AccountDialog({ onUpdate, trigger }: { onUpdate?: () => void; trigger?:
             return;
         }
 
-        if (!userId) {
-            setError("User not found");
-            return;
-        }
-
         await user.update({
-            id: userId,
+            id: currentUser.id,
             name: name.trim(),
             password: password.trim(),
             avatarURL,
             onSuccess: (data) => {
                 setError("");
-                localStorage.setItem("user", JSON.stringify(data));
+                setUser(data);
                 setPassword("");
-                onUpdate?.();
                 setOpen(false);
             },
             onError: (errorMessage) => {

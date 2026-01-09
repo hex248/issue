@@ -1,5 +1,6 @@
 import type { UserRecord } from "@issue/shared";
 import { type FormEvent, useState } from "react";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -26,7 +27,7 @@ export function CreateIssue({
     trigger?: React.ReactNode;
     completeAction?: (issueId: number) => void | Promise<void>;
 }) {
-    const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
+    const { user } = useAuthenticatedSession();
 
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
@@ -61,7 +62,7 @@ export function CreateIssue({
             return;
         }
 
-        if (!userId) {
+        if (!user.id) {
             setError("you must be logged in to create an issue");
             return;
         }

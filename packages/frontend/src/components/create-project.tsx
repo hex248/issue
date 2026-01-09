@@ -1,5 +1,6 @@
 import type { ProjectRecord } from "@issue/shared";
 import { type FormEvent, useState } from "react";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -29,7 +30,7 @@ export function CreateProject({
     trigger?: React.ReactNode;
     completeAction?: (projectId: number) => void | Promise<void>;
 }) {
-    const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
+    const { user } = useAuthenticatedSession();
 
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
@@ -64,7 +65,7 @@ export function CreateProject({
             return;
         }
 
-        if (!userId) {
+        if (!user.id) {
             setError("you must be logged in to create a project");
             return;
         }
@@ -79,7 +80,7 @@ export function CreateProject({
             await project.create({
                 key,
                 name,
-                creatorId: userId,
+                creatorId: user.id,
                 organisationId,
                 onSuccess: async (data) => {
                     const project = data as ProjectRecord;

@@ -1,42 +1,27 @@
-import type { UserRecord } from "@issue/shared";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Loading from "@/components/loading";
 import LogInForm from "@/components/login-form";
-import { clearAuth, getServerURL, setCsrfToken } from "@/lib/utils";
+import { useSession } from "@/components/session-provider";
 
 export default function Login() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [checking, setChecking] = useState(true);
-    const checkedRef = useRef(false);
+    const { user, isLoading } = useSession();
 
     useEffect(() => {
-        if (checkedRef.current) return;
-        checkedRef.current = true;
+        if (!isLoading && user) {
+            const next = searchParams.get("next") || "/app";
+            navigate(next, { replace: true });
+        }
+    }, [user, isLoading, navigate, searchParams]);
 
-        fetch(`${getServerURL()}/auth/me`, {
-            credentials: "include",
-        })
-            .then(async (res) => {
-                if (res.ok) {
-                    const data = (await res.json()) as { user: UserRecord; csrfToken: string };
-                    setCsrfToken(data.csrfToken);
-                    localStorage.setItem("user", JSON.stringify(data.user));
-                    const next = searchParams.get("next") || "/app";
-                    navigate(next, { replace: true });
-                } else {
-                    clearAuth();
-                    setChecking(false);
-                }
-            })
-            .catch(() => {
-                setChecking(false);
-            });
-    }, [navigate, searchParams]);
-
-    if (checking) {
+    if (isLoading) {
         return <Loading message="Checking authentication" />;
+    }
+
+    if (user) {
+        return <Loading message="Redirecting" />;
     }
 
     return (

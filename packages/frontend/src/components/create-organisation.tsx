@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -28,7 +29,7 @@ export function CreateOrganisation({
     trigger?: React.ReactNode;
     completeAction?: (organisationId: number) => void | Promise<void>;
 }) {
-    const userId = JSON.parse(localStorage.getItem("user") || "{}").id as number | undefined;
+    const { user } = useAuthenticatedSession();
 
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
@@ -64,7 +65,7 @@ export function CreateOrganisation({
         if (name.trim() === "" || name.trim().length > 16) return;
         if (slug.trim() === "" || slug.trim().length > 16) return;
 
-        if (!userId) {
+        if (!user.id) {
             setError("you must be logged in to create an organisation");
             return;
         }
@@ -75,7 +76,7 @@ export function CreateOrganisation({
                 name,
                 slug,
                 description,
-                userId,
+                userId: user.id,
                 onSuccess: async (data) => {
                     setOpen(false);
                     reset();

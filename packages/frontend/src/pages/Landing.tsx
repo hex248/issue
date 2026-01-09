@@ -1,45 +1,16 @@
-import type { UserRecord } from "@issue/shared";
-import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
-import { clearAuth, getServerURL, setCsrfToken } from "@/lib/utils";
-
-type AuthState = "unknown" | "authenticated" | "unauthenticated";
 
 export default function Landing() {
-    const [authState, setAuthState] = useState<AuthState>("unknown");
-    const verifiedRef = useRef(false);
-
-    useEffect(() => {
-        if (verifiedRef.current) return;
-        verifiedRef.current = true;
-
-        fetch(`${getServerURL()}/auth/me`, {
-            credentials: "include",
-        })
-            .then(async (res) => {
-                if (res.ok) {
-                    const data = (await res.json()) as { user: UserRecord; csrfToken: string };
-                    localStorage.setItem("user", JSON.stringify(data.user));
-                    setCsrfToken(data.csrfToken);
-                    setAuthState("authenticated");
-                } else {
-                    clearAuth();
-                    setAuthState("unauthenticated");
-                }
-            })
-            .catch(() => {
-                clearAuth();
-                setAuthState("unauthenticated");
-            });
-    }, []);
+    const { user, isLoading } = useSession();
 
     return (
         <div className="min-h-screen flex flex-col">
             <header className="relative flex items-center justify-center p-2 border-b">
                 <div className="text-3xl font-basteleur font-700">Issue</div>
                 <nav className="absolute right-2 flex items-center gap-4">
-                    {authState === "authenticated" ? (
+                    {!isLoading && user ? (
                         <Button asChild variant="outline" size="sm">
                             <Link to="/app">Open app</Link>
                         </Button>
@@ -65,7 +36,7 @@ export default function Landing() {
                 </div>
 
                 <div className="flex gap-4">
-                    {authState === "authenticated" ? (
+                    {!isLoading && user ? (
                         <Button asChild size="lg">
                             <Link to="/app">Open app</Link>
                         </Button>
