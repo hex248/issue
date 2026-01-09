@@ -11,9 +11,16 @@ export default function Landing() {
                 <div className="text-3xl font-basteleur font-700">Issue</div>
                 <nav className="absolute right-2 flex items-center gap-4">
                     {!isLoading && user ? (
-                        <Button asChild variant="outline" size="sm">
-                            <Link to="/app">Open app</Link>
-                        </Button>
+                        <>
+                            {user && (
+                                <h1 className="text-xl font-basteleur font-400">
+                                    Welcome back {user.name.split(" ")[0]}!
+                                </h1>
+                            )}
+                            <Button asChild variant="outline" size="sm">
+                                <Link to="/app">Open app</Link>
+                            </Button>
+                        </>
                     ) : (
                         <Button asChild variant="outline" size="sm">
                             <Link to="/login">Sign in</Link>
@@ -48,20 +55,20 @@ export default function Landing() {
                 </div>
             </main>
 
-            <footer className="flex justify-center gap-2 items-center py-2 border-t">
-                <span className="font-300 text-sm text-muted-foreground">
+            <footer className="flex justify-center gap-2 items-center py-1 border-t">
+                <span className="font-300 text-lg text-muted-foreground font-goudy">
                     Built by{" "}
                     <a
                         href="https://ob248.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-personality"
+                        className="hover:text-personality font-goudy font-700"
                     >
                         Oliver Bryan
                     </a>
                 </span>
                 <a href="https://ob248.com" target="_blank" rel="noopener noreferrer">
-                    <img src="oliver-bryan.svg" alt="Oliver Bryan" className="w-3 h-3" />
+                    <img src="oliver-bryan.svg" alt="Oliver Bryan" className="w-4 h-4" />
                 </a>
             </footer>
         </div>
