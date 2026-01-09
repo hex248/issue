@@ -222,8 +222,20 @@ export default function LogInForm() {
                                         username={username || undefined}
                                         avatarURL={avatarURL}
                                         onAvatarUploaded={setAvatarUrl}
-                                        className={"mt-2 mb-4"}
+                                        className="mb-2"
                                     />
+                                    {avatarURL && (
+                                        <Button
+                                            variant={"dummy"}
+                                            type={"button"}
+                                            onClick={() => {
+                                                setAvatarUrl(null);
+                                            }}
+                                            className="-mt-2 mb-2 hover:text-personality"
+                                        >
+                                            Remove Avatar
+                                        </Button>
+                                    )}
                                     <Field
                                         label="Full Name"
                                         value={name}
