@@ -1,6 +1,7 @@
 import type { IssueResponse, ProjectResponse, UserRecord } from "@issue/shared";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { TimerModal } from "@/components/timer-modal";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ export function IssueDetailPane({
     close: () => void;
     onIssueUpdate?: () => void;
 }) {
+    const { user } = useSession();
     const [assigneeId, setAssigneeId] = useState<string>(
         issueData.Issue.assigneeId?.toString() ?? "unassigned",
     );
@@ -81,9 +83,11 @@ export function IssueDetailPane({
                     <SmallUserDisplay user={issueData.Creator} className={"text-sm"} />
                 </div>
 
-                <div>
-                    <TimerModal issueId={issueData.Issue.id} />
-                </div>
+                {user?.id === Number(assigneeId) && (
+                    <div>
+                        <TimerModal issueId={issueData.Issue.id} />
+                    </div>
+                )}
             </div>
         </div>
     );
