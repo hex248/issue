@@ -1,4 +1,5 @@
 import { UserRound } from "lucide-react";
+import { useSession } from "@/components/session-provider";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_COLOURS = [
@@ -41,18 +42,25 @@ function getInitials(username: string) {
 }
 
 export default function Avatar({
-    avatarURL,
-    name,
+    avatarURL: _avatarURL,
+    name: _name,
     username,
     size,
     textClass = "text-xs",
+    strong = false,
 }: {
     avatarURL?: string | null;
     name?: string;
     username?: string;
     size?: number;
     textClass?: string;
+    strong?: boolean;
 }) {
+    // if the username matches the authed user, use their avatarURL and name (avoid stale data)
+    const { user } = useSession();
+    const avatarURL = !strong && username && user && username === user.username ? user.avatarURL : _avatarURL;
+    const name = !strong && username && user && username === user.username ? user.name : _name;
+
     const backgroundClass = username
         ? FALLBACK_COLOURS[hashStringToIndex(username, FALLBACK_COLOURS.length)]
         : "bg-muted";

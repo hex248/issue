@@ -61,6 +61,7 @@ export function UploadAvatar({
                     avatarURL={avatarURL}
                     size={24}
                     textClass={"text-4xl"}
+                    strong
                 />
 
                 {!uploading && showEdit && (
