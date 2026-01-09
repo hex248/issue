@@ -88,15 +88,20 @@ export default function Landing() {
                 </div>
             </main>
 
-            <footer className="p-2 border-t text-center text-sm font-300 text-muted-foreground">
-                Built by{" "}
-                <a
-                    href="https://ob248.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline underline-offset-2"
-                >
-                    Oliver Bryan
+            <footer className="flex justify-center gap-2 items-center py-2 border-t">
+                <span className="font-300 text-sm text-muted-foreground">
+                    Built by{" "}
+                    <a
+                        href="https://ob248.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline underline-offset-2"
+                    >
+                        Oliver Bryan
+                    </a>
+                </span>
+                <a href="https://ob248.com" target="_blank" rel="noopener noreferrer">
+                    <img src="oliver-bryan.svg" alt="Oliver Bryan" className="w-3 h-3" />
                 </a>
             </footer>
         </div>
