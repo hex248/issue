@@ -4,5 +4,6 @@ Issue
 - issuepm.com is £7.80/yr
 
 Sprint or Sprints
+- sprint4.dev is £11.85/yr
 - sprintpm.dev is £11.89/yr
 - sprints.sh is £26.02/yr
