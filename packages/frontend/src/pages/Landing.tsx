@@ -1,3 +1,4 @@
+import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export default function Landing() {
                     </p>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col items-center gap-8">
                     {!isLoading && user ? (
                         <Button asChild size="lg">
                             <Link to="/app">Open app</Link>
@@ -52,6 +53,16 @@ export default function Landing() {
                             <Link to="/login">Get started</Link>
                         </Button>
                     )}
+
+                    <a
+                        href="https://github.com/hex248/issue"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex gap-2 text-muted-foreground hover:text-personality"
+                    >
+                        <Icon icon="mdi:github" className="h-7 w-7" />
+                        <span className="font-goudy font-700 text-2xl">GitHub</span>
+                    </a>
                 </div>
             </main>
 

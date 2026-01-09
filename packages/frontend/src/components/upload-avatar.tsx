@@ -1,10 +1,10 @@
 import { Edit } from "lucide-react";
 import { useRef, useState } from "react";
+import Avatar from "@/components/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { user } from "@/lib/server";
 import { cn } from "@/lib/utils";
-import Avatar from "./avatar";
 
 export function UploadAvatar({
     name,
