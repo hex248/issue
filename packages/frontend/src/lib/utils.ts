@@ -9,10 +9,19 @@ export function issueID(key: string, num: number) {
     return `${key}-${num.toString().padStart(3, "0")}`;
 }
 
-export function getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem("token");
-    if (!token) return {};
-    return { Authorization: `Bearer ${token}` };
+export function getCsrfToken(): string | null {
+    return sessionStorage.getItem("csrfToken");
+}
+
+export function setCsrfToken(token: string): void {
+    sessionStorage.setItem("csrfToken", token);
+}
+
+export function clearAuth(): void {
+    sessionStorage.removeItem("csrfToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("selectedOrganisationId");
+    localStorage.removeItem("selectedProjectId");
 }
 
 export function capitalise(str: string) {
