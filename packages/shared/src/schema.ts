@@ -55,6 +55,19 @@ export const Session = pgTable("Session", {
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
+export const TimedSession = pgTable("TimedSession", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer()
+        .notNull()
+        .references(() => User.id),
+    issueId: integer()
+        .notNull()
+        .references(() => Issue.id),
+    timestamps: timestamp({ withTimezone: false }).array().notNull(),
+    endedAt: timestamp({ withTimezone: false }),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+});
+
 export const Issue = pgTable(
     "Issue",
     {
@@ -99,6 +112,9 @@ export const IssueInsertSchema = createInsertSchema(Issue);
 export const SessionSelectSchema = createSelectSchema(Session);
 export const SessionInsertSchema = createInsertSchema(Session);
 
+export const TimedSessionSelectSchema = createSelectSchema(TimedSession);
+export const TimedSessionInsertSchema = createInsertSchema(TimedSession);
+
 // Types
 export type UserRecord = z.infer<typeof UserSelectSchema>;
 export type UserInsert = z.infer<typeof UserInsertSchema>;
@@ -117,6 +133,9 @@ export type IssueInsert = z.infer<typeof IssueInsertSchema>;
 
 export type SessionRecord = z.infer<typeof SessionSelectSchema>;
 export type SessionInsert = z.infer<typeof SessionInsertSchema>;
+
+export type TimedSessionRecord = z.infer<typeof TimedSessionSelectSchema>;
+export type TimedSessionInsert = z.infer<typeof TimedSessionInsertSchema>;
 
 // Responses
 

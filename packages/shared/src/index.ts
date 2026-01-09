@@ -13,6 +13,8 @@ export type {
     ProjectResponse,
     SessionInsert,
     SessionRecord,
+    TimedSessionInsert,
+    TimedSessionRecord,
     UserInsert,
     UserRecord,
 } from "./schema";
@@ -32,7 +34,12 @@ export {
     Session,
     SessionInsertSchema,
     SessionSelectSchema,
+    TimedSession,
+    TimedSessionInsertSchema,
+    TimedSessionSelectSchema,
     User,
     UserInsertSchema,
     UserSelectSchema,
 } from "./schema";
+
+export { calculateBreakTimeMs, calculateWorkTimeMs, isTimerRunning } from "./utils/time-tracking";
