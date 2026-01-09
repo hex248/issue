@@ -5,7 +5,7 @@ import Loading from "@/components/loading";
 import LogInForm from "@/components/login-form";
 import { clearAuth, getServerURL, setCsrfToken } from "@/lib/utils";
 
-export default function LoginPage() {
+export default function Login() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [checking, setChecking] = useState(true);

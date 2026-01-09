@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Auth } from "@/components/auth-provider";
-import Landing from "@/components/landing";
-import LoginPage from "@/components/login-page";
-import NotFound from "@/components/NotFound";
+import NotFound from "@/pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
-import Index from "@/Index";
-import Test from "@/Test";
+import Index from "@/pages/Index";
+import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
+import Test from "@/pages/Test";
 
 function App() {
     return (
@@ -14,7 +14,7 @@ function App() {
                 <Routes>
                     {/* public routes */}
                     <Route path="/" element={<Landing />} />
-                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login" element={<Login />} />
 
                     {/* authed routes */}
                     <Route

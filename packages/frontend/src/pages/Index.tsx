@@ -331,8 +331,6 @@ function Index() {
                     )}
                 </ResizablePanelGroup>
             )}
-
-            {/* <LogOutButton /> */}
         </main>
     );
 }
