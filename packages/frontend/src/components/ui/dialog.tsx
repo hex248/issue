@@ -34,9 +34,11 @@ function DialogContent({
     className,
     children,
     showCloseButton = true,
+    closePos = "top-right",
     ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean;
+    closePos?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 }) {
     return (
         <DialogPortal data-slot="dialog-portal">
@@ -59,7 +61,11 @@ function DialogContent({
                         className={cn(
                             "cursor-pointer ring-offset-background focus:ring-ring",
                             "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-                            "absolute top-4 right-4 opacity-70",
+                            "absolute opacity-70",
+                            closePos === "top-left" && "top-4 left-4",
+                            closePos === "top-right" && "top-4 right-4",
+                            closePos === "bottom-left" && "bottom-4 left-4",
+                            closePos === "bottom-right" && "bottom-4 right-4",
                             "hover:opacity-100 focus:ring-2 focus:ring-offset-2 ",
                             "ocus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none",
                             "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
