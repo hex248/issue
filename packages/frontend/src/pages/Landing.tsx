@@ -38,7 +38,7 @@ export default function Landing() {
                     <p className="text-[24px] font-goudy text-muted-foreground">
                         Build your next project with <span className="font-goudy font-700">Issue.</span>
                     </p>
-                    <p className="text-[18px] font-goudy text-muted-foreground">
+                    <p className="text-[18px] font-goudy text-muted-foreground font-700">
                         Sick of Jira? Say hello to your new favorite project management tool.
                     </p>
                 </div>
@@ -53,16 +53,22 @@ export default function Landing() {
                             <Link to="/login">Get started</Link>
                         </Button>
                     )}
-
-                    <a
-                        href="https://github.com/hex248/issue"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex gap-2 text-muted-foreground hover:text-personality"
-                    >
-                        <Icon icon="mdi:github" className="h-7 w-7" />
-                        <span className="font-goudy font-700 text-2xl">GitHub</span>
-                    </a>
+                    <div className="inline-flex gap-2 items-center">
+                        <span className="relative">
+                            <a
+                                href="https://github.com/hex248/issue"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex gap-2 text-muted-foreground hover:text-personality"
+                            >
+                                <Icon icon="mdi:github" className="h-7 w-7" />
+                                <span className="font-goudy font-700 text-2xl">GitHub</span>
+                            </a>
+                            <span className="text-violet-400/90 absolute left-full top-[45%] ml-4 -translate-y-1/2 whitespace-nowrap select-none text-muted-foreground">
+                                {"<-- you can self-host me!"}
+                            </span>
+                        </span>
+                    </div>
                 </div>
             </main>
 
