@@ -55,7 +55,7 @@ function SelectTrigger({
             {label && hasValue && (
                 <span
                     className={cn(
-                        "text-muted-foreground bg-background absolute left-0.5 px-1 text-[9px] leading-none",
+                        "text-muted-foreground bg-background absolute left-0.5 px-1 text-[11px] leading-none",
                         labelPosition === "top" ? "-top-1" : "-bottom-1",
                     )}
                 >
