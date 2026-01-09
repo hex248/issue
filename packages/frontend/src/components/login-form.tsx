@@ -212,7 +212,7 @@ export default function LogInForm() {
                         )}
                     >
                         <ServerConfigurationDialog />
-                        <span className="text-xl ">{capitalise(mode)}</span>
+                        <span className="text-xl font-basteleur mb-2">{capitalise(mode)}</span>
 
                         <div className={"flex flex-col items-center mb-0"}>
                             {mode === "register" && (

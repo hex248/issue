@@ -125,9 +125,6 @@
     body {
         @apply bg-background text-foreground;
     }
-    a:hover {
-        color: var(--personality);
-    }
 }
 
 * {
