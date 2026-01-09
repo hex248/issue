@@ -8,5 +8,10 @@ export default async function me(req: AuthedRequest) {
         return new Response("user not found", { status: 404 });
     }
 
-    return Response.json(user as UserRecord);
+    const { passwordHash: _, ...safeUser } = user;
+
+    return Response.json({
+        user: safeUser as Omit<UserRecord, "passwordHash">,
+        csrfToken: req.csrfToken,
+    });
 }

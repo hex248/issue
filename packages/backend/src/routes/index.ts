@@ -1,4 +1,5 @@
 import authLogin from "./auth/login";
+import authLogout from "./auth/logout";
 import authMe from "./auth/me";
 import authRegister from "./auth/register";
 import issueCreate from "./issue/create";
@@ -30,6 +31,7 @@ import userUploadAvatar from "./user/upload-avatar";
 export const routes = {
     authRegister,
     authLogin,
+    authLogout,
     authMe,
 
     userByUsername,

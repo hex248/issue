@@ -1,6 +1,6 @@
 import type { BunRequest } from "bun";
-import { generateToken, hashPassword } from "../../auth/utils";
-import { createUser, getUserByUsername } from "../../db/queries";
+import { buildAuthCookie, generateToken, hashPassword } from "../../auth/utils";
+import { createSession, createUser, getUserByUsername } from "../../db/queries";
 
 const isNonEmptyString = (value: unknown): value is string =>
     typeof value === "string" && value.trim().length > 0;
@@ -54,10 +54,24 @@ export default async function register(req: BunRequest) {
         return new Response("failed to create user", { status: 500 });
     }
 
-    const token = generateToken(user.id);
+    const session = await createSession(user.id);
+    if (!session) {
+        return new Response("failed to create session", { status: 500 });
+    }
 
-    return Response.json({
-        token,
-        user,
-    });
+    const token = generateToken(session.id, user.id);
+
+    return new Response(
+        JSON.stringify({
+            user: { id: user.id, name: user.name, username: user.username, avatarURL: user.avatarURL },
+            csrfToken: session.csrfToken,
+        }),
+        {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Set-Cookie": buildAuthCookie(token),
+            },
+        },
+    );
 }

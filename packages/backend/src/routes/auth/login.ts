@@ -1,6 +1,6 @@
 import type { BunRequest } from "bun";
-import { generateToken, verifyPassword } from "../../auth/utils";
-import { getUserByUsername } from "../../db/queries";
+import { buildAuthCookie, generateToken, verifyPassword } from "../../auth/utils";
+import { createSession, getUserByUsername } from "../../db/queries";
 
 const isNonEmptyString = (value: unknown): value is string =>
     typeof value === "string" && value.trim().length > 0;
@@ -37,10 +37,24 @@ export default async function login(req: BunRequest) {
         return new Response("invalid credentials", { status: 401 });
     }
 
-    const token = generateToken(user.id);
+    const session = await createSession(user.id);
+    if (!session) {
+        return new Response("failed to create session", { status: 500 });
+    }
 
-    return Response.json({
-        user: { id: user.id, name: user.name, username: user.username },
-        token,
-    });
+    const token = generateToken(session.id, user.id);
+
+    return new Response(
+        JSON.stringify({
+            user: { id: user.id, name: user.name, username: user.username, avatarURL: user.avatarURL },
+            csrfToken: session.csrfToken,
+        }),
+        {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Set-Cookie": buildAuthCookie(token),
+            },
+        },
+    );
 }
