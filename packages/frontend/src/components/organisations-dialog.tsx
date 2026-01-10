@@ -13,6 +13,7 @@ import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import StatusTag from "@/components/status-tag";
 import { Button } from "@/components/ui/button";
+import ColourPicker from "@/components/ui/colour-picker";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ function OrganisationsDialog({
     const [statuses, setStatuses] = useState<Record<string, string>>({});
     const [isCreatingStatus, setIsCreatingStatus] = useState(false);
     const [newStatusName, setNewStatusName] = useState("");
+    const [newStatusColour, setNewStatusColour] = useState(DEFAULT_STATUS_COLOUR);
     const [statusError, setStatusError] = useState<string | null>(null);
     const [statusToRemove, setStatusToRemove] = useState<string | null>(null);
     const [reassignToStatus, setReassignToStatus] = useState<string>("");
@@ -202,7 +204,7 @@ function OrganisationsDialog({
             return;
         }
         const newStatuses = { ...statuses };
-        newStatuses[trimmed] = DEFAULT_STATUS_COLOUR;
+        newStatuses[trimmed] = newStatusColour;
         await updateStatuses(newStatuses);
         setNewStatusName("");
         setIsCreatingStatus(false);
@@ -482,6 +484,11 @@ function OrganisationsDialog({
                                                                 }
                                                             }}
                                                             autoFocus
+                                                        />
+
+                                                        <ColourPicker
+                                                            colour={newStatusColour}
+                                                            onChange={setNewStatusColour}
                                                         />
                                                         <Button
                                                             variant="outline"
