@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { StatusSelect } from "@/components/status-select";
+import StatusTag from "@/components/status-tag";
 import { TimerModal } from "@/components/timer-modal";
 import { Button } from "@/components/ui/button";
+import { SelectTrigger } from "@/components/ui/select";
 import { UserSelect } from "@/components/user-select";
 import { issue } from "@/lib/server";
 import { issueID } from "@/lib/utils";
@@ -84,9 +86,23 @@ export function IssueDetailPane({
             </div>
 
             <div className="flex flex-col w-full p-2 py-2 gap-2">
-                <div className="flex gap-2 -mt-1 -ml-1">
-                    <StatusSelect statuses={statuses} value={status} onChange={handleStatusChange} />
-                    <div className="flex w-full h-8 border-b items-center min-w-0">
+                <div className="flex gap-2">
+                    <StatusSelect
+                        statuses={statuses}
+                        value={status}
+                        onChange={handleStatusChange}
+                        trigger={({ isOpen, value }) => (
+                            <SelectTrigger
+                                className="group w-auto flex items-center"
+                                variant="unstyled"
+                                chevronClassName="hidden"
+                                isOpen={isOpen}
+                            >
+                                <StatusTag status={value} className="group-hover:bg-foreground/75" />
+                            </SelectTrigger>
+                        )}
+                    />
+                    <div className="flex w-full items-center min-w-0">
                         <span className="block w-full truncate">{issueData.Issue.title}</span>
                     </div>
                 </div>

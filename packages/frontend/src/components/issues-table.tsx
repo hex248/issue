@@ -1,5 +1,6 @@
 import type { IssueResponse } from "@issue/shared";
 import Avatar from "@/components/avatar";
+import StatusTag from "@/components/status-tag";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
@@ -47,9 +48,7 @@ export function IssuesTable({
                             <TableCell>
                                 <span className="flex items-center gap-2 max-w-full truncate">
                                     {(columns.status == null || columns.status === true) && (
-                                        <div className="text-xs px-1 bg-foreground/85 rounded text-background">
-                                            {issueData.Issue.status}
-                                        </div>
+                                        <StatusTag status={issueData.Issue.status} />
                                     )}
                                     {issueData.Issue.title}
                                 </span>
