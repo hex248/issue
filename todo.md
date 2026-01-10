@@ -2,7 +2,6 @@
 - pricing page
   - see jira and other competitors
     - explore payment providers (stripe is the only one i know)
-- github link
 - dedicated /register route (currently login/register are combined on /login)
 - real logo
 - org settings
@@ -14,6 +13,11 @@
     - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
   - sprint
   - more than one assignee
+  - delete issue
+  - edit title & description
 - time tracking (linked to issues or standalone)
 - user preferences
   - "assign to me by default" option for new issues
+- add toasts app-wide
+  - for almost every network interaction that is user prompted
+  - the interface feels snappy but sometimes it's hard to tell if your changes are volatile or saved
