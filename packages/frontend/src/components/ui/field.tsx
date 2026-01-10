@@ -14,6 +14,7 @@ export function Field({
     tabIndex,
     spellcheck,
     maxLength,
+    showCounter = true,
 }: {
     label: string;
     value?: string;
@@ -26,6 +27,7 @@ export function Field({
     tabIndex?: number;
     spellcheck?: boolean;
     maxLength?: number;
+    showCounter?: boolean;
 }) {
     const [internalTouched, setInternalTouched] = useState(false);
     const isTouched = submitAttempted || internalTouched;
@@ -59,6 +61,7 @@ export function Field({
                 tabIndex={tabIndex}
                 spellCheck={spellcheck}
                 maxLength={maxLength}
+                showCounter={showCounter}
             />
             <div className="flex items-end justify-end w-full text-xs mb-0 -mt-1">
                 {error || invalidMessage !== "" ? (
