@@ -14,7 +14,7 @@ function Input({
     return (
         <div
             className={cn(
-                "border-input dark:bg-input/30 flex h-9 w-full min-w-0 items-center border bg-transparent shadow-xs",
+                "border-input dark:bg-input/30 flex h-9 w-full min-w-0 items-center border bg-transparent",
                 "transition-[color,box-shadow]",
                 "has-[:focus-visible]:border-ring",
                 "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
@@ -27,7 +27,7 @@ function Input({
                 data-slot="input"
                 className={cn(
                     "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-                    "h-full w-full min-w-0 bg-transparent px-3 py-1 pr-1 text-base outline-none",
+                    "h-full flex-1 min-w-0 bg-transparent px-3 py-1 pr-1 text-base outline-none",
                     "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
                     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
                 )}
@@ -36,7 +36,7 @@ function Input({
             {showCounter && currentLength !== undefined && maxLength !== undefined && (
                 <span
                     className={cn(
-                        "border-l px-2 h-full flex items-center justify-center text-[11px] tabular-nums",
+                        "border-l px-2 h-full flex w-fit items-center justify-center text-[11px] tabular-nums",
                         currentLength / maxLength >= 1
                             ? "text-destructive"
                             : currentLength / maxLength >= 0.75
