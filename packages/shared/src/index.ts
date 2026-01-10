@@ -42,4 +42,6 @@ export {
     UserSelectSchema,
 } from "./schema";
 
+export const ISSUE_STATUS_MAX_LENGTH = 24;
+
 export { calculateBreakTimeMs, calculateWorkTimeMs, isTimerRunning } from "./utils/time-tracking";

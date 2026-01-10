@@ -1,4 +1,8 @@
-import type { OrganisationMemberResponse, OrganisationResponse } from "@issue/shared";
+import {
+    ISSUE_STATUS_MAX_LENGTH,
+    type OrganisationMemberResponse,
+    type OrganisationResponse,
+} from "@issue/shared";
 import { ChevronDown, ChevronUp, Plus, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -36,6 +40,7 @@ function OrganisationsDialog({
     const [statuses, setStatuses] = useState<string[]>([]);
     const [isCreatingStatus, setIsCreatingStatus] = useState(false);
     const [newStatusName, setNewStatusName] = useState("");
+    const [statusError, setStatusError] = useState<string | null>(null);
     const [statusToRemove, setStatusToRemove] = useState<string | null>(null);
     const [reassignToStatus, setReassignToStatus] = useState<string>("");
 
@@ -185,9 +190,16 @@ function OrganisationsDialog({
     const handleCreateStatus = async () => {
         const trimmed = newStatusName.trim().toUpperCase();
         if (!trimmed) return;
+
+        if (trimmed.length > ISSUE_STATUS_MAX_LENGTH) {
+            setStatusError(`status must be <= ${ISSUE_STATUS_MAX_LENGTH} characters`);
+            return;
+        }
+
         if (statuses.includes(trimmed)) {
             setNewStatusName("");
             setIsCreatingStatus(false);
+            setStatusError(null);
             return;
         }
 
@@ -195,6 +207,7 @@ function OrganisationsDialog({
         await updateStatuses(newStatuses);
         setNewStatusName("");
         setIsCreatingStatus(false);
+        setStatusError(null);
     };
 
     const handleRemoveStatusClick = (status: string) => {
@@ -440,34 +453,53 @@ function OrganisationsDialog({
                                         </div>
                                         {isAdmin &&
                                             (isCreatingStatus ? (
-                                                <div className="flex gap-2">
-                                                    <Input
-                                                        value={newStatusName}
-                                                        onChange={(e) => setNewStatusName(e.target.value)}
-                                                        placeholder="Status name"
-                                                        className="flex-1"
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") {
-                                                                void handleCreateStatus();
-                                                            } else if (e.key === "Escape") {
-                                                                setIsCreatingStatus(false);
-                                                                setNewStatusName("");
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            value={newStatusName}
+                                                            maxLength={ISSUE_STATUS_MAX_LENGTH}
+                                                            onChange={(e) => {
+                                                                setNewStatusName(e.target.value);
+                                                                if (statusError) setStatusError(null);
+                                                            }}
+                                                            placeholder="Status name"
+                                                            className="flex-1"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    void handleCreateStatus();
+                                                                } else if (e.key === "Escape") {
+                                                                    setIsCreatingStatus(false);
+                                                                    setNewStatusName("");
+                                                                    setStatusError(null);
+                                                                }
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            onClick={() => void handleCreateStatus()}
+                                                            disabled={
+                                                                newStatusName.trim().length >
+                                                                ISSUE_STATUS_MAX_LENGTH
                                                             }
-                                                        }}
-                                                        autoFocus
-                                                    />
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => void handleCreateStatus()}
-                                                    >
-                                                        <Plus className="size-4" />
-                                                    </Button>
+                                                        >
+                                                            <Plus className="size-4" />
+                                                        </Button>
+                                                    </div>
+                                                    {statusError && (
+                                                        <p className="text-xs text-destructive">
+                                                            {statusError}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <Button
                                                     variant="outline"
-                                                    onClick={() => setIsCreatingStatus(true)}
+                                                    onClick={() => {
+                                                        setIsCreatingStatus(true);
+                                                        setStatusError(null);
+                                                    }}
                                                 >
                                                     Create status <Plus className="size-4" />
                                                 </Button>

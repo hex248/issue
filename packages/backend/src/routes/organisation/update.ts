@@ -1,3 +1,4 @@
+import { ISSUE_STATUS_MAX_LENGTH } from "@issue/shared";
 import type { BunRequest } from "bun";
 import { getOrganisationById, updateOrganisation } from "../../db/queries";
 
@@ -19,6 +20,12 @@ export default async function organisationUpdate(req: BunRequest) {
             }
             if (statuses.length === 0) {
                 return new Response("statuses must have at least one status", { status: 400 });
+            }
+
+            if (statuses.some((s) => s.length > ISSUE_STATUS_MAX_LENGTH)) {
+                return new Response(`status must be <= ${ISSUE_STATUS_MAX_LENGTH} characters`, {
+                    status: 400,
+                });
             }
         } catch {
             return new Response("invalid statuses format (must be JSON array)", { status: 400 });
