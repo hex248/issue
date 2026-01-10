@@ -10,7 +10,7 @@ export function IssuesTable({
     className,
 }: {
     issuesData: IssueResponse[];
-    columns?: { id?: boolean; title?: boolean; description?: boolean; assignee?: boolean };
+    columns?: { id?: boolean; title?: boolean; description?: boolean; status?: boolean; assignee?: boolean };
     issueSelectAction?: (issue: IssueResponse) => void;
     className: string;
 }) {
@@ -44,7 +44,16 @@ export function IssuesTable({
                             </TableCell>
                         )}
                         {(columns.title == null || columns.title === true) && (
-                            <TableCell>{issueData.Issue.title}</TableCell>
+                            <TableCell>
+                                <span className="flex items-center gap-2 max-w-full truncate">
+                                    {(columns.status == null || columns.status === true) && (
+                                        <div className="text-xs px-1 bg-foreground/85 rounded text-background">
+                                            {issueData.Issue.status}
+                                        </div>
+                                    )}
+                                    {issueData.Issue.title}
+                                </span>
+                            </TableCell>
                         )}
                         {(columns.description == null || columns.description === true) && (
                             <TableCell className="overflow-hide">{issueData.Issue.description}</TableCell>

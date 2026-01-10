@@ -1,9 +1,9 @@
 import type { AuthedRequest } from "../../auth/middleware";
 import { createIssue, getProjectByID, getProjectByKey } from "../../db/queries";
 
-// /issue/create?projectId=1&title=Testing&description=Description
+// /issue/create?projectId=1&title=Testing&description=Description&status=TO%20DO
 // OR
-// /issue/create?projectKey=projectKey&title=Testing&description=Description
+// /issue/create?projectKey=projectKey&title=Testing&description=Description&status=TO%20DO
 export default async function issueCreate(req: AuthedRequest) {
     const url = new URL(req.url);
     const projectId = url.searchParams.get("projectId");
@@ -25,8 +25,9 @@ export default async function issueCreate(req: AuthedRequest) {
     const description = url.searchParams.get("description") || "";
     const assigneeIdParam = url.searchParams.get("assigneeId");
     const assigneeId = assigneeIdParam ? Number(assigneeIdParam) : undefined;
+    const status = url.searchParams.get("status") || undefined;
 
-    const issue = await createIssue(project.id, title, description, req.userId, assigneeId);
+    const issue = await createIssue(project.id, title, description, req.userId, assigneeId, status);
 
     return Response.json(issue);
 }

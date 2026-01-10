@@ -312,6 +312,9 @@ export default function App() {
                                         project={selectedProject}
                                         issueData={selectedIssue}
                                         members={members}
+                                        statuses={
+                                            selectedOrganisation.Organisation.statuses as unknown as string[]
+                                        }
                                         close={() => setSelectedIssue(null)}
                                         onIssueUpdate={refetchIssues}
                                     />

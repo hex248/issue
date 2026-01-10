@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
+import { StatusSelect } from "@/components/status-select";
 import { TimerModal } from "@/components/timer-modal";
 import { Button } from "@/components/ui/button";
 import { UserSelect } from "@/components/user-select";
@@ -13,12 +14,14 @@ export function IssueDetailPane({
     project,
     issueData,
     members,
+    statuses,
     close,
     onIssueUpdate,
 }: {
     project: ProjectResponse;
     issueData: IssueResponse;
     members: UserRecord[];
+    statuses: string[];
     close: () => void;
     onIssueUpdate?: () => void;
 }) {
@@ -26,10 +29,12 @@ export function IssueDetailPane({
     const [assigneeId, setAssigneeId] = useState<string>(
         issueData.Issue.assigneeId?.toString() ?? "unassigned",
     );
+    const [status, setStatus] = useState<string>(issueData.Issue.status);
 
     useEffect(() => {
         setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
-    }, [issueData.Issue.assigneeId]);
+        setStatus(issueData.Issue.status);
+    }, [issueData.Issue.assigneeId, issueData.Issue.status]);
 
     const handleAssigneeChange = async (value: string) => {
         setAssigneeId(value);
@@ -44,6 +49,22 @@ export function IssueDetailPane({
             onError: (error) => {
                 console.error("error updating assignee:", error);
                 setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
+            },
+        });
+    };
+
+    const handleStatusChange = async (value: string) => {
+        setStatus(value);
+
+        await issue.update({
+            issueId: issueData.Issue.id,
+            status: value,
+            onSuccess: () => {
+                onIssueUpdate?.();
+            },
+            onError: (error) => {
+                console.error("error updating status:", error);
+                setStatus(issueData.Issue.status);
             },
         });
     };
@@ -63,7 +84,12 @@ export function IssueDetailPane({
             </div>
 
             <div className="flex flex-col w-full p-2 py-2 gap-2">
-                <h1 className="text-md">{issueData.Issue.title}</h1>
+                <div className="flex gap-2 -mt-1 -ml-1">
+                    <StatusSelect statuses={statuses} value={status} onChange={handleStatusChange} />
+                    <div className="flex w-full h-8 border-b items-center min-w-0">
+                        <span className="block w-full truncate">{issueData.Issue.title}</span>
+                    </div>
+                </div>
                 {issueData.Issue.description !== "" && (
                     <p className="text-sm">{issueData.Issue.description}</p>
                 )}

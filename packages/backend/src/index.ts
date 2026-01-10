@@ -42,6 +42,7 @@ const main = async () => {
             "/issue/delete": withCors(withAuth(withCSRF(routes.issueDelete))),
 
             "/issues/by-project": withCors(withAuth(routes.issuesByProject)),
+            "/issues/replace-status": withCors(withAuth(withCSRF(routes.issuesReplaceStatus))),
             "/issues/all": withCors(withAuth(routes.issues)),
 
             "/organisation/create": withCors(withAuth(withCSRF(routes.organisationCreate))),

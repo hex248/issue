@@ -24,6 +24,7 @@ function SelectTrigger({
     label,
     hasValue,
     labelPosition = "top",
+    chevronClassName,
     ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
     isOpen?: boolean;
@@ -31,6 +32,7 @@ function SelectTrigger({
     label?: string;
     hasValue?: boolean;
     labelPosition?: "top" | "bottom";
+    chevronClassName?: string;
 }) {
     return (
         <SelectPrimitive.Trigger
@@ -65,7 +67,7 @@ function SelectTrigger({
             {children}
             <SelectPrimitive.Icon asChild>
                 <ChevronDownIcon
-                    className="size-4 opacity-50"
+                    className={cn("size-4 opacity-50", chevronClassName)}
                     style={{ rotate: isOpen ? "180deg" : "0deg" }}
                 />
             </SelectPrimitive.Icon>
@@ -129,7 +131,14 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
     );
 }
 
-function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
+function SelectItem({
+    className,
+    textClassName,
+    children,
+    ...props
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+    textClassName?: string;
+}) {
     return (
         <SelectPrimitive.Item
             data-slot="select-item"
@@ -153,7 +162,11 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
                     <CheckIcon className="size-4" />
                 </SelectPrimitive.ItemIndicator>
             </span>
-            <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+            {textClassName ? (
+                <span className={cn(textClassName)}>{children}</span>
+            ) : (
+                <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+            )}
         </SelectPrimitive.Item>
     );
 }

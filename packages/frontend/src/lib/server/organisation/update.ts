@@ -2,28 +2,26 @@ import { getCsrfToken, getServerURL } from "@/lib/utils";
 import type { ServerQueryInput } from "..";
 
 export async function update({
-    issueId,
-    title,
+    organisationId,
+    name,
     description,
-    assigneeId,
-    status,
+    slug,
+    statuses,
     onSuccess,
     onError,
 }: {
-    issueId: number;
-    title?: string;
+    organisationId: number;
+    name?: string;
     description?: string;
-    assigneeId?: number | null;
-    status?: string;
+    slug?: string;
+    statuses?: string[];
 } & ServerQueryInput) {
-    const url = new URL(`${getServerURL()}/issue/update`);
-    url.searchParams.set("id", `${issueId}`);
-    if (title !== undefined) url.searchParams.set("title", title);
+    const url = new URL(`${getServerURL()}/organisation/update`);
+    url.searchParams.set("id", `${organisationId}`);
+    if (name !== undefined) url.searchParams.set("name", name);
     if (description !== undefined) url.searchParams.set("description", description);
-    if (assigneeId !== undefined) {
-        url.searchParams.set("assigneeId", assigneeId === null ? "null" : `${assigneeId}`);
-    }
-    if (status !== undefined) url.searchParams.set("status", status);
+    if (slug !== undefined) url.searchParams.set("slug", slug);
+    if (statuses !== undefined) url.searchParams.set("statuses", JSON.stringify(statuses));
 
     const csrfToken = getCsrfToken();
     const headers: HeadersInit = {};
@@ -36,7 +34,7 @@ export async function update({
 
     if (!res.ok) {
         const error = await res.text();
-        onError?.(error || `failed to update issue (${res.status})`);
+        onError?.(error || `failed to update organisation (${res.status})`);
     } else {
         const data = await res.json();
         onSuccess?.(data, res);

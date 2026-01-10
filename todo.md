@@ -6,13 +6,12 @@
 - dedicated /register route (currently login/register are combined on /login)
 - real logo
 - org settings
+  - customise status COLOURS (green for done, orange for in progress, white for todo, red for rejected, purple for review)
 - sprints
 - issues
   - deadline
   - comments
     - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
-  - status
-    - predefined statuses are added to organisation by default. list of statuses can be edited by owner/admin (maybe this should be on projects rather than organisations?)
   - sprint
   - more than one assignee
 - time tracking (linked to issues or standalone)

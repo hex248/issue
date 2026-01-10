@@ -1,5 +1,5 @@
 import { Issue, User } from "@issue/shared";
-import { aliasedTable, and, eq, sql } from "drizzle-orm";
+import { aliasedTable, and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 
 export async function createIssue(
@@ -8,6 +8,7 @@ export async function createIssue(
     description: string,
     creatorId: number,
     assigneeId?: number,
+    status?: string,
 ) {
     // prevents two issues with the same unique number
     return await db.transaction(async (tx) => {
@@ -30,6 +31,7 @@ export async function createIssue(
                 number: nextNumber,
                 creatorId,
                 assigneeId,
+                ...(status && { status }),
             })
             .returning();
 
@@ -43,7 +45,7 @@ export async function deleteIssue(id: number) {
 
 export async function updateIssue(
     id: number,
-    updates: { title?: string; description?: string; assigneeId?: number | null },
+    updates: { title?: string; description?: string; assigneeId?: number | null; status?: string },
 ) {
     return await db.update(Issue).set(updates).where(eq(Issue.id, id)).returning();
 }
@@ -67,6 +69,27 @@ export async function getIssueByNumber(projectId: number, number: number) {
         .from(Issue)
         .where(and(eq(Issue.projectId, projectId), eq(Issue.number, number)));
     return issue;
+}
+
+export async function replaceIssueStatus(organisationId: number, oldStatus: string, newStatus: string) {
+    const { Project } = await import("@issue/shared");
+
+    // get all project IDs for this organisation
+    const projects = await db
+        .select({ id: Project.id })
+        .from(Project)
+        .where(eq(Project.organisationId, organisationId));
+    const projectIds = projects.map((p) => p.id);
+
+    if (projectIds.length === 0) return { updated: 0 };
+
+    // update all issues with oldStatus to newStatus for projects in this organisation
+    const result = await db
+        .update(Issue)
+        .set({ status: newStatus })
+        .where(and(eq(Issue.status, oldStatus), inArray(Issue.projectId, projectIds)));
+
+    return { updated: result.rowCount ?? 0 };
 }
 
 export async function getIssuesWithUsersByProject(projectId: number) {
