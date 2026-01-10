@@ -11,7 +11,6 @@ export {
     USER_NAME_MAX_LENGTH,
     USER_USERNAME_MAX_LENGTH,
 } from "./constants";
-
 export type {
     IssueInsert,
     IssueRecord,
@@ -33,6 +32,8 @@ export type {
     UserRecord,
 } from "./schema";
 export {
+    DEFAULT_STATUS_COLOUR,
+    DEFAULT_STATUS_COLOURS,
     Issue,
     IssueInsertSchema,
     IssueSelectSchema,

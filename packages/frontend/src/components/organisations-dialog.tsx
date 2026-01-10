@@ -1,4 +1,5 @@
 import {
+    DEFAULT_STATUS_COLOUR,
     ISSUE_STATUS_MAX_LENGTH,
     type OrganisationMemberResponse,
     type OrganisationResponse,
@@ -38,7 +39,7 @@ function OrganisationsDialog({
     const [activeTab, setActiveTab] = useState("info");
     const [members, setMembers] = useState<OrganisationMemberResponse[]>([]);
 
-    const [statuses, setStatuses] = useState<string[]>([]);
+    const [statuses, setStatuses] = useState<Record<string, string>>({});
     const [isCreatingStatus, setIsCreatingStatus] = useState(false);
     const [newStatusName, setNewStatusName] = useState("");
     const [statusError, setStatusError] = useState<string | null>(null);
@@ -161,16 +162,13 @@ function OrganisationsDialog({
 
     useEffect(() => {
         if (selectedOrganisation) {
-            const orgStatuses = (selectedOrganisation.Organisation as unknown as { statuses: string[] })
-                .statuses;
-            setStatuses(
-                Array.isArray(orgStatuses) ? orgStatuses : ["TO DO", "IN PROGRESS", "REVIEW", "DONE"],
-            );
+            setStatuses(selectedOrganisation.Organisation.statuses);
         }
     }, [selectedOrganisation]);
 
-    const updateStatuses = async (newStatuses: string[]) => {
+    const updateStatuses = async (newStatuses: Record<string, string>) => {
         if (!selectedOrganisation) return;
+
         try {
             await organisation.update({
                 organisationId: selectedOrganisation.Organisation.id,
@@ -197,14 +195,14 @@ function OrganisationsDialog({
             return;
         }
 
-        if (statuses.includes(trimmed)) {
+        if (Object.keys(statuses).includes(trimmed)) {
             setNewStatusName("");
             setIsCreatingStatus(false);
             setStatusError(null);
             return;
         }
-
-        const newStatuses = [...statuses, trimmed];
+        const newStatuses = { ...statuses };
+        newStatuses[trimmed] = DEFAULT_STATUS_COLOUR;
         await updateStatuses(newStatuses);
         setNewStatusName("");
         setIsCreatingStatus(false);
@@ -212,26 +210,25 @@ function OrganisationsDialog({
     };
 
     const handleRemoveStatusClick = (status: string) => {
-        if (statuses.length <= 1) return;
+        if (Object.keys(statuses).length <= 1) return;
         setStatusToRemove(status);
-        const remaining = statuses.filter((s) => s !== status);
+        const remaining = Object.keys(statuses).filter((s) => s !== status);
         setReassignToStatus(remaining[0] || "");
     };
 
     const moveStatus = async (status: string, direction: "up" | "down") => {
-        const currentIndex = statuses.indexOf(status);
+        const currentIndex = Object.keys(statuses).indexOf(status);
         if (currentIndex === -1) return;
 
         const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-        if (nextIndex < 0 || nextIndex >= statuses.length) return;
-
-        const nextStatuses = [...statuses];
+        if (nextIndex < 0 || nextIndex >= Object.keys(statuses).length) return;
+        const nextStatuses = [...Object.keys(statuses)];
         [nextStatuses[currentIndex], nextStatuses[nextIndex]] = [
             nextStatuses[nextIndex],
             nextStatuses[currentIndex],
         ];
 
-        await updateStatuses(nextStatuses);
+        await updateStatuses(Object.fromEntries(nextStatuses.map((status) => [status, statuses[status]])));
     };
 
     const confirmRemoveStatus = async () => {
@@ -242,8 +239,10 @@ function OrganisationsDialog({
             oldStatus: statusToRemove,
             newStatus: reassignToStatus,
             onSuccess: async () => {
-                const newStatuses = statuses.filter((s) => s !== statusToRemove);
-                await updateStatuses(newStatuses);
+                const newStatuses = Object.keys(statuses).filter((s) => s !== statusToRemove);
+                await updateStatuses(
+                    Object.fromEntries(newStatuses.map((status) => [status, statuses[status]])),
+                );
                 setStatusToRemove(null);
                 setReassignToStatus("");
             },
@@ -406,13 +405,19 @@ function OrganisationsDialog({
                                 <div className="border p-2 min-w-0 overflow-hidden">
                                     <h2 className="text-xl font-600 mb-2">Issue Statuses</h2>
                                     <div className="flex flex-col gap-2 w-full">
-                                        <div className="flex flex-col gap-2 max-h-56 overflow-y-scroll">
-                                            {statuses.map((status, index) => (
+                                        <div className="flex flex-col gap-2 max-h-86 overflow-y-scroll grid grid-cols-2">
+                                            {Object.keys(statuses).map((status, index) => (
                                                 <div
                                                     key={status}
                                                     className="flex items-center justify-between p-2 border"
                                                 >
-                                                    <StatusTag status={status} />
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm">{index + 1}</span>
+                                                        <StatusTag
+                                                            status={status}
+                                                            colour={statuses[status]}
+                                                        />
+                                                    </div>
                                                     {isAdmin && (
                                                         <div className="flex items-center gap-2">
                                                             <Button
@@ -427,7 +432,9 @@ function OrganisationsDialog({
                                                             <Button
                                                                 variant="dummy"
                                                                 size="none"
-                                                                disabled={index === statuses.length - 1}
+                                                                disabled={
+                                                                    index === Object.keys(statuses).length - 1
+                                                                }
                                                                 onClick={() =>
                                                                     void moveStatus(status, "down")
                                                                 }
@@ -435,7 +442,7 @@ function OrganisationsDialog({
                                                             >
                                                                 <ChevronDown className="size-5 text-muted-foreground" />
                                                             </Button>
-                                                            {statuses.length > 1 && (
+                                                            {Object.keys(statuses).length > 1 && (
                                                                 <Button
                                                                     variant="dummy"
                                                                     size="none"
@@ -563,11 +570,11 @@ function OrganisationsDialog({
                                     <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {statuses
+                                    {Object.keys(statuses)
                                         .filter((s) => s !== statusToRemove)
                                         .map((status) => (
                                             <SelectItem key={status} value={status}>
-                                                {status}
+                                                <StatusTag status={status} colour={statuses[status]} />
                                             </SelectItem>
                                         ))}
                                 </SelectContent>

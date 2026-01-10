@@ -14,14 +14,16 @@ export async function update({
     name?: string;
     description?: string;
     slug?: string;
-    statuses?: string[];
+    statuses?: Record<string, string>;
 } & ServerQueryInput) {
     const url = new URL(`${getServerURL()}/organisation/update`);
     url.searchParams.set("id", `${organisationId}`);
     if (name !== undefined) url.searchParams.set("name", name);
     if (description !== undefined) url.searchParams.set("description", description);
     if (slug !== undefined) url.searchParams.set("slug", slug);
-    if (statuses !== undefined) url.searchParams.set("statuses", JSON.stringify(statuses));
+    if (statuses !== undefined) {
+        url.searchParams.set("statuses", JSON.stringify(statuses));
+    }
 
     const csrfToken = getCsrfToken();
     const headers: HeadersInit = {};

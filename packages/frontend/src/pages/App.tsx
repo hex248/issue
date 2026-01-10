@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+
 import type {
     IssueResponse,
     OrganisationMemberResponse,
@@ -240,7 +241,7 @@ export default function App() {
                         <CreateIssue
                             projectId={selectedProject?.Project.id}
                             members={members}
-                            statuses={selectedOrganisation.Organisation.statuses as unknown as string[]}
+                            statuses={selectedOrganisation.Organisation.statuses}
                             completeAction={async () => {
                                 if (!selectedProject) return;
                                 await refetchIssues();
@@ -288,13 +289,14 @@ export default function App() {
             </div>
 
             {/* main body */}
-            {selectedProject && issues.length > 0 && (
+            {selectedOrganisation && selectedProject && issues.length > 0 && (
                 <ResizablePanelGroup className={`flex-1`}>
                     <ResizablePanel id={"left"} minSize={400}>
                         {/* issues list (table) */}
                         <IssuesTable
                             issuesData={issues}
                             columns={{ description: false }}
+                            statuses={selectedOrganisation.Organisation.statuses}
                             issueSelectAction={(issue) => {
                                 if (issue.Issue.id === selectedIssue?.Issue.id) setSelectedIssue(null);
                                 else setSelectedIssue(issue);
@@ -313,9 +315,7 @@ export default function App() {
                                         project={selectedProject}
                                         issueData={selectedIssue}
                                         members={members}
-                                        statuses={
-                                            selectedOrganisation.Organisation.statuses as unknown as string[]
-                                        }
+                                        statuses={selectedOrganisation.Organisation.statuses}
                                         close={() => setSelectedIssue(null)}
                                         onIssueUpdate={refetchIssues}
                                     />

@@ -10,7 +10,7 @@ export function StatusSelect({
     placeholder = "Select status",
     trigger,
 }: {
-    statuses: string[];
+    statuses: Record<string, string>;
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
@@ -33,9 +33,9 @@ export function StatusSelect({
                 </SelectTrigger>
             )}
             <SelectContent side="bottom" position="popper" align="start">
-                {statuses.map((status) => (
+                {Object.entries(statuses).map(([status, colour]) => (
                     <SelectItem key={status} value={status} textClassName="text-xs">
-                        <StatusTag status={status} className="" />
+                        <StatusTag status={status} colour={colour} />
                     </SelectItem>
                 ))}
             </SelectContent>

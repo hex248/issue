@@ -1,0 +1,1 @@
+ALTER TABLE "Organisation" RENAME COLUMN "statusColours" TO "statuses";

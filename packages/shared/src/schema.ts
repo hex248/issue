@@ -1,4 +1,4 @@
-import { integer, pgTable, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { integer, json, pgTable, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import {
@@ -12,6 +12,18 @@ import {
     USER_NAME_MAX_LENGTH,
     USER_USERNAME_MAX_LENGTH,
 } from "./constants";
+
+export const DEFAULT_STATUS_COLOUR = "#a1a1a1";
+
+export const DEFAULT_STATUS_COLOURS: Record<string, string> = {
+    "TO DO": "#fafafa",
+    "IN PROGRESS": "#f97316",
+    REVIEW: "#8952bc",
+    DONE: "#22c55e",
+    REJECTED: "#ef4444",
+    ARCHIVED: DEFAULT_STATUS_COLOUR,
+    MERGED: DEFAULT_STATUS_COLOUR,
+};
 
 export const User = pgTable("User", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -28,10 +40,7 @@ export const Organisation = pgTable("Organisation", {
     name: varchar({ length: ORG_NAME_MAX_LENGTH }).notNull(),
     description: varchar({ length: ORG_DESCRIPTION_MAX_LENGTH }),
     slug: varchar({ length: ORG_SLUG_MAX_LENGTH }).notNull().unique(),
-    statuses: varchar({ length: ISSUE_STATUS_MAX_LENGTH })
-        .array()
-        .notNull()
-        .default(["TO DO", "IN PROGRESS", "REVIEW", "DONE", "ARCHIVED", "MERGED"]),
+    statuses: json("statuses").$type<Record<string, string>>().notNull().default(DEFAULT_STATUS_COLOURS),
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
@@ -135,7 +144,9 @@ export const TimedSessionInsertSchema = createInsertSchema(TimedSession);
 export type UserRecord = z.infer<typeof UserSelectSchema>;
 export type UserInsert = z.infer<typeof UserInsertSchema>;
 
-export type OrganisationRecord = z.infer<typeof OrganisationSelectSchema>;
+export type OrganisationRecord = z.infer<typeof OrganisationSelectSchema> & {
+    statuses: Record<string, string>;
+};
 export type OrganisationInsert = z.infer<typeof OrganisationInsertSchema>;
 
 export type OrganisationMemberRecord = z.infer<typeof OrganisationMemberSelectSchema>;

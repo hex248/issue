@@ -8,11 +8,13 @@ export function IssuesTable({
     issuesData,
     columns = {},
     issueSelectAction,
+    statuses,
     className,
 }: {
     issuesData: IssueResponse[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; status?: boolean; assignee?: boolean };
     issueSelectAction?: (issue: IssueResponse) => void;
+    statuses: Record<string, string>;
     className: string;
 }) {
     return (
@@ -48,7 +50,10 @@ export function IssuesTable({
                             <TableCell>
                                 <span className="flex items-center gap-2 max-w-full truncate">
                                     {(columns.status == null || columns.status === true) && (
-                                        <StatusTag status={issueData.Issue.status} />
+                                        <StatusTag
+                                            status={issueData.Issue.status}
+                                            colour={statuses[issueData.Issue.status]}
+                                        />
                                     )}
                                     {issueData.Issue.title}
                                 </span>

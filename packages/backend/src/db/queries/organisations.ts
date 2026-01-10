@@ -81,7 +81,12 @@ export async function getOrganisationsByUserId(userId: number) {
 
 export async function updateOrganisation(
     organisationId: number,
-    updates: { name?: string; description?: string; slug?: string; statuses?: string[] },
+    updates: {
+        name?: string;
+        description?: string;
+        slug?: string;
+        statuses?: Record<string, string>;
+    },
 ) {
     const [organisation] = await db
         .update(Organisation)

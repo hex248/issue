@@ -28,7 +28,7 @@ export function CreateIssue({
 }: {
     projectId?: number;
     members?: UserRecord[];
-    statuses?: string[];
+    statuses: Record<string, string>;
     trigger?: React.ReactNode;
     completeAction?: (issueId: number) => void | Promise<void>;
 }) {
@@ -38,7 +38,7 @@ export function CreateIssue({
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [assigneeId, setAssigneeId] = useState<string>("unassigned");
-    const [status, setStatus] = useState<string>(statuses?.[0] ?? "");
+    const [status, setStatus] = useState<string>(Object.keys(statuses)[0] ?? "");
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -130,7 +130,7 @@ export function CreateIssue({
 
                 <form onSubmit={handleSubmit}>
                     <div className="grid">
-                        {statuses && statuses.length > 0 && (
+                        {statuses && Object.keys(statuses).length > 0 && (
                             <div className="flex flex-col gap-2 mb-4">
                                 <Label>Status</Label>
                                 <StatusSelect
@@ -150,7 +150,8 @@ export function CreateIssue({
                                         >
                                             <StatusTag
                                                 status={value}
-                                                className="group-hover:bg-foreground/75"
+                                                colour={statuses[value]}
+                                                className="hover:opacity-85"
                                             />
                                         </SelectTrigger>
                                     )}

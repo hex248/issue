@@ -2,7 +2,7 @@ import { ISSUE_STATUS_MAX_LENGTH } from "@issue/shared";
 import type { BunRequest } from "bun";
 import { getOrganisationById, updateOrganisation } from "../../db/queries";
 
-// /organisation/update?id=1&name=New%20Name&description=New%20Description&slug=new-slug&statuses=["TO DO","IN PROGRESS"]
+// /organisation/update?id=1&name=New%20Name&description=New%20Description&slug=new-slug
 export default async function organisationUpdate(req: BunRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
@@ -11,24 +11,28 @@ export default async function organisationUpdate(req: BunRequest) {
     const slug = url.searchParams.get("slug") || undefined;
     const statusesParam = url.searchParams.get("statuses");
 
-    let statuses: string[] | undefined;
+    let statuses: Record<string, string> | undefined;
     if (statusesParam) {
         try {
-            statuses = JSON.parse(statusesParam);
-            if (!Array.isArray(statuses) || !statuses.every((s) => typeof s === "string")) {
-                return new Response("statuses must be an array of strings", { status: 400 });
+            const parsed = JSON.parse(statusesParam);
+            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                return new Response("statuses must be an object", { status: 400 });
             }
-            if (statuses.length === 0) {
+            const entries = Object.entries(parsed);
+            if (entries.length === 0) {
                 return new Response("statuses must have at least one status", { status: 400 });
             }
-
-            if (statuses.some((s) => s.length > ISSUE_STATUS_MAX_LENGTH)) {
+            if (!entries.every(([key, value]) => typeof key === "string" && typeof value === "string")) {
+                return new Response("statuses values must be strings", { status: 400 });
+            }
+            if (entries.some(([key]) => key.length > ISSUE_STATUS_MAX_LENGTH)) {
                 return new Response(`status must be <= ${ISSUE_STATUS_MAX_LENGTH} characters`, {
                     status: 400,
                 });
             }
+            statuses = parsed;
         } catch {
-            return new Response("invalid statuses format (must be JSON array)", { status: 400 });
+            return new Response("invalid statuses format (must be JSON object)", { status: 400 });
         }
     }
 

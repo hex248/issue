@@ -23,7 +23,7 @@ export function IssueDetailPane({
     project: ProjectResponse;
     issueData: IssueResponse;
     members: UserRecord[];
-    statuses: string[];
+    statuses: Record<string, string>;
     close: () => void;
     onIssueUpdate?: () => void;
 }) {
@@ -98,7 +98,11 @@ export function IssueDetailPane({
                                 chevronClassName="hidden"
                                 isOpen={isOpen}
                             >
-                                <StatusTag status={value} className="group-hover:bg-foreground/75" />
+                                <StatusTag
+                                    status={value}
+                                    colour={statuses[value]}
+                                    className="hover:opacity-85"
+                                />
                             </SelectTrigger>
                         )}
                     />
