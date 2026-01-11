@@ -69,6 +69,35 @@ export default function App() {
         projectMatched: false,
     });
 
+    const initialUrlSyncRef = useRef(false);
+
+    const updateUrlParams = (updates: {
+        orgSlug?: string | null;
+        projectKey?: string | null;
+        issueNumber?: number | null;
+    }) => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (updates.orgSlug !== undefined) {
+            if (updates.orgSlug) params.set("o", updates.orgSlug);
+            else params.delete("o");
+        }
+
+        if (updates.projectKey !== undefined) {
+            if (updates.projectKey) params.set("p", updates.projectKey);
+            else params.delete("p");
+        }
+
+        if (updates.issueNumber !== undefined) {
+            if (updates.issueNumber != null) params.set("i", `${updates.issueNumber}`);
+            else params.delete("i");
+        }
+
+        const search = params.toString();
+        const nextUrl = `${window.location.pathname}${search ? `?${search}` : ""}`;
+        window.history.replaceState(null, "", nextUrl);
+    };
+
     const refetchOrganisations = async (options?: { selectOrganisationId?: number }) => {
         try {
             await organisation.byUser({
@@ -275,6 +304,29 @@ export default function App() {
         void refetchIssues();
     }, [selectedProject]);
 
+    useEffect(() => {
+        if (initialUrlSyncRef.current) return;
+
+        if (deepLinkParams.orgSlug || deepLinkParams.projectKey || deepLinkParams.issueNumber != null) {
+            initialUrlSyncRef.current = true;
+            return;
+        }
+
+        if (new URLSearchParams(window.location.search).toString() !== "") {
+            initialUrlSyncRef.current = true;
+            return;
+        }
+
+        if (selectedOrganisation && selectedProject) {
+            updateUrlParams({
+                orgSlug: selectedOrganisation.Organisation.slug.toLowerCase(),
+                projectKey: selectedProject.Project.key.toLowerCase(),
+                issueNumber: null,
+            });
+            initialUrlSyncRef.current = true;
+        }
+    }, [deepLinkParams, selectedOrganisation, selectedProject]);
+
     return (
         <main className={`w-full h-screen flex flex-col gap-${BREATHING_ROOM} p-${BREATHING_ROOM}`}>
             {/* header area */}
@@ -287,6 +339,11 @@ export default function App() {
                         onSelectedOrganisationChange={(org) => {
                             setSelectedOrganisation(org);
                             localStorage.setItem("selectedOrganisationId", `${org?.Organisation.id}`);
+                            updateUrlParams({
+                                orgSlug: org?.Organisation.slug.toLowerCase() ?? null,
+                                projectKey: null,
+                                issueNumber: null,
+                            });
                         }}
                         onCreateOrganisation={async (organisationId) => {
                             await refetchOrganisations({ selectOrganisationId: organisationId });
@@ -304,6 +361,10 @@ export default function App() {
                                 setSelectedProject(project);
                                 localStorage.setItem("selectedProjectId", `${project?.Project.id}`);
                                 setSelectedIssue(null);
+                                updateUrlParams({
+                                    projectKey: project?.Project.key.toLowerCase() ?? null,
+                                    issueNumber: null,
+                                });
                             }}
                             onCreateProject={async (projectId) => {
                                 if (!selectedOrganisation) return;
@@ -375,8 +436,13 @@ export default function App() {
                             columns={{ description: false }}
                             statuses={selectedOrganisation.Organisation.statuses}
                             issueSelectAction={(issue) => {
-                                if (issue.Issue.id === selectedIssue?.Issue.id) setSelectedIssue(null);
-                                else setSelectedIssue(issue);
+                                if (issue.Issue.id === selectedIssue?.Issue.id) {
+                                    setSelectedIssue(null);
+                                    updateUrlParams({ issueNumber: null });
+                                } else {
+                                    setSelectedIssue(issue);
+                                    updateUrlParams({ issueNumber: issue.Issue.number });
+                                }
                             }}
                             className="border w-full flex-shrink"
                         />
@@ -393,7 +459,10 @@ export default function App() {
                                         issueData={selectedIssue}
                                         members={members}
                                         statuses={selectedOrganisation.Organisation.statuses}
-                                        close={() => setSelectedIssue(null)}
+                                        close={() => {
+                                            setSelectedIssue(null);
+                                            updateUrlParams({ issueNumber: null });
+                                        }}
                                         onIssueUpdate={refetchIssues}
                                         onIssueDelete={handleIssueDelete}
                                     />
