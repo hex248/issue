@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { useSession } from "@/components/session-provider";
+import ThemeToggle from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 
 export default function Landing() {
@@ -11,6 +12,7 @@ export default function Landing() {
             <header className="relative flex items-center justify-center p-2 border-b">
                 <div className="text-3xl font-basteleur font-700">Issue</div>
                 <nav className="absolute right-2 flex items-center gap-4">
+                    <ThemeToggle />
                     {!isLoading && user ? (
                         <>
                             {user && (
