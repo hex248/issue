@@ -71,6 +71,25 @@ export async function getIssueByNumber(projectId: number, number: number) {
     return issue;
 }
 
+export async function getIssueStatusCountByOrganisation(organisationId: number, status: string) {
+    const { Project } = await import("@issue/shared");
+
+    const projects = await db
+        .select({ id: Project.id })
+        .from(Project)
+        .where(eq(Project.organisationId, organisationId));
+    const projectIds = projects.map((p) => p.id);
+
+    if (projectIds.length === 0) return { count: 0 };
+
+    const [result] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(Issue)
+        .where(and(eq(Issue.status, status), inArray(Issue.projectId, projectIds)));
+
+    return { count: result?.count ?? 0 };
+}
+
 export async function replaceIssueStatus(organisationId: number, oldStatus: string, newStatus: string) {
     const { Project } = await import("@issue/shared");
 

@@ -1,3 +1,4 @@
+import { DEFAULT_STATUS_COLOUR } from "@issue/shared";
 import { cn } from "@/lib/utils";
 
 const DARK_TEXT_COLOUR = "#0a0a0a";
@@ -14,7 +15,7 @@ const isLight = (hex: string): boolean => {
 
 export default function StatusTag({
     status,
-    colour,
+    colour = DEFAULT_STATUS_COLOUR,
     className,
 }: {
     status: string;

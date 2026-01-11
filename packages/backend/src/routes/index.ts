@@ -8,6 +8,7 @@ import issueUpdate from "./issue/update";
 import issues from "./issues/all";
 import issuesByProject from "./issues/by-project";
 import issuesReplaceStatus from "./issues/replace-status";
+import issuesStatusCount from "./issues/status-count";
 import organisationAddMember from "./organisation/add-member";
 import organisationById from "./organisation/by-id";
 import organisationsByUser from "./organisation/by-user";
@@ -50,6 +51,7 @@ export const routes = {
     issuesByProject,
     issues,
     issuesReplaceStatus,
+    issuesStatusCount,
 
     organisationCreate,
     organisationById,

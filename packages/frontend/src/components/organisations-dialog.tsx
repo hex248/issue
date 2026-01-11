@@ -52,6 +52,7 @@ function OrganisationsDialog({
     const [newStatusColour, setNewStatusColour] = useState(DEFAULT_STATUS_COLOUR);
     const [statusError, setStatusError] = useState<string | null>(null);
     const [statusToRemove, setStatusToRemove] = useState<string | null>(null);
+    const [issuesUsingStatus, setIssuesUsingStatus] = useState<number>(0);
     const [reassignToStatus, setReassignToStatus] = useState<string>("");
 
     const [confirmDialog, setConfirmDialog] = useState<{
@@ -218,11 +219,34 @@ function OrganisationsDialog({
         setStatusError(null);
     };
 
-    const handleRemoveStatusClick = (status: string) => {
-        if (Object.keys(statuses).length <= 1) return;
-        setStatusToRemove(status);
-        const remaining = Object.keys(statuses).filter((s) => s !== status);
-        setReassignToStatus(remaining[0] || "");
+    const handleRemoveStatusClick = async (status: string) => {
+        if (Object.keys(statuses).length <= 1 || !selectedOrganisation) return;
+        try {
+            await issue.statusCount({
+                organisationId: selectedOrganisation.Organisation.id,
+                status,
+                onSuccess: (data) => {
+                    const count = (data as { count?: number }).count ?? 0;
+                    if (count > 0) {
+                        setStatusToRemove(status);
+                        setIssuesUsingStatus(count);
+                        const remaining = Object.keys(statuses).filter((s) => s !== status);
+                        setReassignToStatus(remaining[0] || "");
+                        return;
+                    }
+
+                    const nextStatuses = Object.keys(statuses).filter((s) => s !== status);
+                    void updateStatuses(
+                        Object.fromEntries(nextStatuses.map((statusKey) => [statusKey, statuses[statusKey]])),
+                    );
+                },
+                onError: (error) => {
+                    console.error("error checking status usage:", error);
+                },
+            });
+        } catch (err) {
+            console.error("error checking status usage:", err);
+        }
     };
 
     const moveStatus = async (status: string, direction: "up" | "down") => {
@@ -276,7 +300,7 @@ function OrganisationsDialog({
                 )}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-md w-full max-w-[calc(100vw-2rem)]">
+            <DialogContent className="max-w-lg w-full max-w-[calc(100vw-2rem)]">
                 <DialogHeader>
                     <DialogTitle>Organisations</DialogTitle>
                 </DialogHeader>
@@ -471,7 +495,7 @@ function OrganisationsDialog({
                                                                         Object.keys(statuses).length <= 1
                                                                     }
                                                                     onSelect={() =>
-                                                                        handleRemoveStatusClick(status)
+                                                                        void handleRemoveStatusClick(status)
                                                                     }
                                                                     className="hover:bg-destructive/10"
                                                                 >
@@ -587,7 +611,7 @@ function OrganisationsDialog({
                             }
                         }}
                     >
-                        <DialogContent className="sm:max-w-lg">
+                        <DialogContent className="w-md">
                             <DialogHeader>
                                 <DialogTitle>Remove Status</DialogTitle>
                             </DialogHeader>
@@ -596,7 +620,8 @@ function OrganisationsDialog({
                                 {statusToRemove ? (
                                     <StatusTag status={statusToRemove} colour={statuses[statusToRemove]} />
                                 ) : null}{" "}
-                                status? Which status would you like issues with this status to be set to?
+                                status? <span className="font-700 text-foreground">{issuesUsingStatus}</span>{" "}
+                                issues are using it. Which status would you like these issues to use instead?
                             </p>
                             <Select value={reassignToStatus} onValueChange={setReassignToStatus}>
                                 <SelectTrigger className="w-min">
