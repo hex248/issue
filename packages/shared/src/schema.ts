@@ -84,9 +84,7 @@ export const TimedSession = pgTable("TimedSession", {
     userId: integer()
         .notNull()
         .references(() => User.id),
-    issueId: integer()
-        .notNull()
-        .references(() => Issue.id),
+    issueId: integer().references(() => Issue.id, { onDelete: "set null" }),
     timestamps: timestamp({ withTimezone: false }).array().notNull(),
     endedAt: timestamp({ withTimezone: false }),
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
