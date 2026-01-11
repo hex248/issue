@@ -5,7 +5,7 @@
 - dedicated /register route (currently login/register are combined on /login)
 - real logo
 - org settings
-  - customise status COLOURS (green for done, orange for in progress, white for todo, red for rejected, purple for review)
+  - disable individual features
 - sprints
 - issues
   - deadline
