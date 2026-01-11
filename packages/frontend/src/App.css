@@ -49,6 +49,7 @@
 }
 
 :root {
+    --font-weight: 450;
     --radius: 0.625rem;
     --personality: #f26d77;
     --background: oklch(1 0 0);
@@ -85,6 +86,7 @@
 }
 
 .dark {
+    --font-weight: 400;
     --personality: #f26d77;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
@@ -135,22 +137,40 @@
 * {
     font-family: "Commit Mono", monospace;
     font-optical-sizing: auto;
-    font-weight: 500;
+    font-weight: var(--font-weight, 400);
     font-style: normal;
     font-variant-ligatures: none;
 }
 
+.font-200 {
+    font-weight: 200;
+}
+.font-250 {
+    font-weight: 250;
+}
 .font-300 {
     font-weight: 300;
+}
+.font-350 {
+    font-weight: 350;
 }
 .font-400 {
     font-weight: 400;
 }
+.font-450 {
+    font-weight: 450;
+}
 .font-500 {
     font-weight: 500;
 }
+.font-550 {
+    font-weight: 550;
+}
 .font-600 {
     font-weight: 600;
+}
+.font-650 {
+    font-weight: 650;
 }
 .font-700 {
     font-weight: 700;

@@ -63,7 +63,7 @@ function SelectTrigger({
             {label && hasValue && (
                 <span
                     className={cn(
-                        "text-muted-foreground bg-background absolute left-0.5 px-1 text-[11px] leading-none",
+                        "text-muted-foreground bg-background absolute left-1 text-[12px] leading-none font-700",
                         labelPosition === "top" ? "-top-1" : "-bottom-1",
                     )}
                 >
@@ -131,7 +131,7 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
     return (
         <SelectPrimitive.Label
             data-slot="select-label"
-            className={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
+            className={cn("text-muted-foreground px-2 py-1.5 text-xs font-700", className)}
             {...props}
         />
     );
