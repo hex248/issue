@@ -1,6 +1,6 @@
 import type { IssueResponse, ProjectResponse, UserRecord } from "@issue/shared";
-import { Trash, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Check, Link, Trash, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { StatusSelect } from "@/components/status-select";
@@ -36,11 +36,21 @@ export function IssueDetailPane({
     );
     const [status, setStatus] = useState<string>(issueData.Issue.status);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const copyTimeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
         setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
         setStatus(issueData.Issue.status);
     }, [issueData.Issue.assigneeId, issueData.Issue.status]);
+
+    useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                window.clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleAssigneeChange = async (value: string) => {
         setAssigneeId(value);
@@ -79,6 +89,22 @@ export function IssueDetailPane({
         setDeleteOpen(true);
     };
 
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setLinkCopied(true);
+            if (copyTimeoutRef.current) {
+                window.clearTimeout(copyTimeoutRef.current);
+            }
+            copyTimeoutRef.current = window.setTimeout(() => {
+                setLinkCopied(false);
+                copyTimeoutRef.current = null;
+            }, 1500);
+        } catch (error) {
+            console.error("error copying issue link:", error);
+        }
+    };
+
     const handleConfirmDelete = async () => {
         await issue.delete({
             issueId: issueData.Issue.id,
@@ -100,12 +126,19 @@ export function IssueDetailPane({
                         {issueID(project.Project.key, issueData.Issue.number)}
                     </p>
                 </span>
-                <div className="flex gap-1 items-center">
+                <div className="flex items-center">
                     <Button
                         variant="dummy"
-                        size="none"
+                        onClick={handleCopyLink}
+                        className="px-0 py-0 w-6 h-6 hover:text-foreground/70"
+                        title={linkCopied ? "Copied" : "Copy link"}
+                    >
+                        {linkCopied ? <Check /> : <Link />}
+                    </Button>
+                    <Button
+                        variant="dummy"
                         onClick={handleDelete}
-                        className="text-destructive hover:text-destructive/70"
+                        className="px-0 py-0 w-6 h-6 text-destructive hover:text-destructive/70"
                     >
                         <Trash />
                     </Button>
