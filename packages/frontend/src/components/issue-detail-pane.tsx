@@ -1,5 +1,5 @@
 import type { IssueResponse, ProjectResponse, UserRecord } from "@issue/shared";
-import { X } from "lucide-react";
+import { Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
@@ -7,6 +7,7 @@ import { StatusSelect } from "@/components/status-select";
 import StatusTag from "@/components/status-tag";
 import { TimerModal } from "@/components/timer-modal";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { SelectTrigger } from "@/components/ui/select";
 import { UserSelect } from "@/components/user-select";
 import { issue } from "@/lib/server";
@@ -19,6 +20,7 @@ export function IssueDetailPane({
     statuses,
     close,
     onIssueUpdate,
+    onIssueDelete,
 }: {
     project: ProjectResponse;
     issueData: IssueResponse;
@@ -26,12 +28,14 @@ export function IssueDetailPane({
     statuses: Record<string, string>;
     close: () => void;
     onIssueUpdate?: () => void;
+    onIssueDelete?: (issueId: number) => void | Promise<void>;
 }) {
     const { user } = useSession();
     const [assigneeId, setAssigneeId] = useState<string>(
         issueData.Issue.assigneeId?.toString() ?? "unassigned",
     );
     const [status, setStatus] = useState<string>(issueData.Issue.status);
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
     useEffect(() => {
         setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
@@ -71,6 +75,23 @@ export function IssueDetailPane({
         });
     };
 
+    const handleDelete = () => {
+        setDeleteOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        await issue.delete({
+            issueId: issueData.Issue.id,
+            onSuccess: async () => {
+                await onIssueDelete?.(issueData.Issue.id);
+            },
+            onError: (error) => {
+                console.error("error deleting issue:", error);
+            },
+        });
+        setDeleteOpen(false);
+    };
+
     return (
         <div className="flex flex-col">
             <div className="flex flex-row items-center justify-end border-b h-[25px]">
@@ -79,10 +100,19 @@ export function IssueDetailPane({
                         {issueID(project.Project.key, issueData.Issue.number)}
                     </p>
                 </span>
-
-                <Button variant={"dummy"} onClick={close} className="px-0 py-0 w-6 h-6">
-                    <X />
-                </Button>
+                <div className="flex gap-1 items-center">
+                    <Button
+                        variant="dummy"
+                        size="none"
+                        onClick={handleDelete}
+                        className="text-destructive hover:text-destructive/70"
+                    >
+                        <Trash />
+                    </Button>
+                    <Button variant={"dummy"} onClick={close} className="px-0 py-0 w-6 h-6">
+                        <X />
+                    </Button>
+                </div>
             </div>
 
             <div className="flex flex-col w-full p-2 py-2 gap-2">
@@ -134,6 +164,16 @@ export function IssueDetailPane({
                         <TimerModal issueId={issueData.Issue.id} />
                     </div>
                 )}
+                <ConfirmDialog
+                    open={deleteOpen}
+                    onOpenChange={setDeleteOpen}
+                    onConfirm={handleConfirmDelete}
+                    title="Delete issue"
+                    message="This will permanently delete the issue."
+                    processingText="Deleting..."
+                    confirmText="Delete"
+                    variant="destructive"
+                />
             </div>
         </div>
     );

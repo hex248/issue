@@ -13,7 +13,6 @@
     - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
   - sprint
   - more than one assignee
-  - delete issue
   - edit title & description
 - time tracking:
   - add current work time on detail pane for issues with time tracked

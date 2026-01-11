@@ -191,6 +191,12 @@ export default function App() {
         }
     };
 
+    const handleIssueDelete = async (issueId: number) => {
+        setSelectedIssue(null);
+        setIssues((prev) => prev.filter((issue) => issue.Issue.id !== issueId));
+        await refetchIssues();
+    };
+
     // fetch issues when project is selected
     useEffect(() => {
         if (!selectedProject) return;
@@ -318,6 +324,7 @@ export default function App() {
                                         statuses={selectedOrganisation.Organisation.statuses}
                                         close={() => setSelectedIssue(null)}
                                         onIssueUpdate={refetchIssues}
+                                        onIssueDelete={handleIssueDelete}
                                     />
                                 </div>
                             </ResizablePanel>
