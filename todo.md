@@ -24,4 +24,3 @@
   - for almost every network interaction that is user prompted
   - the interface feels snappy but sometimes it's hard to tell if your changes are volatile or saved
 - import existing jira data
-- move the 3 status action buttons to a burger menu (3 dots tho)
