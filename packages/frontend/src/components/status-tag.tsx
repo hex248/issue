@@ -1,17 +1,5 @@
 import { DEFAULT_STATUS_COLOUR } from "@issue/shared";
-import { cn } from "@/lib/utils";
-
-const DARK_TEXT_COLOUR = "#0a0a0a";
-const THRESHOLD = 0.6;
-
-const isLight = (hex: string): boolean => {
-    const num = Number.parseInt(hex.replace("#", ""), 16);
-    const r = (num >> 16) & 255;
-    const g = (num >> 8) & 255;
-    const b = num & 255;
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > THRESHOLD;
-};
+import { cn, DARK_TEXT_COLOUR, isLight } from "@/lib/utils";
 
 export default function StatusTag({
     status,
