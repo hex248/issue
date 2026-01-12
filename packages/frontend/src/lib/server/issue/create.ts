@@ -5,6 +5,7 @@ export async function create({
     projectId,
     title,
     description,
+    sprintId,
     assigneeId,
     status,
     onSuccess,
@@ -13,6 +14,7 @@ export async function create({
     projectId: number;
     title: string;
     description: string;
+    sprintId?: number | null;
     assigneeId?: number | null;
     status?: string;
 } & ServerQueryInput) {
@@ -20,6 +22,7 @@ export async function create({
     url.searchParams.set("projectId", `${projectId}`);
     url.searchParams.set("title", title.trim());
     if (description.trim() !== "") url.searchParams.set("description", description.trim());
+    if (sprintId != null) url.searchParams.set("sprintId", `${sprintId}`);
     if (assigneeId != null) url.searchParams.set("assigneeId", `${assigneeId}`);
     if (status != null && status.trim() !== "") url.searchParams.set("status", status.trim());
 

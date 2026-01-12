@@ -7,6 +7,7 @@ export async function createIssue(
     title: string,
     description: string,
     creatorId: number,
+    sprintId?: number,
     assigneeId?: number,
     status?: string,
 ) {
@@ -30,6 +31,7 @@ export async function createIssue(
                 description,
                 number: nextNumber,
                 creatorId,
+                sprintId,
                 assigneeId,
                 ...(status && { status }),
             })

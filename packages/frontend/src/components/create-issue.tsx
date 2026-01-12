@@ -1,4 +1,10 @@
-import { ISSUE_DESCRIPTION_MAX_LENGTH, ISSUE_TITLE_MAX_LENGTH, type UserRecord } from "@issue/shared";
+import {
+    ISSUE_DESCRIPTION_MAX_LENGTH,
+    ISSUE_TITLE_MAX_LENGTH,
+    type SprintRecord,
+    type UserRecord,
+} from "@issue/shared";
+
 import { type FormEvent, useState } from "react";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import { StatusSelect } from "@/components/status-select";
@@ -18,15 +24,18 @@ import { SelectTrigger } from "@/components/ui/select";
 import { UserSelect } from "@/components/user-select";
 import { issue } from "@/lib/server";
 import { cn } from "@/lib/utils";
+import { SprintSelect } from "./sprint-select";
 
 export function CreateIssue({
     projectId,
+    sprints,
     members,
     statuses,
     trigger,
     completeAction,
 }: {
     projectId?: number;
+    sprints?: SprintRecord[];
     members?: UserRecord[];
     statuses: Record<string, string>;
     trigger?: React.ReactNode;
@@ -37,6 +46,7 @@ export function CreateIssue({
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [sprintId, setSprintId] = useState<string>("unassigned");
     const [assigneeId, setAssigneeId] = useState<string>("unassigned");
     const [status, setStatus] = useState<string>(Object.keys(statuses)[0] ?? "");
     const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -46,6 +56,7 @@ export function CreateIssue({
     const reset = () => {
         setTitle("");
         setDescription("");
+        setSprintId("unassigned");
         setAssigneeId("unassigned");
         setStatus(statuses?.[0] ?? "");
         setSubmitAttempted(false);
@@ -90,6 +101,7 @@ export function CreateIssue({
                 projectId,
                 title,
                 description,
+                sprintId: sprintId === "unassigned" ? null : Number(sprintId),
                 assigneeId: assigneeId === "unassigned" ? null : Number(assigneeId),
                 status: status.trim() === "" ? undefined : status,
                 onSuccess: async (data) => {
@@ -131,7 +143,7 @@ export function CreateIssue({
                 <form onSubmit={handleSubmit}>
                     <div className="grid">
                         {statuses && Object.keys(statuses).length > 0 && (
-                            <div className="flex flex-col gap-2 mb-4">
+                            <div className="flex items-center gap-2 mb-4">
                                 <Label>Status</Label>
                                 <StatusSelect
                                     statuses={statuses}
@@ -188,8 +200,15 @@ export function CreateIssue({
                             maxLength={ISSUE_DESCRIPTION_MAX_LENGTH}
                         />
 
+                        {sprints && sprints.length > 0 && (
+                            <div className="flex items-center gap-2 mt-0">
+                                <Label className="text-sm">Sprint</Label>
+                                <SprintSelect sprints={sprints} value={sprintId} onChange={setSprintId} />
+                            </div>
+                        )}
+
                         {members && members.length > 0 && (
-                            <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center gap-2 mt-4">
                                 <Label className="text-sm">Assignee</Label>
                                 <UserSelect users={members} value={assigneeId} onChange={setAssigneeId} />
                             </div>

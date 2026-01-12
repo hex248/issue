@@ -23,11 +23,13 @@ export default async function issueCreate(req: AuthedRequest) {
 
     const title = url.searchParams.get("title") || "Untitled Issue";
     const description = url.searchParams.get("description") || "";
+    const sprintIdParam = url.searchParams.get("sprintId");
+    const sprintId = sprintIdParam ? Number(sprintIdParam) : undefined;
     const assigneeIdParam = url.searchParams.get("assigneeId");
     const assigneeId = assigneeIdParam ? Number(assigneeIdParam) : undefined;
     const status = url.searchParams.get("status") || undefined;
 
-    const issue = await createIssue(project.id, title, description, req.userId, assigneeId, status);
+    const issue = await createIssue(project.id, title, description, req.userId, sprintId, assigneeId, status);
 
     return Response.json(issue);
 }

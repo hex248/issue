@@ -419,6 +419,7 @@ export default function App() {
                         <>
                             <CreateIssue
                                 projectId={selectedProject?.Project.id}
+                                sprints={sprints}
                                 members={members}
                                 statuses={selectedOrganisation.Organisation.statuses}
                                 completeAction={async () => {
