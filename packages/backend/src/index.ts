@@ -69,6 +69,9 @@ const main = async () => {
             "/projects/all": withCors(withAuth(routes.projectsAll)),
             "/projects/with-creators": withCors(withAuth(routes.projectsWithCreators)),
 
+            "/sprint/create": withCors(withAuth(withCSRF(routes.sprintCreate))),
+            "/sprints/by-project": withCors(withAuth(routes.sprintsByProject)),
+
             "/timer/toggle": withCors(withAuth(withCSRF(routes.timerToggle))),
             "/timer/end": withCors(withAuth(withCSRF(routes.timerEnd))),
             "/timer/get": withCors(withAuth(withCSRF(routes.timerGet))),

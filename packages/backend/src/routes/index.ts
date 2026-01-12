@@ -26,6 +26,8 @@ import projectDelete from "./project/delete";
 import projectUpdate from "./project/update";
 import projectWithCreator from "./project/with-creator";
 import projectsWithCreators from "./project/with-creators";
+import sprintCreate from "./sprint/create";
+import sprintsByProject from "./sprints/by-project";
 import timerEnd from "./timer/end";
 import timerGet from "./timer/get";
 import timerGetInactive from "./timer/get-inactive";
@@ -74,6 +76,9 @@ export const routes = {
     projectsByOrganisation,
     projectsAll,
     projectsWithCreators,
+
+    sprintCreate,
+    sprintsByProject,
 
     timerToggle,
     timerGet,
