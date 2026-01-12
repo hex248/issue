@@ -12,8 +12,8 @@ export default function ColourPicker({
 }) {
     return (
         <Popover>
-            <PopoverTrigger>
-                <Button className="w-8 h-8" style={{ backgroundColor: colour }}></Button>
+            <PopoverTrigger asChild>
+                <Button type="button" className="w-8 h-8" style={{ backgroundColor: colour }} />
             </PopoverTrigger>
             <PopoverContent className="w-fit grid gap-2 p-2" align="start" side={"top"}>
                 <HexColorPicker color={colour} onChange={onChange} className="p-0 m-0" />
