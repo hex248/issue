@@ -1,4 +1,4 @@
-import type { IssueResponse, ProjectResponse, UserRecord } from "@issue/shared";
+import type { IssueResponse, ProjectResponse, SprintRecord, UserRecord } from "@issue/shared";
 import { Check, Link, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/components/session-provider";
@@ -13,9 +13,11 @@ import { SelectTrigger } from "@/components/ui/select";
 import { UserSelect } from "@/components/user-select";
 import { issue } from "@/lib/server";
 import { issueID } from "@/lib/utils";
+import { SprintSelect } from "./sprint-select";
 
 export function IssueDetailPane({
     project,
+    sprints,
     issueData,
     members,
     statuses,
@@ -24,6 +26,7 @@ export function IssueDetailPane({
     onIssueDelete,
 }: {
     project: ProjectResponse;
+    sprints: SprintRecord[];
     issueData: IssueResponse;
     members: UserRecord[];
     statuses: Record<string, string>;
@@ -35,15 +38,17 @@ export function IssueDetailPane({
     const [assigneeId, setAssigneeId] = useState<string>(
         issueData.Issue.assigneeId?.toString() ?? "unassigned",
     );
+    const [sprintId, setSprintId] = useState<string>(issueData.Issue.sprintId?.toString() ?? "unassigned");
     const [status, setStatus] = useState<string>(issueData.Issue.status);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
     const copyTimeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
+        setSprintId(issueData.Issue.sprintId?.toString() ?? "unassigned");
         setAssigneeId(issueData.Issue.assigneeId?.toString() ?? "unassigned");
         setStatus(issueData.Issue.status);
-    }, [issueData.Issue.assigneeId, issueData.Issue.status]);
+    }, [issueData.Issue.sprintId, issueData.Issue.assigneeId, issueData.Issue.status]);
 
     useEffect(() => {
         return () => {
@@ -52,6 +57,23 @@ export function IssueDetailPane({
             }
         };
     }, []);
+
+    const handleSprintChange = async (value: string) => {
+        setSprintId(value);
+        const newSprintId = value === "unassigned" ? null : Number(value);
+
+        await issue.update({
+            issueId: issueData.Issue.id,
+            sprintId: newSprintId,
+            onSuccess: () => {
+                onIssueUpdate?.();
+            },
+            onError: (error) => {
+                console.error("error updating sprint:", error);
+                setSprintId(issueData.Issue.sprintId?.toString() ?? "unassigned");
+            },
+        });
+    };
 
     const handleAssigneeChange = async (value: string) => {
         setAssigneeId(value);
@@ -177,6 +199,11 @@ export function IssueDetailPane({
                 {issueData.Issue.description !== "" && (
                     <p className="text-sm">{issueData.Issue.description}</p>
                 )}
+
+                <div className="flex items-center gap-2">
+                    <span className="text-sm">Sprint:</span>
+                    <SprintSelect sprints={sprints} value={sprintId} onChange={handleSprintChange} />
+                </div>
 
                 <div className="flex items-center gap-2">
                     <span className="text-sm">Assignee:</span>
