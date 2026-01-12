@@ -1,3 +1,20 @@
+# HIGH PRIORITY
+
+- sprints
+  - timeline display
+  - display sprints
+- add toasts app-wide
+  - for almost every network interaction that is user prompted
+  - the interface feels snappy but sometimes it's hard to tell if your changes are volatile or saved
+- issues
+  - sprint
+  - edit title & description
+  - more than one assignee
+- user preferences
+  - "assign to me by default" option for new issues
+
+# LOW PRIORITY
+
 - setup guide
 - pricing page
   - see jira and other competitors
@@ -6,19 +23,18 @@
 - real logo
 - org settings
   - disable individual features
-- sprints
 - issues
   - deadline
   - comments
     - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
-  - sprint
-  - more than one assignee
-  - edit title & description
 - time tracking:
   - add overlay in the bottom left for active timers if there are any. this should be minimal with the issue key (API-005), the time, and a play/pause + end button
 - user preferences
-  - "assign to me by default" option for new issues
-- add toasts app-wide
-  - for almost every network interaction that is user prompted
-  - the interface feels snappy but sometimes it's hard to tell if your changes are volatile or saved
+  - icon style:
+    i think the best way to this is have an "Icon" component with "icon" param, and "type" param. for example: "trash", "pixel" will use the pixelarticons "Trash" icon.
+    types:
+    - Lucide
+    - Pixel - npm: @nsmr/pixelart-react & pixelarticons.com
+    - Phosphor - github.com/phosphor-icons/react
+  - colour scheme
 - import existing jira data
