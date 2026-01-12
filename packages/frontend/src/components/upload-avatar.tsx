@@ -1,5 +1,6 @@
 import { Edit } from "lucide-react";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import Avatar from "@/components/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -42,6 +43,10 @@ export function UploadAvatar({
                 setError(msg);
                 setUploading(false);
             },
+        });
+
+        toast.success(`Avatar uploaded successfully`, {
+            dismissible: false,
         });
     };
 

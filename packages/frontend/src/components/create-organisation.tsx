@@ -1,4 +1,9 @@
-import { ORG_DESCRIPTION_MAX_LENGTH, ORG_NAME_MAX_LENGTH, ORG_SLUG_MAX_LENGTH } from "@issue/shared";
+import {
+    ORG_DESCRIPTION_MAX_LENGTH,
+    ORG_NAME_MAX_LENGTH,
+    ORG_SLUG_MAX_LENGTH,
+    type OrganisationRecord,
+} from "@issue/shared";
 import { type FormEvent, useState } from "react";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
@@ -28,7 +33,7 @@ export function CreateOrganisation({
     completeAction,
 }: {
     trigger?: React.ReactNode;
-    completeAction?: (organisationId: number) => void | Promise<void>;
+    completeAction?: (org: OrganisationRecord) => void | Promise<void>;
 }) {
     const { user } = useAuthenticatedSession();
 
@@ -83,7 +88,7 @@ export function CreateOrganisation({
                     setOpen(false);
                     reset();
                     try {
-                        await completeAction?.(data.id);
+                        await completeAction?.(data);
                     } catch (actionErr) {
                         console.error(actionErr);
                     }

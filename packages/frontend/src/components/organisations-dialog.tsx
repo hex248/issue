@@ -7,6 +7,7 @@ import {
 import { ChevronDown, ChevronUp, EllipsisVertical, Plus, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { AddMemberDialog } from "@/components/add-member-dialog";
 import { OrganisationSelect } from "@/components/organisation-select";
 import { useAuthenticatedSession } from "@/components/session-provider";
@@ -26,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { issue, organisation } from "@/lib/server";
+import { capitalise } from "@/lib/utils";
 
 function OrganisationsDialog({
     trigger,
@@ -129,6 +131,10 @@ function OrganisationsDialog({
                             console.error(error);
                         },
                     });
+
+                    toast.success(`${capitalise(action)}d ${memberName} to ${newRole} successfully`, {
+                        dismissible: false,
+                    });
                 } catch (err) {
                     console.error(err);
                 }
@@ -162,6 +168,13 @@ function OrganisationsDialog({
                             console.error(error);
                         },
                     });
+
+                    toast.success(
+                        `Removed ${memberName} from ${selectedOrganisation.Organisation.name} successfully`,
+                        {
+                            dismissible: false,
+                        },
+                    );
                 } catch (err) {
                     console.error(err);
                 }
@@ -175,7 +188,10 @@ function OrganisationsDialog({
         }
     }, [selectedOrganisation]);
 
-    const updateStatuses = async (newStatuses: Record<string, string>) => {
+    const updateStatuses = async (
+        newStatuses: Record<string, string>,
+        statusRemoved?: { name: string; colour: string },
+    ) => {
         if (!selectedOrganisation) return;
 
         try {
@@ -184,6 +200,18 @@ function OrganisationsDialog({
                 statuses: newStatuses,
                 onSuccess: () => {
                     setStatuses(newStatuses);
+                    if (statusRemoved) {
+                        toast.success(
+                            <>
+                                Removed{" "}
+                                <StatusTag status={statusRemoved.name} colour={statusRemoved.colour} /> status
+                                successfully
+                            </>,
+                            {
+                                dismissible: false,
+                            },
+                        );
+                    }
                     void refetchOrganisations();
                 },
                 onError: (error) => {
@@ -213,6 +241,17 @@ function OrganisationsDialog({
         const newStatuses = { ...statuses };
         newStatuses[trimmed] = newStatusColour;
         await updateStatuses(newStatuses);
+
+        toast.success(
+            <>
+                Created <StatusTag status={newStatusName.trim()} colour={newStatusColour} /> status
+                successfully
+            </>,
+            {
+                dismissible: false,
+            },
+        );
+
         setNewStatusName("");
         setNewStatusColour(DEFAULT_STATUS_COLOUR);
         setIsCreatingStatus(false);
@@ -238,6 +277,7 @@ function OrganisationsDialog({
                     const nextStatuses = Object.keys(statuses).filter((s) => s !== status);
                     void updateStatuses(
                         Object.fromEntries(nextStatuses.map((statusKey) => [statusKey, statuses[statusKey]])),
+                        { name: status, colour: statuses[status] },
                     );
                 },
                 onError: (error) => {
@@ -262,6 +302,15 @@ function OrganisationsDialog({
         ];
 
         await updateStatuses(Object.fromEntries(nextStatuses.map((status) => [status, statuses[status]])));
+        toast.success(
+            <>
+                Moved <StatusTag status={status} colour={statuses[status]} /> from position {currentIndex + 1}{" "}
+                to {nextIndex + 1} successfully
+            </>,
+            {
+                dismissible: false,
+            },
+        );
     };
 
     const confirmRemoveStatus = async () => {
@@ -275,6 +324,7 @@ function OrganisationsDialog({
                 const newStatuses = Object.keys(statuses).filter((s) => s !== statusToRemove);
                 await updateStatuses(
                     Object.fromEntries(newStatuses.map((status) => [status, statuses[status]])),
+                    { name: statusToRemove, colour: statuses[statusToRemove] },
                 );
                 setStatusToRemove(null);
                 setReassignToStatus("");
@@ -319,8 +369,11 @@ function OrganisationsDialog({
                                             `${org?.Organisation.id}`,
                                         );
                                     }}
-                                    onCreateOrganisation={async (organisationId) => {
-                                        await refetchOrganisations({ selectOrganisationId: organisationId });
+                                    onCreateOrganisation={async (org) => {
+                                        toast.success(`Created Organisation ${org.name}`, {
+                                            dismissible: false,
+                                        });
+                                        await refetchOrganisations({ selectOrganisationId: org.id });
                                     }}
                                     contentClass={
                                         "data-[side=bottom]:translate-y-2 data-[side=bottom]:translate-x-0.25"
@@ -422,7 +475,15 @@ function OrganisationsDialog({
                                             <AddMemberDialog
                                                 organisationId={selectedOrganisation.Organisation.id}
                                                 existingMembers={members.map((m) => m.User.username)}
-                                                onSuccess={refetchMembers}
+                                                onSuccess={(user) => {
+                                                    toast.success(
+                                                        `${user.name} added to ${selectedOrganisation.Organisation.name} successfully`,
+                                                        {
+                                                            dismissible: false,
+                                                        },
+                                                    );
+                                                    refetchMembers();
+                                                }}
                                                 trigger={
                                                     <Button variant="outline">
                                                         Add user <Plus className="size-4" />
@@ -579,8 +640,11 @@ function OrganisationsDialog({
                                     setSelectedOrganisation(org);
                                     localStorage.setItem("selectedOrganisationId", `${org?.Organisation.id}`);
                                 }}
-                                onCreateOrganisation={async (organisationId) => {
-                                    await refetchOrganisations({ selectOrganisationId: organisationId });
+                                onCreateOrganisation={async (org) => {
+                                    toast.success(`Created Organisation ${org.name}`, {
+                                        dismissible: false,
+                                    });
+                                    await refetchOrganisations({ selectOrganisationId: org.id });
                                 }}
                                 contentClass={
                                     "data-[side=bottom]:translate-y-2 data-[side=bottom]:translate-x-0.25"

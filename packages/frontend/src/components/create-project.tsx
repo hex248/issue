@@ -28,7 +28,7 @@ export function CreateProject({
 }: {
     organisationId?: number;
     trigger?: React.ReactNode;
-    completeAction?: (projectId: number) => void | Promise<void>;
+    completeAction?: (project: ProjectRecord) => void | Promise<void>;
 }) {
     const { user } = useAuthenticatedSession();
 
@@ -93,7 +93,7 @@ export function CreateProject({
                     setOpen(false);
                     reset();
                     try {
-                        await completeAction?.(project.id);
+                        await completeAction?.(project);
                     } catch (actionErr) {
                         console.error(actionErr);
                     }

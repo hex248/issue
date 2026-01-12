@@ -1,3 +1,4 @@
+import type { UserRecord } from "@issue/shared";
 import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,7 @@ export function AddMemberDialog({
     organisationId: number;
     existingMembers: string[];
     trigger?: React.ReactNode;
-    onSuccess?: () => void | Promise<void>;
+    onSuccess?: (user: UserRecord) => void | Promise<void>;
 }) {
     const [open, setOpen] = useState(false);
     const [username, setUsername] = useState("");
@@ -59,10 +60,12 @@ export function AddMemberDialog({
         setSubmitting(true);
         try {
             let userId: number | null = null;
+            let userData: UserRecord;
             await user.byUsername({
                 username,
-                onSuccess: (userData) => {
-                    userId = userData.id;
+                onSuccess: (data: UserRecord) => {
+                    userData = data;
+                    userId = data.id;
                 },
                 onError: (err) => {
                     setError(err || "user not found");
@@ -82,7 +85,7 @@ export function AddMemberDialog({
                     setOpen(false);
                     reset();
                     try {
-                        await onSuccess?.();
+                        await onSuccess?.(userData);
                     } catch (actionErr) {
                         console.error(actionErr);
                     }

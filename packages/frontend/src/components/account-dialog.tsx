@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -53,6 +54,10 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
             onError: (errorMessage) => {
                 setError(errorMessage);
             },
+        });
+
+        toast.success(`Account updated successfully`, {
+            dismissible: false,
         });
     };
 

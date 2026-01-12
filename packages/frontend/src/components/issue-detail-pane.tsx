@@ -1,6 +1,7 @@
 import type { IssueResponse, ProjectResponse, SprintRecord, UserRecord } from "@issue/shared";
 import { Check, Link, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { StatusSelect } from "@/components/status-select";
@@ -83,6 +84,13 @@ export function IssueDetailPane({
             issueId: issueData.Issue.id,
             assigneeId: newAssigneeId,
             onSuccess: () => {
+                const user = members.find((member) => member.id === newAssigneeId);
+                toast.success(
+                    `Assigned ${user?.name} to ${issueID(project.Project.key, issueData.Issue.number)}`,
+                    {
+                        dismissible: false,
+                    },
+                );
                 onIssueUpdate?.();
             },
             onError: (error) => {
@@ -99,6 +107,13 @@ export function IssueDetailPane({
             issueId: issueData.Issue.id,
             status: value,
             onSuccess: () => {
+                toast.success(
+                    <>
+                        {issueID(project.Project.key, issueData.Issue.number)}'s status updated to{" "}
+                        <StatusTag status={value} colour={statuses[value]} />
+                    </>,
+                    { dismissible: false },
+                );
                 onIssueUpdate?.();
             },
             onError: (error) => {

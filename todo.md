@@ -1,13 +1,11 @@
 # HIGH PRIORITY
 
+- fix colour picker alignment in new status form
 - projects
   - project management menu (will this be accessed from the organisations-dialog? or will it be a separate menu in the user select)
 - sprints
   - timeline display
   - display sprints
-- add toasts app-wide
-  - for almost every network interaction that is user prompted
-  - the interface feels snappy but sometimes it's hard to tell if your changes are volatile or saved
 - issues
   - sprint
   - edit title & description

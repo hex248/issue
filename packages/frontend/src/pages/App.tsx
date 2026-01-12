@@ -9,6 +9,7 @@ import type {
     UserRecord,
 } from "@issue/shared";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import AccountDialog from "@/components/account-dialog";
 import { CreateIssue } from "@/components/create-issue";
 import { CreateSprint } from "@/components/create-sprint";
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
 import { issue, organisation, project, sprint } from "@/lib/server";
+import { issueID } from "@/lib/utils";
 
 const BREATHING_ROOM = 1;
 
@@ -385,8 +387,11 @@ export default function App() {
                                 issueNumber: null,
                             });
                         }}
-                        onCreateOrganisation={async (organisationId) => {
-                            await refetchOrganisations({ selectOrganisationId: organisationId });
+                        onCreateOrganisation={async (org) => {
+                            toast.success(`Created Organisation ${org.name}`, {
+                                dismissible: false,
+                            });
+                            await refetchOrganisations({ selectOrganisationId: org.id });
                         }}
                         showLabel
                     />
@@ -406,10 +411,13 @@ export default function App() {
                                     issueNumber: null,
                                 });
                             }}
-                            onCreateProject={async (projectId) => {
+                            onCreateProject={async (project) => {
                                 if (!selectedOrganisation) return;
+                                toast.success(`Created Project ${project.name}`, {
+                                    dismissible: false,
+                                });
                                 await refetchProjects(selectedOrganisation.Organisation.id, {
-                                    selectProjectId: projectId,
+                                    selectProjectId: project.id,
                                 });
                             }}
                             showLabel
@@ -422,16 +430,31 @@ export default function App() {
                                 sprints={sprints}
                                 members={members}
                                 statuses={selectedOrganisation.Organisation.statuses}
-                                completeAction={async () => {
+                                completeAction={async (issueNumber) => {
                                     if (!selectedProject) return;
+                                    toast.success(
+                                        `Created ${issueID(selectedProject.Project.key, issueNumber)}`,
+                                        {
+                                            dismissible: false,
+                                        },
+                                    );
                                     await refetchIssues();
                                 }}
                             />
                             {isAdmin && (
                                 <CreateSprint
                                     projectId={selectedProject?.Project.id}
-                                    completeAction={async () => {
+                                    completeAction={async (sprint) => {
                                         if (!selectedProject) return;
+                                        toast.success(
+                                            <>
+                                                Created sprint{" "}
+                                                <span style={{ color: sprint.color }}>{sprint.name}</span>
+                                            </>,
+                                            {
+                                                dismissible: false,
+                                            },
+                                        );
                                         await refetchSprints(selectedProject?.Project.id);
                                     }}
                                 />

@@ -1,4 +1,4 @@
-import type { ProjectResponse } from "@issue/shared";
+import type { ProjectRecord, ProjectResponse } from "@issue/shared";
 import { useState } from "react";
 import { CreateProject } from "@/components/create-project";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export function ProjectSelect({
     selectedProject: ProjectResponse | null;
     organisationId: number | undefined;
     onSelectedProjectChange: (project: ProjectResponse | null) => void;
-    onCreateProject?: (projectId: number) => void | Promise<void>;
+    onCreateProject?: (project: ProjectRecord) => void | Promise<void>;
     placeholder?: string;
     showLabel?: boolean;
     label?: string;
@@ -75,9 +75,9 @@ export function ProjectSelect({
                             Create Project
                         </Button>
                     }
-                    completeAction={async (projectId) => {
+                    completeAction={async (project) => {
                         try {
-                            await onCreateProject?.(projectId);
+                            await onCreateProject?.(project);
                         } catch (err) {
                             console.error(err);
                         }

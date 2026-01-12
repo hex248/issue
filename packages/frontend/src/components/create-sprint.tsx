@@ -1,4 +1,4 @@
-import { DEFAULT_SPRINT_COLOUR } from "@issue/shared";
+import { DEFAULT_SPRINT_COLOUR, type SprintRecord } from "@issue/shared";
 import { type FormEvent, useMemo, useState } from "react";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,7 @@ export function CreateSprint({
 }: {
     projectId?: number;
     trigger?: React.ReactNode;
-    completeAction?: () => void | Promise<void>;
+    completeAction?: (sprint: SprintRecord) => void | Promise<void>;
 }) {
     const { user } = useAuthenticatedSession();
 
@@ -122,14 +122,14 @@ export function CreateSprint({
             await sprint.create({
                 projectId,
                 name,
-                color: colour, // hm - always unsure which i should use 
+                color: colour, // hm - always unsure which i should use
                 startDate,
                 endDate,
-                onSuccess: async () => {
+                onSuccess: async (data) => {
                     setOpen(false);
                     reset();
                     try {
-                        await completeAction?.();
+                        await completeAction?.(data);
                     } catch (actionErr) {
                         console.error(actionErr);
                     }

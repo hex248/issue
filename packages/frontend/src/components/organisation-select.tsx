@@ -1,4 +1,4 @@
-import type { OrganisationResponse } from "@issue/shared";
+import type { OrganisationRecord, OrganisationResponse } from "@issue/shared";
 import { useState } from "react";
 import { CreateOrganisation } from "@/components/create-organisation";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export function OrganisationSelect({
     organisations: OrganisationResponse[];
     selectedOrganisation: OrganisationResponse | null;
     onSelectedOrganisationChange: (organisation: OrganisationResponse | null) => void;
-    onCreateOrganisation?: (organisationId: number) => void | Promise<void>;
+    onCreateOrganisation?: (org: OrganisationRecord) => void | Promise<void>;
     placeholder?: string;
     contentClass?: string;
     showLabel?: boolean;
@@ -79,9 +79,9 @@ export function OrganisationSelect({
                             Create Organisation
                         </Button>
                     }
-                    completeAction={async (organisationId) => {
+                    completeAction={async (org) => {
                         try {
-                            await onCreateOrganisation?.(organisationId);
+                            await onCreateOrganisation?.(org);
                         } catch (err) {
                             console.error(err);
                         }

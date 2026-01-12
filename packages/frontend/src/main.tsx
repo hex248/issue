@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAuth, SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import App from "@/pages/App";
 import Font from "@/pages/Font";
 import Landing from "@/pages/Landing";
@@ -44,6 +45,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                     </Routes>
                 </SessionProvider>
             </BrowserRouter>
+            <Toaster visibleToasts={1} duration={2000} />
         </ThemeProvider>
     </React.StrictMode>,
 );

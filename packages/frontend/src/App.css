@@ -214,3 +214,13 @@
     height: 16px !important;
     border: 1px solid white !important;
 }
+
+[data-sonner-toast] {
+    transition: none !important;
+    padding: 10px 15px 10px 15px !important;
+    width: max-content !important;
+    max-width: 90vw !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+}

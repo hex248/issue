@@ -39,7 +39,7 @@ export function CreateIssue({
     members?: UserRecord[];
     statuses: Record<string, string>;
     trigger?: React.ReactNode;
-    completeAction?: (issueId: number) => void | Promise<void>;
+    completeAction?: (issueNumber: number) => void | Promise<void>;
 }) {
     const { user } = useAuthenticatedSession();
 
@@ -108,7 +108,7 @@ export function CreateIssue({
                     setOpen(false);
                     reset();
                     try {
-                        await completeAction?.(data.id);
+                        await completeAction?.(data.number);
                     } catch (actionErr) {
                         console.error(actionErr);
                     }
