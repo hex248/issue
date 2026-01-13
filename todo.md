@@ -36,6 +36,7 @@
     types:
     - Lucide
     - Pixel - npm: @nsmr/pixelart-react & pixelarticons.com
-    - Phosphor - github.com/phosphor-icons/react
+    - Phosphor - https://github.com/phosphor-icons/react
+    - HugeIcons - https://hugeicons.com/icons?style=Stroke&type=Rounded
   - colour scheme
 - import existing jira data
