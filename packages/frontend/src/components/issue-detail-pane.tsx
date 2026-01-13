@@ -117,7 +117,10 @@ export function IssueDetailPane({
             onSuccess: () => {
                 const user = members.find((member) => member.id === newAssigneeId);
                 toast.success(
-                    `Assigned ${user?.name} to ${issueID(project.Project.key, issueData.Issue.number)}`,
+                    <div className={"flex items-center gap-2"}>
+                        Assigned {user ? <SmallUserDisplay user={user} className={"text-sm"} /> : "unknown"}{" "}
+                        to {issueID(project.Project.key, issueData.Issue.number)}
+                    </div>,
                     {
                         dismissible: false,
                     },

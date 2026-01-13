@@ -15,8 +15,8 @@ import Test from "@/pages/Test";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <BrowserRouter>
-                <SessionProvider>
+            <SessionProvider>
+                <BrowserRouter>
                     <Routes>
                         {/* public routes */}
                         <Route path="/" element={<Landing />} />
@@ -43,9 +43,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
                         <Route path="*" element={<NotFound />} />
                     </Routes>
-                </SessionProvider>
-            </BrowserRouter>
-            <Toaster visibleToasts={1} duration={2000} />
+                </BrowserRouter>
+                <Toaster visibleToasts={1} duration={2000} />
+            </SessionProvider>
         </ThemeProvider>
     </React.StrictMode>,
 );
