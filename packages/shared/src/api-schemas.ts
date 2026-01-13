@@ -1,0 +1,430 @@
+import { z } from "zod";
+import {
+    ISSUE_DESCRIPTION_MAX_LENGTH,
+    ISSUE_STATUS_MAX_LENGTH,
+    ISSUE_TITLE_MAX_LENGTH,
+    ORG_DESCRIPTION_MAX_LENGTH,
+    ORG_NAME_MAX_LENGTH,
+    ORG_SLUG_MAX_LENGTH,
+    PROJECT_NAME_MAX_LENGTH,
+    USER_NAME_MAX_LENGTH,
+    USER_USERNAME_MAX_LENGTH,
+} from "./constants";
+
+// error response
+
+export const ApiErrorSchema = z.object({
+    error: z.string(),
+    code: z.string().optional(),
+    details: z.record(z.array(z.string())).optional(),
+});
+
+export type ApiError = z.infer<typeof ApiErrorSchema>;
+
+// auth schemas
+
+export const LoginRequestSchema = z.object({
+    username: z.string().min(1, "username is required").max(USER_USERNAME_MAX_LENGTH),
+    password: z.string().min(8, "password must be at least 8 characters"),
+});
+
+export type LoginRequest = z.infer<typeof LoginRequestSchema>;
+
+export const RegisterRequestSchema = z.object({
+    name: z.string().min(1, "name is required").max(USER_NAME_MAX_LENGTH),
+    username: z
+        .string()
+        .min(1, "username is required")
+        .max(USER_USERNAME_MAX_LENGTH)
+        .regex(/^[a-zA-Z0-9_-]+$/, "username can only contain letters, numbers, underscores, and hyphens"),
+    password: z
+        .string()
+        .min(8, "password must be at least 8 characters")
+        .regex(/[A-Z]/, "password must contain an uppercase letter")
+        .regex(/[a-z]/, "password must contain a lowercase letter")
+        .regex(/[0-9]/, "password must contain a number"),
+    avatarURL: z.string().url().optional(),
+});
+
+export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
+
+export const AuthResponseSchema = z.object({
+    user: z.object({
+        id: z.number(),
+        name: z.string(),
+        username: z.string(),
+        avatarURL: z.string().nullable(),
+    }),
+    csrfToken: z.string(),
+});
+
+export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// issue schemas
+
+export const IssueCreateRequestSchema = z.object({
+    projectId: z.number().int().positive("projectId must be a positive integer"),
+    title: z.string().min(1, "title is required").max(ISSUE_TITLE_MAX_LENGTH),
+    description: z.string().max(ISSUE_DESCRIPTION_MAX_LENGTH).default(""),
+    status: z.string().max(ISSUE_STATUS_MAX_LENGTH).optional(),
+    assigneeId: z.number().int().positive().nullable().optional(),
+    sprintId: z.number().int().positive().nullable().optional(),
+});
+
+export type IssueCreateRequest = z.infer<typeof IssueCreateRequestSchema>;
+
+export const IssueUpdateRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+    title: z.string().min(1).max(ISSUE_TITLE_MAX_LENGTH).optional(),
+    description: z.string().max(ISSUE_DESCRIPTION_MAX_LENGTH).optional(),
+    status: z.string().max(ISSUE_STATUS_MAX_LENGTH).optional(),
+    assigneeId: z.number().int().positive().nullable().optional(),
+    sprintId: z.number().int().positive().nullable().optional(),
+});
+
+export type IssueUpdateRequest = z.infer<typeof IssueUpdateRequestSchema>;
+
+export const IssueDeleteRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+});
+
+export type IssueDeleteRequest = z.infer<typeof IssueDeleteRequestSchema>;
+
+export const IssuesByProjectQuerySchema = z.object({
+    projectId: z.coerce.number().int().positive("projectId must be a positive integer"),
+});
+
+export type IssuesByProjectQuery = z.infer<typeof IssuesByProjectQuerySchema>;
+
+export const IssuesStatusCountQuerySchema = z.object({
+    organisationId: z.coerce.number().int().positive("organisationId must be a positive integer"),
+    status: z.string().min(1, "status is required").max(ISSUE_STATUS_MAX_LENGTH),
+});
+
+export type IssuesStatusCountQuery = z.infer<typeof IssuesStatusCountQuerySchema>;
+
+export const IssuesReplaceStatusRequestSchema = z.object({
+    organisationId: z.number().int().positive("organisationId must be a positive integer"),
+    oldStatus: z.string().min(1, "oldStatus is required").max(ISSUE_STATUS_MAX_LENGTH),
+    newStatus: z.string().min(1, "newStatus is required").max(ISSUE_STATUS_MAX_LENGTH),
+});
+
+export type IssuesReplaceStatusRequest = z.infer<typeof IssuesReplaceStatusRequestSchema>;
+
+// organisation schemas
+
+export const OrgCreateRequestSchema = z.object({
+    name: z.string().min(1, "name is required").max(ORG_NAME_MAX_LENGTH),
+    slug: z
+        .string()
+        .min(1, "slug is required")
+        .max(ORG_SLUG_MAX_LENGTH)
+        .regex(/^[a-z0-9-]+$/, "slug can only contain lowercase letters, numbers, and hyphens"),
+    description: z.string().max(ORG_DESCRIPTION_MAX_LENGTH).optional(),
+});
+
+export type OrgCreateRequest = z.infer<typeof OrgCreateRequestSchema>;
+
+export const OrgUpdateRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+    name: z.string().min(1).max(ORG_NAME_MAX_LENGTH).optional(),
+    description: z.string().max(ORG_DESCRIPTION_MAX_LENGTH).optional(),
+    slug: z
+        .string()
+        .min(1)
+        .max(ORG_SLUG_MAX_LENGTH)
+        .regex(/^[a-z0-9-]+$/)
+        .optional(),
+    statuses: z
+        .record(z.string())
+        .refine((obj) => Object.keys(obj).length > 0, "statuses must have at least one entry")
+        .refine(
+            (obj) => Object.keys(obj).every((key) => key.length <= ISSUE_STATUS_MAX_LENGTH),
+            `status keys must be <= ${ISSUE_STATUS_MAX_LENGTH} characters`,
+        )
+        .optional(),
+});
+
+export type OrgUpdateRequest = z.infer<typeof OrgUpdateRequestSchema>;
+
+export const OrgDeleteRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+});
+
+export type OrgDeleteRequest = z.infer<typeof OrgDeleteRequestSchema>;
+
+export const OrgByIdQuerySchema = z.object({
+    id: z.coerce.number().int().positive("id must be a positive integer"),
+});
+
+export type OrgByIdQuery = z.infer<typeof OrgByIdQuerySchema>;
+
+export const OrgMembersQuerySchema = z.object({
+    organisationId: z.coerce.number().int().positive("organisationId must be a positive integer"),
+});
+
+export type OrgMembersQuery = z.infer<typeof OrgMembersQuerySchema>;
+
+export const OrgAddMemberRequestSchema = z.object({
+    organisationId: z.number().int().positive("organisationId must be a positive integer"),
+    userId: z.number().int().positive("userId must be a positive integer"),
+    role: z.enum(["admin", "member"]).default("member"),
+});
+
+export type OrgAddMemberRequest = z.infer<typeof OrgAddMemberRequestSchema>;
+
+export const OrgRemoveMemberRequestSchema = z.object({
+    organisationId: z.number().int().positive("organisationId must be a positive integer"),
+    userId: z.number().int().positive("userId must be a positive integer"),
+});
+
+export type OrgRemoveMemberRequest = z.infer<typeof OrgRemoveMemberRequestSchema>;
+
+export const OrgUpdateMemberRoleRequestSchema = z.object({
+    organisationId: z.number().int().positive("organisationId must be a positive integer"),
+    userId: z.number().int().positive("userId must be a positive integer"),
+    role: z.enum(["admin", "member"]),
+});
+
+export type OrgUpdateMemberRoleRequest = z.infer<typeof OrgUpdateMemberRoleRequestSchema>;
+
+// project schemas
+
+export const ProjectCreateRequestSchema = z.object({
+    name: z.string().min(1, "name is required").max(PROJECT_NAME_MAX_LENGTH),
+    key: z
+        .string()
+        .length(4, "key must be exactly 4 characters")
+        .regex(/^[A-Z]{4}$/, "key must be 4 uppercase letters"),
+    organisationId: z.number().int().positive("organisationId must be a positive integer"),
+});
+
+export type ProjectCreateRequest = z.infer<typeof ProjectCreateRequestSchema>;
+
+export const ProjectUpdateRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+    name: z.string().min(1).max(PROJECT_NAME_MAX_LENGTH).optional(),
+    key: z
+        .string()
+        .length(4)
+        .regex(/^[A-Z]{4}$/)
+        .optional(),
+    creatorId: z.number().int().positive().optional(),
+    organisationId: z.number().int().positive().optional(),
+});
+
+export type ProjectUpdateRequest = z.infer<typeof ProjectUpdateRequestSchema>;
+
+export const ProjectDeleteRequestSchema = z.object({
+    id: z.number().int().positive("id must be a positive integer"),
+});
+
+export type ProjectDeleteRequest = z.infer<typeof ProjectDeleteRequestSchema>;
+
+export const ProjectByOrgQuerySchema = z.object({
+    organisationId: z.coerce.number().int().positive("organisationId must be a positive integer"),
+});
+
+export type ProjectByOrgQuery = z.infer<typeof ProjectByOrgQuerySchema>;
+
+export const ProjectByIdQuerySchema = z.object({
+    id: z.coerce.number().int().positive("id must be a positive integer"),
+});
+
+export type ProjectByIdQuery = z.infer<typeof ProjectByIdQuerySchema>;
+
+export const ProjectByCreatorQuerySchema = z.object({
+    creatorId: z.coerce.number().int().positive("creatorId must be a positive integer"),
+});
+
+export type ProjectByCreatorQuery = z.infer<typeof ProjectByCreatorQuerySchema>;
+
+// sprint schemas
+
+export const SprintCreateRequestSchema = z
+    .object({
+        projectId: z.number().int().positive("projectId must be a positive integer"),
+        name: z.string().min(1, "name is required").max(64),
+        color: z
+            .string()
+            .regex(/^#[0-9a-fA-F]{6}$/, "color must be a valid hex color")
+            .optional(),
+        startDate: z.string().datetime("startDate must be a valid ISO datetime"),
+        endDate: z.string().datetime("endDate must be a valid ISO datetime"),
+    })
+    .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
+        message: "endDate must be after startDate",
+        path: ["endDate"],
+    });
+
+export type SprintCreateRequest = z.infer<typeof SprintCreateRequestSchema>;
+
+export const SprintsByProjectQuerySchema = z.object({
+    projectId: z.coerce.number().int().positive("projectId must be a positive integer"),
+});
+
+export type SprintsByProjectQuery = z.infer<typeof SprintsByProjectQuerySchema>;
+
+// timer schemas
+
+export const TimerToggleRequestSchema = z.object({
+    issueId: z.number().int().positive("issueId must be a positive integer"),
+});
+
+export type TimerToggleRequest = z.infer<typeof TimerToggleRequestSchema>;
+
+export const TimerEndRequestSchema = z.object({
+    issueId: z.number().int().positive("issueId must be a positive integer"),
+});
+
+export type TimerEndRequest = z.infer<typeof TimerEndRequestSchema>;
+
+export const TimerGetQuerySchema = z.object({
+    issueId: z.coerce.number().int().positive("issueId must be a positive integer"),
+});
+
+export type TimerGetQuery = z.infer<typeof TimerGetQuerySchema>;
+
+// user schemas
+
+export const UserUpdateRequestSchema = z.object({
+    name: z.string().min(1).max(USER_NAME_MAX_LENGTH).optional(),
+    password: z
+        .string()
+        .min(8)
+        .regex(/[A-Z]/, "password must contain an uppercase letter")
+        .regex(/[a-z]/, "password must contain a lowercase letter")
+        .regex(/[0-9]/, "password must contain a number")
+        .optional(),
+    avatarURL: z.string().url().nullable().optional(),
+});
+
+export type UserUpdateRequest = z.infer<typeof UserUpdateRequestSchema>;
+
+export const UserByUsernameQuerySchema = z.object({
+    username: z.string().min(1, "username is required"),
+});
+
+export type UserByUsernameQuery = z.infer<typeof UserByUsernameQuerySchema>;
+
+// response schemas
+
+export const UserResponseSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    username: z.string(),
+    avatarURL: z.string().nullable(),
+    createdAt: z.string().nullable().optional(),
+    updatedAt: z.string().nullable().optional(),
+});
+
+export type UserResponse = z.infer<typeof UserResponseSchema>;
+
+export const IssueRecordSchema = z.object({
+    id: z.number(),
+    projectId: z.number(),
+    number: z.number(),
+    title: z.string(),
+    description: z.string(),
+    status: z.string(),
+    creatorId: z.number(),
+    assigneeId: z.number().nullable(),
+    sprintId: z.number().nullable(),
+});
+
+export const IssueResponseSchema = z.object({
+    Issue: IssueRecordSchema,
+    Creator: UserResponseSchema,
+    Assignee: UserResponseSchema.nullable(),
+});
+
+export type IssueResponseType = z.infer<typeof IssueResponseSchema>;
+
+export const OrganisationRecordSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string().nullable(),
+    slug: z.string(),
+    statuses: z.record(z.string()),
+    createdAt: z.string().nullable().optional(),
+    updatedAt: z.string().nullable().optional(),
+});
+
+export const OrganisationMemberRecordSchema = z.object({
+    id: z.number(),
+    organisationId: z.number(),
+    userId: z.number(),
+    role: z.string(),
+    createdAt: z.string().nullable().optional(),
+});
+
+export const OrganisationResponseSchema = z.object({
+    Organisation: OrganisationRecordSchema,
+    OrganisationMember: OrganisationMemberRecordSchema,
+});
+
+export type OrganisationResponseType = z.infer<typeof OrganisationResponseSchema>;
+
+export const ProjectRecordSchema = z.object({
+    id: z.number(),
+    key: z.string(),
+    name: z.string(),
+    organisationId: z.number(),
+    creatorId: z.number(),
+});
+
+export const ProjectResponseSchema = z.object({
+    Project: ProjectRecordSchema,
+    Organisation: OrganisationRecordSchema,
+    User: UserResponseSchema,
+});
+
+export type ProjectResponseType = z.infer<typeof ProjectResponseSchema>;
+
+export const SprintRecordSchema = z.object({
+    id: z.number(),
+    projectId: z.number(),
+    name: z.string(),
+    color: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    createdAt: z.string().nullable().optional(),
+});
+
+export type SprintResponseType = z.infer<typeof SprintRecordSchema>;
+
+export const TimerStateSchema = z
+    .object({
+        id: z.number(),
+        workTimeMs: z.number(),
+        breakTimeMs: z.number(),
+        isRunning: z.boolean(),
+        timestamps: z.array(z.string()),
+        endedAt: z.string().nullable(),
+    })
+    .nullable();
+
+export type TimerStateType = z.infer<typeof TimerStateSchema>;
+
+export const StatusCountResponseSchema = z.array(
+    z.object({
+        status: z.string(),
+        count: z.number(),
+    }),
+);
+
+export type StatusCountResponse = z.infer<typeof StatusCountResponseSchema>;
+
+export const ReplaceStatusResponseSchema = z.object({
+    rowCount: z.number(),
+});
+
+export type ReplaceStatusResponse = z.infer<typeof ReplaceStatusResponseSchema>;
+
+// general
+
+export const SuccessResponseSchema = z.object({
+    success: z.boolean(),
+});
+
+export type SuccessResponse = z.infer<typeof SuccessResponseSchema>;
