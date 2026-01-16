@@ -8,7 +8,7 @@ import Avatar from "@/components/avatar";
 import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
 import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { UploadAvatar } from "@/components/upload-avatar";
@@ -154,19 +154,21 @@ export default function LogInForm() {
                         <X />
                     </Button>
                     <AlertTriangle className="w-16 h-16 text-yellow-500" strokeWidth={1.5} />
-                    <p className="text-center text-sm text-muted-foreground font-500">
-                        This application is currently under construction. Your data is very likely to be lost
-                        at some point.
-                        <pre> </pre>
-                        <p className="font-700 underline underline-offset-3 text-foreground/85 decoration-yellow-500">
+                    <div className="text-center text-sm text-muted-foreground font-500">
+                        <p>
+                            This application is currently under construction. Your data is very likely to be
+                            lost at some point.
+                        </p>
+                        <p className="font-700 underline underline-offset-3 text-foreground/85 decoration-yellow-500 mt-2">
                             It is not recommended for production use.
                         </p>
-                        But you're more than welcome to have a look around!
+                        <p className="mt-2">But you're more than welcome to have a look around!</p>
                         <Dialog open={loginDetailsOpen} onOpenChange={setLoginDetailsOpen}>
                             <DialogTrigger className="text-primary hover:text-personality cursor-pointer mt-2">
                                 Login Details
                             </DialogTrigger>
                             <DialogContent className="w-xs" showCloseButton={false}>
+                                <DialogTitle className="sr-only">Demo Login Credentials</DialogTitle>
                                 <div className="grid grid-cols-2 gap-4">
                                     {DEMO_USERS.map((user) => (
                                         <button
@@ -204,7 +206,7 @@ export default function LogInForm() {
                                 </div>
                             </DialogContent>
                         </Dialog>
-                    </p>
+                    </div>
                 </div>
             )}
             <div>
