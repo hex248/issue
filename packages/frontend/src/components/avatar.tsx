@@ -48,6 +48,7 @@ export default function Avatar({
     size,
     textClass = "text-xs",
     strong = false,
+    className,
 }: {
     avatarURL?: string | null;
     name?: string;
@@ -55,6 +56,7 @@ export default function Avatar({
     size?: number;
     textClass?: string;
     strong?: boolean;
+    className?: string;
 }) {
     // if the username matches the authed user, use their avatarURL and name (avoid stale data)
     const { user } = useSession();
@@ -75,6 +77,7 @@ export default function Avatar({
                 "transition-colors",
                 `w-${size || 6}`,
                 `h-${size || 6}`,
+                className,
             )}
         >
             {avatarURL ? (
