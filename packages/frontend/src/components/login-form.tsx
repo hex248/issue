@@ -98,7 +98,9 @@ export default function LogInForm() {
                 }
                 // bad request (probably a bad user input)
                 else if (res.status === 400) {
-                    setError(await res.text());
+                    const data = await res.json();
+                    const firstDetail = data.details ? Object.values(data.details).flat().find(Boolean) : "";
+                    setError(firstDetail || data.error || "Bad request");
                 } else {
                     setError("An unknown error occured.");
                 }
