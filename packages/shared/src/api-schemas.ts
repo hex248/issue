@@ -67,7 +67,7 @@ export const IssueCreateRequestSchema = z.object({
     title: z.string().min(1, "title is required").max(ISSUE_TITLE_MAX_LENGTH),
     description: z.string().max(ISSUE_DESCRIPTION_MAX_LENGTH).default(""),
     status: z.string().max(ISSUE_STATUS_MAX_LENGTH).optional(),
-    assigneeId: z.number().int().positive().nullable().optional(),
+    assigneeIds: z.array(z.number().int().positive()).optional(),
     sprintId: z.number().int().positive().nullable().optional(),
 });
 
@@ -78,7 +78,7 @@ export const IssueUpdateRequestSchema = z.object({
     title: z.string().min(1).max(ISSUE_TITLE_MAX_LENGTH).optional(),
     description: z.string().max(ISSUE_DESCRIPTION_MAX_LENGTH).optional(),
     status: z.string().max(ISSUE_STATUS_MAX_LENGTH).optional(),
-    assigneeId: z.number().int().positive().nullable().optional(),
+    assigneeIds: z.array(z.number().int().positive()).nullable().optional(),
     sprintId: z.number().int().positive().nullable().optional(),
 });
 
@@ -328,14 +328,13 @@ export const IssueRecordSchema = z.object({
     description: z.string(),
     status: z.string(),
     creatorId: z.number(),
-    assigneeId: z.number().nullable(),
     sprintId: z.number().nullable(),
 });
 
 export const IssueResponseSchema = z.object({
     Issue: IssueRecordSchema,
     Creator: UserResponseSchema,
-    Assignee: UserResponseSchema.nullable(),
+    Assignees: z.array(UserResponseSchema),
 });
 
 export type IssueResponseType = z.infer<typeof IssueResponseSchema>;

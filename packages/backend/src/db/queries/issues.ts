@@ -1,4 +1,4 @@
-import { Issue, User } from "@sprint/shared";
+import { Issue, IssueAssignee, type IssueResponse, User, type UserRecord } from "@sprint/shared";
 import { aliasedTable, and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 
@@ -8,7 +8,7 @@ export async function createIssue(
     description: string,
     creatorId: number,
     sprintId?: number,
-    assigneeId?: number,
+    assigneeIds?: number[],
     status?: string,
 ) {
     // prevents two issues with the same unique number
@@ -22,7 +22,6 @@ export async function createIssue(
 
         const nextNumber = (lastIssue?.max || 0) + 1;
 
-        // 2. create new issue
         const [newIssue] = await tx
             .insert(Issue)
             .values({
@@ -32,10 +31,22 @@ export async function createIssue(
                 number: nextNumber,
                 creatorId,
                 sprintId,
-                assigneeId,
                 ...(status && { status }),
             })
             .returning();
+
+        if (!newIssue) {
+            throw new Error("failed to create issue");
+        }
+
+        if (assigneeIds && assigneeIds.length > 0) {
+            await tx.insert(IssueAssignee).values(
+                assigneeIds.map((userId) => ({
+                    issueId: newIssue.id,
+                    userId,
+                })),
+            );
+        }
 
         return newIssue;
     });
@@ -51,11 +62,25 @@ export async function updateIssue(
         title?: string;
         description?: string;
         sprintId?: number | null;
-        assigneeId?: number | null;
         status?: string;
     },
 ) {
     return await db.update(Issue).set(updates).where(eq(Issue.id, id)).returning();
+}
+
+export async function setIssueAssignees(issueId: number, userIds: number[]) {
+    return await db.transaction(async (tx) => {
+        await tx.delete(IssueAssignee).where(eq(IssueAssignee.issueId, issueId));
+
+        if (userIds.length > 0) {
+            await tx.insert(IssueAssignee).values(
+                userIds.map((userId) => ({
+                    issueId,
+                    userId,
+                })),
+            );
+        }
+    });
 }
 
 export async function getIssues() {
@@ -119,18 +144,41 @@ export async function replaceIssueStatus(organisationId: number, oldStatus: stri
     return { updated: result.rowCount ?? 0 };
 }
 
-export async function getIssuesWithUsersByProject(projectId: number) {
+export async function getIssuesWithUsersByProject(projectId: number): Promise<IssueResponse[]> {
     const Creator = aliasedTable(User, "Creator");
-    const Assignee = aliasedTable(User, "Assignee");
 
-    return await db
+    const issuesWithCreators = await db
         .select({
             Issue: Issue,
             Creator: Creator,
-            Assignee: Assignee,
         })
         .from(Issue)
         .where(eq(Issue.projectId, projectId))
-        .innerJoin(Creator, eq(Issue.creatorId, Creator.id))
-        .leftJoin(Assignee, eq(Issue.assigneeId, Assignee.id));
+        .innerJoin(Creator, eq(Issue.creatorId, Creator.id));
+
+    const issueIds = issuesWithCreators.map((i) => i.Issue.id);
+    const assigneesData =
+        issueIds.length > 0
+            ? await db
+                  .select({
+                      issueId: IssueAssignee.issueId,
+                      User: User,
+                  })
+                  .from(IssueAssignee)
+                  .innerJoin(User, eq(IssueAssignee.userId, User.id))
+                  .where(inArray(IssueAssignee.issueId, issueIds))
+            : [];
+
+    const assigneesByIssue = new Map<number, UserRecord[]>();
+    for (const a of assigneesData) {
+        const existing = assigneesByIssue.get(a.issueId) || [];
+        existing.push(a.User);
+        assigneesByIssue.set(a.issueId, existing);
+    }
+
+    return issuesWithCreators.map((row) => ({
+        Issue: row.Issue,
+        Creator: row.Creator,
+        Assignees: assigneesByIssue.get(row.Issue.id) || [],
+    }));
 }
