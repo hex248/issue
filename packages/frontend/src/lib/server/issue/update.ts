@@ -8,7 +8,7 @@ export async function update({
     title,
     description,
     sprintId,
-    assigneeId,
+    assigneeIds,
     status,
     onSuccess,
     onError,
@@ -17,7 +17,7 @@ export async function update({
     title?: string;
     description?: string;
     sprintId?: number | null;
-    assigneeId?: number | null;
+    assigneeIds?: number[] | null;
     status?: string;
 } & ServerQueryInput<IssueRecord>) {
     const csrfToken = getCsrfToken();
@@ -33,7 +33,7 @@ export async function update({
             title,
             description,
             sprintId,
-            assigneeId,
+            assigneeIds,
             status,
         }),
         credentials: "include",
