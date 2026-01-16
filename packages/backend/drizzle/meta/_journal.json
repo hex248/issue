@@ -127,6 +127,13 @@
       "when": 1768176165908,
       "tag": "0017_tiny_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1768599498899,
+      "tag": "0018_previous_puppet_master",
+      "breakpoints": true
     }
   ]
 }

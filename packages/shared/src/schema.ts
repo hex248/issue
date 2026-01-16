@@ -121,7 +121,6 @@ export const Issue = pgTable(
         creatorId: integer()
             .notNull()
             .references(() => User.id),
-        assigneeId: integer().references(() => User.id),
 
         sprintId: integer().references(() => Sprint.id),
     },
@@ -130,6 +129,21 @@ export const Issue = pgTable(
         // you can have Issue 1 in PROJ and Issue 1 in TEST, but not two Issue 1s in PROJ
         uniqueIndex("unique_project_issue_number").on(t.projectId, t.number),
     ],
+);
+
+export const IssueAssignee = pgTable(
+    "IssueAssignee",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        issueId: integer()
+            .notNull()
+            .references(() => Issue.id, { onDelete: "cascade" }),
+        userId: integer()
+            .notNull()
+            .references(() => User.id, { onDelete: "cascade" }),
+        assignedAt: timestamp({ withTimezone: false }).defaultNow(),
+    },
+    (t) => [uniqueIndex("unique_issue_user").on(t.issueId, t.userId)],
 );
 
 // Zod schemas
@@ -150,6 +164,9 @@ export const SprintInsertSchema = createInsertSchema(Sprint);
 
 export const IssueSelectSchema = createSelectSchema(Issue);
 export const IssueInsertSchema = createInsertSchema(Issue);
+
+export const IssueAssigneeSelectSchema = createSelectSchema(IssueAssignee);
+export const IssueAssigneeInsertSchema = createInsertSchema(IssueAssignee);
 
 export const SessionSelectSchema = createSelectSchema(Session);
 export const SessionInsertSchema = createInsertSchema(Session);
@@ -178,6 +195,9 @@ export type SprintInsert = z.infer<typeof SprintInsertSchema>;
 export type IssueRecord = z.infer<typeof IssueSelectSchema>;
 export type IssueInsert = z.infer<typeof IssueInsertSchema>;
 
+export type IssueAssigneeRecord = z.infer<typeof IssueAssigneeSelectSchema>;
+export type IssueAssigneeInsert = z.infer<typeof IssueAssigneeInsertSchema>;
+
 export type SessionRecord = z.infer<typeof SessionSelectSchema>;
 export type SessionInsert = z.infer<typeof SessionInsertSchema>;
 
@@ -189,7 +209,7 @@ export type TimedSessionInsert = z.infer<typeof TimedSessionInsertSchema>;
 export type IssueResponse = {
     Issue: IssueRecord;
     Creator: UserRecord;
-    Assignee: UserRecord | null;
+    Assignees: UserRecord[];
 };
 
 export type ProjectResponse = {

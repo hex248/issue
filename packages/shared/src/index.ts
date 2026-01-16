@@ -101,6 +101,8 @@ export {
     USER_USERNAME_MAX_LENGTH,
 } from "./constants";
 export type {
+    IssueAssigneeInsert,
+    IssueAssigneeRecord,
     IssueInsert,
     IssueRecord,
     IssueResponse,
@@ -128,6 +130,9 @@ export {
     DEFAULT_STATUS_COLOUR,
     DEFAULT_STATUS_COLOURS,
     Issue,
+    IssueAssignee,
+    IssueAssigneeInsertSchema,
+    IssueAssigneeSelectSchema,
     IssueInsertSchema,
     IssueSelectSchema,
     Organisation,
