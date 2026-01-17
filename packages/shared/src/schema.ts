@@ -27,12 +27,16 @@ export const DEFAULT_STATUS_COLOURS: Record<string, string> = {
     MERGED: DEFAULT_STATUS_COLOUR,
 };
 
+export const iconStyles = ["lucide", "pixel", "phosphor"] as const;
+export type IconStyle = (typeof iconStyles)[number];
+
 export const User = pgTable("User", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: USER_NAME_MAX_LENGTH }).notNull(),
     username: varchar({ length: USER_USERNAME_MAX_LENGTH }).notNull().unique(),
     passwordHash: varchar({ length: 255 }).notNull(),
     avatarURL: varchar({ length: 512 }),
+    iconPreference: varchar({ length: 10 }).notNull().default("lucide").$type<IconStyle>(),
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });

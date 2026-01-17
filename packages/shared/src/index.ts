@@ -101,6 +101,7 @@ export {
     USER_USERNAME_MAX_LENGTH,
 } from "./constants";
 export type {
+    IconStyle,
     IssueAssigneeInsert,
     IssueAssigneeRecord,
     IssueInsert,
@@ -135,6 +136,7 @@ export {
     IssueAssigneeSelectSchema,
     IssueInsertSchema,
     IssueSelectSchema,
+    iconStyles,
     Organisation,
     OrganisationInsertSchema,
     OrganisationMember,

@@ -297,6 +297,7 @@ export const UserUpdateRequestSchema = z.object({
         .regex(/[0-9]/, "Password must contain a number")
         .optional(),
     avatarURL: z.string().url().nullable().optional(),
+    iconPreference: z.enum(["lucide", "pixel", "phosphor"]).optional(),
 });
 
 export type UserUpdateRequest = z.infer<typeof UserUpdateRequestSchema>;

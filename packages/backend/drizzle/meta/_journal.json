@@ -134,6 +134,13 @@
       "when": 1768599498899,
       "tag": "0018_previous_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1768677778201,
+      "tag": "0019_outstanding_sentry",
+      "breakpoints": true
     }
   ]
 }
