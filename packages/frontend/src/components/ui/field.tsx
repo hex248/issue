@@ -41,7 +41,7 @@ export function Field({
 
     return (
         <div className="flex flex-col gap-1 w-full">
-            <div className="flex items-end justify-between w-full text-xs">
+            <div className="flex items-end justify-between w-full">
                 <Label htmlFor={label} className="flex items-center text-sm">
                     {label}
                 </Label>

@@ -1,3 +1,4 @@
+import type { IconStyle } from "@sprint/shared";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -5,7 +6,9 @@ import { useAuthenticatedSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
+import Icon from "@/components/ui/icon";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadAvatar } from "@/components/upload-avatar";
 import { parseError, user } from "@/lib/server";
 
@@ -17,6 +20,7 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [avatarURL, setAvatarUrl] = useState<string | null>(null);
+    const [iconPreference, setIconPreference] = useState<IconStyle>("lucide");
     const [error, setError] = useState("");
     const [submitAttempted, setSubmitAttempted] = useState(false);
 
@@ -26,6 +30,7 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
         setName(currentUser.name);
         setUsername(currentUser.username);
         setAvatarUrl(currentUser.avatarURL || null);
+        setIconPreference((currentUser.iconPreference as IconStyle) ?? "lucide");
 
         setPassword("");
         setError("");
@@ -44,6 +49,7 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
             name: name.trim(),
             password: password.trim() || undefined,
             avatarURL,
+            iconPreference,
             onSuccess: (data) => {
                 setError("");
                 setUser(data);
@@ -113,6 +119,39 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
                         placeholder="Leave empty to keep current password"
                         hidden={true}
                     />
+                    <Label className="text-lg -mt-2">Preferences</Label>
+
+                    <div className="flex flex-col gap-1 w-min">
+                        <Label className="text-sm">Icon Style</Label>
+                        <Select
+                            value={iconPreference}
+                            onValueChange={(v) => setIconPreference(v as IconStyle)}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent position="popper" side="bottom" align="start">
+                                <SelectItem value="lucide">
+                                    <div className="flex items-center gap-2">
+                                        <Icon icon="sun" iconStyle="lucide" size={16} />
+                                        Lucide
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="pixel">
+                                    <div className="flex items-center gap-2">
+                                        <Icon icon="sun" iconStyle="pixel" size={16} />
+                                        Pixel
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="phosphor">
+                                    <div className="flex items-center gap-2">
+                                        <Icon icon="sun" iconStyle="phosphor" size={16} />
+                                        Phosphor
+                                    </div>
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     {error !== "" && <Label className="text-destructive text-sm">{error}</Label>}
 
