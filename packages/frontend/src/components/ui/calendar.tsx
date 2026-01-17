@@ -1,3 +1,4 @@
+import type { SprintRecord } from "@sprint/shared";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import * as React from "react";
 import { type DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
@@ -12,9 +13,13 @@ function Calendar({
     buttonVariant = "ghost",
     formatters,
     components,
+    sprints,
+    isEnd,
     ...props
 }: React.ComponentProps<typeof DayPicker> & {
     buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+    sprints?: SprintRecord[];
+    isEnd?: boolean;
 }) {
     const defaultClassNames = getDefaultClassNames();
 
@@ -113,7 +118,7 @@ function Calendar({
 
                     return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
                 },
-                DayButton: CalendarDayButton,
+                DayButton: (props) => <CalendarDayButton {...props} sprints={sprints} isEnd={isEnd} />,
                 WeekNumber: ({ children, ...props }) => {
                     return (
                         <td {...props}>
@@ -130,13 +135,32 @@ function Calendar({
     );
 }
 
-function CalendarDayButton({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) {
+function CalendarDayButton({
+    className,
+    day,
+    modifiers,
+    sprints,
+    style,
+    disabled,
+    isEnd,
+    ...props
+}: React.ComponentProps<typeof DayButton> & { sprints?: SprintRecord[]; isEnd?: boolean }) {
     const defaultClassNames = getDefaultClassNames();
 
     const ref = React.useRef<HTMLButtonElement>(null);
     React.useEffect(() => {
         if (modifiers.focused) ref.current?.focus();
     }, [modifiers.focused]);
+
+    let isDisabled = false;
+    let sprint: SprintRecord | null = null;
+
+    for (const entry of sprints || []) {
+        if (day.date >= new Date(entry.startDate) && day.date <= new Date(entry.endDate)) {
+            isDisabled = true;
+            sprint = entry;
+        }
+    }
 
     return (
         <Button
@@ -156,14 +180,34 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
             className={cn(
                 "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal",
                 "[&>span]:text-xs [&>span]:opacity-70",
-                "hover:bg-primary/90 hover:text-foreground",
+                !sprint?.color && "hover:bg-primary/90 hover:text-foreground",
                 "data-[selected-single=true]:!bg-foreground data-[selected-single=true]:!text-background data-[selected-single=true]:hover:!bg-foreground/90",
                 "data-[range-start=true]:!bg-foreground data-[range-start=true]:!text-background",
                 "data-[range-middle=true]:!bg-foreground data-[range-middle=true]:!text-background",
                 "data-[range-end=true]:!bg-foreground data-[range-end=true]:!text-background",
+                sprint?.color && "border-t border-b !border-(--sprint-color) !bg-(--sprint-color)/5",
                 defaultClassNames.day,
                 className,
             )}
+            style={
+                {
+                    ...style,
+                    "--sprint-color": sprint?.color ? sprint.color : null,
+                    "border-left":
+                        sprint && day.date.getUTCDate() === new Date(sprint.startDate).getUTCDate()
+                            ? `1px solid ${sprint?.color}`
+                            : day.date.getDay() === 0 // sunday (left side)
+                              ? `1px dashed ${sprint?.color}`
+                              : `0px`,
+                    "border-right":
+                        sprint && day.date.getUTCDate() === new Date(sprint.endDate).getUTCDate()
+                            ? `1px solid ${sprint?.color}`
+                            : day.date.getDay() === 6 // saturday (right side)
+                              ? `1px dashed ${sprint?.color}`
+                              : `0px`,
+                } as React.CSSProperties
+            }
+            disabled={isDisabled || disabled}
             {...props}
         />
     );

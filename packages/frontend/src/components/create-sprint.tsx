@@ -49,10 +49,12 @@ const getDefaultDates = () => {
 
 export function CreateSprint({
     projectId,
+    sprints,
     trigger,
     completeAction,
 }: {
     projectId?: number;
+    sprints: SprintRecord[];
     trigger?: React.ReactNode;
     completeAction?: (sprint: SprintRecord) => void | Promise<void>;
 }) {
@@ -203,6 +205,7 @@ export function CreateSprint({
                                                 setStartDate(getStartOfDay(value));
                                             }}
                                             autoFocus
+                                            sprints={sprints}
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -225,6 +228,8 @@ export function CreateSprint({
                                                 setEndDate(getEndOfDay(value));
                                             }}
                                             autoFocus
+                                            sprints={sprints}
+                                            isEnd
                                         />
                                     </PopoverContent>
                                 </Popover>

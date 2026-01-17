@@ -682,6 +682,7 @@ function OrganisationsDialog({
                                                                         <Plus className="size-4" />
                                                                     </Button>
                                                                 }
+                                                                sprints={sprints}
                                                             />
                                                         )}
                                                     </div>
