@@ -21,6 +21,11 @@ export function useSession(): SessionContextValue {
     return context;
 }
 
+// safe version that returns null if outside provider
+export function useSessionSafe(): SessionContextValue | null {
+    return useContext(SessionContext);
+}
+
 // for use inside RequireAuth
 export function useAuthenticatedSession(): { user: UserRecord; setUser: (user: UserRecord) => void } {
     const { user, setUser } = useSession();
