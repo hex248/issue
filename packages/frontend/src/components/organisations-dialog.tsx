@@ -7,7 +7,6 @@ import {
     type ProjectResponse,
     type SprintRecord,
 } from "@sprint/shared";
-import { ChevronDown, ChevronUp, EllipsisVertical, Plus, X } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddMemberDialog } from "@/components/add-member-dialog";
@@ -28,6 +27,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -571,9 +571,15 @@ function OrganisationsDialog({
                                                                     >
                                                                         {member.OrganisationMember.role ===
                                                                         "admin" ? (
-                                                                            <ChevronDown className="size-5" />
+                                                                            <Icon
+                                                                                icon="chevronDown"
+                                                                                className="size-5"
+                                                                            />
                                                                         ) : (
-                                                                            <ChevronUp className="size-5" />
+                                                                            <Icon
+                                                                                icon="chevronUp"
+                                                                                className="size-5"
+                                                                            />
                                                                         )}
                                                                     </IconButton>
                                                                     <IconButton
@@ -585,7 +591,7 @@ function OrganisationsDialog({
                                                                             )
                                                                         }
                                                                     >
-                                                                        <X className="size-5" />
+                                                                        <Icon icon="x" className="size-5" />
                                                                     </IconButton>
                                                                 </>
                                                             )}
@@ -609,7 +615,7 @@ function OrganisationsDialog({
                                                 }}
                                                 trigger={
                                                     <Button variant="outline">
-                                                        Add user <Plus className="size-4" />
+                                                        Add user <Icon icon="plus" className="size-4" />
                                                     </Button>
                                                 }
                                             />
@@ -683,7 +689,10 @@ function OrganisationsDialog({
                                                                 trigger={
                                                                     <Button variant="outline" size="sm">
                                                                         Create sprint{" "}
-                                                                        <Plus className="size-4" />
+                                                                        <Icon
+                                                                            icon="plus"
+                                                                            className="size-4"
+                                                                        />
                                                                     </Button>
                                                                 }
                                                                 sprints={sprints}
@@ -726,7 +735,10 @@ function OrganisationsDialog({
                                                                 noStyle
                                                                 className="hover:opacity-80 cursor-pointer"
                                                             >
-                                                                <EllipsisVertical className="size-4 text-foreground" />
+                                                                <Icon
+                                                                    icon="ellipsisVertical"
+                                                                    className="size-4 text-foreground"
+                                                                />
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent
                                                                 align="end"
@@ -740,7 +752,10 @@ function OrganisationsDialog({
                                                                     }
                                                                     className="hover:bg-primary-foreground"
                                                                 >
-                                                                    <ChevronUp className="size-4 text-muted-foreground" />
+                                                                    <Icon
+                                                                        icon="chevronUp"
+                                                                        className="size-4 text-muted-foreground"
+                                                                    />
                                                                     Move up
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
@@ -753,7 +768,10 @@ function OrganisationsDialog({
                                                                     }
                                                                     className="hover:bg-primary-foreground"
                                                                 >
-                                                                    <ChevronDown className="size-4 text-muted-foreground" />
+                                                                    <Icon
+                                                                        icon="chevronDown"
+                                                                        className="size-4 text-muted-foreground"
+                                                                    />
                                                                     Move down
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
@@ -766,7 +784,7 @@ function OrganisationsDialog({
                                                                     }
                                                                     className="hover:bg-destructive/10"
                                                                 >
-                                                                    <X className="size-4" />
+                                                                    <Icon icon="x" className="size-4" />
                                                                     Remove
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
@@ -815,7 +833,7 @@ function OrganisationsDialog({
                                                                 ISSUE_STATUS_MAX_LENGTH
                                                             }
                                                         >
-                                                            <Plus className="size-4" />
+                                                            <Icon icon="plus" className="size-4" />
                                                         </IconButton>
                                                     </div>
                                                     {statusError && (
@@ -833,7 +851,7 @@ function OrganisationsDialog({
                                                     }}
                                                     className="flex gap-2 w-full min-w-0"
                                                 >
-                                                    Create status <Plus className="size-4" />
+                                                    Create status <Icon icon="plus" className="size-4" />
                                                 </Button>
                                             ))}
                                     </div>

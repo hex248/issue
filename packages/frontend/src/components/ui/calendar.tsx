@@ -1,8 +1,8 @@
 import type { SprintRecord } from "@sprint/shared";
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import * as React from "react";
 import { type DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { Button, buttonVariants } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 function Calendar({
@@ -109,14 +109,16 @@ function Calendar({
                 },
                 Chevron: ({ className, orientation, ...props }) => {
                     if (orientation === "left") {
-                        return <ChevronLeftIcon className={cn("size-4", className)} {...props} />;
+                        return <Icon icon="chevronLeftIcon" className={cn("size-4", className)} {...props} />;
                     }
 
                     if (orientation === "right") {
-                        return <ChevronRightIcon className={cn("size-4", className)} {...props} />;
+                        return (
+                            <Icon icon="chevronRightIcon" className={cn("size-4", className)} {...props} />
+                        );
                     }
 
-                    return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
+                    return <Icon icon="chevronDownIcon" className={cn("size-4", className)} {...props} />;
                 },
                 DayButton: (props) => <CalendarDayButton {...props} sprints={sprints} isEnd={isEnd} />,
                 WeekNumber: ({ children, ...props }) => {

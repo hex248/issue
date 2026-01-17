@@ -1,6 +1,6 @@
-import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { clearAuth, cn, getCsrfToken, getServerURL } from "@/lib/utils";
 
 export default function LogOutButton({
@@ -37,7 +37,7 @@ export default function LogOutButton({
             size={noStyle ? "none" : "default"}
         >
             Log out
-            <LogOut size={15} />
+            <Icon icon="logOut" size={15} />
         </Button>
     );
 }

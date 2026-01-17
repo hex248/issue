@@ -1,7 +1,5 @@
 # HIGH PRIORITY
 
-- icons
-  - respect user.iconPreference throughout the app
 - projects menu
   - delete project
 - sprints

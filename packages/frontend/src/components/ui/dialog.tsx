@@ -1,6 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { XIcon } from "lucide-react";
 import type * as React from "react";
+import Icon from "@/components/ui/icon";
 
 import { cn } from "@/lib/utils";
 
@@ -71,7 +71,7 @@ function DialogContent({
                             "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
                         )}
                     >
-                        <XIcon />
+                        <Icon icon="x" />
                         <span className="sr-only">Close</span>
                     </DialogPrimitive.Close>
                 )}

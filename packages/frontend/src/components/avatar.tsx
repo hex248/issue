@@ -1,5 +1,5 @@
-import { UserRound } from "lucide-react";
 import { useSession } from "@/components/session-provider";
+import Icon from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_COLOURS = [
@@ -89,7 +89,7 @@ export default function Avatar({
             ) : name ? (
                 <span className={textClass}>{getInitials(name)}</span>
             ) : (
-                <UserRound className={"size-10"} />
+                <Icon icon="userRound" className={"size-10"} />
             )}
         </div>
     );

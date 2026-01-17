@@ -1,8 +1,8 @@
-import { Timer } from "lucide-react";
 import { useState } from "react";
 import { IssueTimer } from "@/components/issue-timer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import Icon from "@/components/ui/icon";
 
 export function TimerModal({ issueId }: { issueId: number }) {
     const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export function TimerModal({ issueId }: { issueId: number }) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
-                    <Timer className="size-4" />
+                    <Icon icon="timer" className="size-4" />
                     Timer
                 </Button>
             </DialogTrigger>

@@ -56,6 +56,7 @@ import {
     WarningIcon as PhosphorWarning,
     XIcon as PhosphorX,
 } from "@phosphor-icons/react";
+import type { IconStyle } from "@sprint/shared";
 import {
     AlertTriangle,
     Check,
@@ -92,6 +93,7 @@ import {
     UserRound,
     X,
 } from "lucide-react";
+import { useSessionSafe } from "@/components/session-provider";
 
 const icons = {
     alertTriangle: { lucide: AlertTriangle, pixel: PixelAlert, phosphor: PhosphorWarning },
@@ -141,11 +143,11 @@ const icons = {
 export type IconName = keyof typeof icons;
 export const iconNames = Object.keys(icons) as IconName[];
 export const iconStyles = ["lucide", "pixel", "phosphor"] as const;
-export type IconStyle = (typeof iconStyles)[number];
+export type { IconStyle };
 
 export default function Icon({
     icon,
-    iconStyle = "lucide",
+    iconStyle,
     size = 24,
     ...props
 }: {
@@ -154,7 +156,9 @@ export default function Icon({
     size?: number | string;
     color?: string;
 } & React.ComponentProps<"svg">) {
-    const IconComponent = icons[icon]?.[iconStyle];
+    const session = useSessionSafe();
+    const resolvedStyle = (iconStyle ?? session?.user?.iconPreference ?? "lucide") as IconStyle;
+    const IconComponent = icons[icon]?.[resolvedStyle];
 
     if (!IconComponent) {
         return null;
@@ -164,9 +168,9 @@ export default function Icon({
         <IconComponent
             size={size}
             fill={
-                (iconStyle === "pixel" && icon === "moon") ||
-                (iconStyle === "pixel" && icon === "hash") ||
-                iconStyle === "phosphor"
+                (resolvedStyle === "pixel" && icon === "moon") ||
+                (resolvedStyle === "pixel" && icon === "hash") ||
+                resolvedStyle === "phosphor"
                     ? "var(--foreground)"
                     : "transparent"
             }

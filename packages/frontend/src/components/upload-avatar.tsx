@@ -1,8 +1,8 @@
-import { Edit } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/avatar";
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { Label } from "@/components/ui/label";
 import { parseError, user } from "@/lib/server";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ export function UploadAvatar({
 
                 {!uploading && showEdit && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <Edit className="size-6 text-white drop-shadow-md" />
+                        <Icon icon="edit" className="size-6 text-white drop-shadow-md" />
                     </div>
                 )}
             </Button>

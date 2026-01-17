@@ -1,7 +1,7 @@
-import { CheckIcon, ServerIcon, Undo2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,7 +118,7 @@ export function ServerConfigurationDialog({ trigger }: { trigger?: ReactNode }) 
                             className="absolute top-2 right-2"
                             title={"Server Configuration"}
                         >
-                            <ServerIcon className="size-4" />
+                            <Icon icon="serverIcon" className="size-4" />
                         </IconButton>
                     )}
                 </DialogTrigger>
@@ -152,7 +152,7 @@ export function ServerConfigurationDialog({ trigger }: { trigger?: ReactNode }) 
                                     disabled={!canSave || isCheckingHealth}
                                     onClick={handleSave}
                                 >
-                                    <CheckIcon className="size-4" />
+                                    <Icon icon="checkIcon" className="size-4" />
                                 </IconButton>
                                 <IconButton
                                     variant="secondary"
@@ -161,7 +161,7 @@ export function ServerConfigurationDialog({ trigger }: { trigger?: ReactNode }) 
                                     onClick={handleResetToDefault}
                                     title="Reset to default"
                                 >
-                                    <Undo2 className="size-4" />
+                                    <Icon icon="undo2" className="size-4" />
                                 </IconButton>
                             </div>
                             {!isValid && (

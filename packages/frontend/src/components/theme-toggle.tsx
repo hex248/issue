@@ -1,5 +1,5 @@
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ function ThemeToggle({ className }: { className?: string }) {
             onClick={() => setTheme(isDark ? "light" : "dark")}
             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
-            {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+            {isDark ? <Icon icon="sun" className="size-5" /> : <Icon icon="moon" className="size-5" />}
         </IconButton>
     );
 }

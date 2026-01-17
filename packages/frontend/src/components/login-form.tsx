@@ -1,7 +1,6 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 
 import { USER_NAME_MAX_LENGTH, USER_USERNAME_MAX_LENGTH } from "@sprint/shared";
-import { AlertTriangle, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Avatar from "@/components/avatar";
@@ -10,6 +9,7 @@ import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
+import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Label } from "@/components/ui/label";
 import { UploadAvatar } from "@/components/upload-avatar";
@@ -153,9 +153,9 @@ export default function LogInForm() {
                             setShowWarning(false);
                         }}
                     >
-                        <X />
+                        <Icon icon="x" />
                     </IconButton>
-                    <AlertTriangle className="w-16 h-16 text-yellow-500" strokeWidth={1.5} />
+                    <Icon icon="alertTriangle" className="w-16 h-16 text-yellow-500" />
                     <div className="text-center text-sm text-muted-foreground font-500">
                         <p>
                             This application is currently under construction. Your data is very likely to be

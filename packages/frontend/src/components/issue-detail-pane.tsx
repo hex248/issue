@@ -1,5 +1,4 @@
 import type { IssueResponse, ProjectResponse, SprintRecord, UserRecord } from "@sprint/shared";
-import { Check, Link, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { MultiAssigneeSelect } from "@/components/multi-assignee-select";
@@ -10,6 +9,7 @@ import StatusTag from "@/components/status-tag";
 import { TimerDisplay } from "@/components/timer-display";
 import { TimerModal } from "@/components/timer-modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import Icon from "@/components/ui/icon";
 import { SelectTrigger } from "@/components/ui/select";
 import { issue } from "@/lib/server";
 import { issueID } from "@/lib/utils";
@@ -246,13 +246,13 @@ export function IssueDetailPane({
                 </span>
                 <div className="flex items-center">
                     <IconButton onClick={handleCopyLink} title={linkCopied ? "Copied" : "Copy link"}>
-                        {linkCopied ? <Check /> : <Link />}
+                        {linkCopied ? <Icon icon="check" /> : <Icon icon="link" />}
                     </IconButton>
                     <IconButton variant="destructive" onClick={handleDelete} title={"Delete issue"}>
-                        <Trash />
+                        <Icon icon="trash" />
                     </IconButton>
                     <IconButton onClick={close} title={"Close"}>
-                        <X />
+                        <Icon icon="x" />
                     </IconButton>
                 </div>
             </div>

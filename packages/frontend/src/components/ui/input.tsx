@@ -1,5 +1,5 @@
-import { Hash } from "lucide-react";
 import type * as React from "react";
+import Icon from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 function Input({
@@ -25,7 +25,7 @@ function Input({
         >
             {showHashPrefix && (
                 <span className="border-r px-1 py-1 text-muted-foreground">
-                    <Hash className="size-3.5" strokeWidth={1.5} />
+                    <Icon icon="hash" className="size-3.5" />
                 </span>
             )}
             <input
