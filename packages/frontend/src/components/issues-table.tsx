@@ -18,18 +18,20 @@ export function IssuesTable({
     className: string;
 }) {
     return (
-        <Table className={cn(className)}>
+        <Table className={cn("table-fixed", className)}>
             <TableHeader>
                 <TableRow hoverEffect={false}>
                     {(columns.id == null || columns.id === true) && (
-                        <TableHead className="text-right w-[1px] border-r">ID</TableHead>
+                        <TableHead className="text-right w-10 border-r">ID</TableHead>
                     )}
                     {(columns.title == null || columns.title === true) && <TableHead>Title</TableHead>}
                     {(columns.description == null || columns.description === true) && (
                         <TableHead>Description</TableHead>
                     )}
                     {/* below is kept blank to fill the space, used as the "Assignee" column */}
-                    {(columns.assignee == null || columns.assignee === true) && <TableHead></TableHead>}
+                    {(columns.assignee == null || columns.assignee === true) && (
+                        <TableHead className="w-[1%]"></TableHead>
+                    )}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -47,25 +49,25 @@ export function IssuesTable({
                             </TableCell>
                         )}
                         {(columns.title == null || columns.title === true) && (
-                            <TableCell>
-                                <span className="flex items-center gap-2 truncate">
+                            <TableCell className="min-w-0">
+                                <div className="flex items-center gap-2 min-w-0">
                                     {(columns.status == null || columns.status === true) && (
                                         <StatusTag
                                             status={issueData.Issue.status}
                                             colour={statuses[issueData.Issue.status]}
                                         />
                                     )}
-                                    {issueData.Issue.title}
-                                </span>
+                                    <span className="truncate">{issueData.Issue.title}</span>
+                                </div>
                             </TableCell>
                         )}
                         {(columns.description == null || columns.description === true) && (
-                            <TableCell className="overflow-hide">{issueData.Issue.description}</TableCell>
+                            <TableCell className="overflow-hidden">{issueData.Issue.description}</TableCell>
                         )}
                         {(columns.assignee == null || columns.assignee === true) && (
-                            <TableCell className={"flex items-center justify-end px-1 py-0 h-[32px]"}>
+                            <TableCell className={"flex items-center justify-end py-0 h-[32px]"}>
                                 {issueData.Assignees && issueData.Assignees.length > 0 && (
-                                    <div className="flex items-center -space-x-2">
+                                    <div className="flex items-center -space-x-2 pr-1.5">
                                         {issueData.Assignees.slice(0, 3).map((assignee) => (
                                             <Avatar
                                                 key={assignee.id}

@@ -554,7 +554,7 @@ export default function App() {
                     {selectedIssue && selectedOrganisation && (
                         <>
                             <ResizableSeparator />
-                            <ResizablePanel id={"right"} defaultSize={"30%"} minSize={360} maxSize={"60%"}>
+                            <ResizablePanel id={"right"} defaultSize={"30%"} minSize={363} maxSize={"60%"}>
                                 <div className="border">
                                     <IssueDetailPane
                                         project={selectedProject}
