@@ -1,5 +1,7 @@
 # HIGH PRIORITY
 
+- icons
+  - respect user.iconPreference throughout the app
 - projects menu
   - delete project
 - sprints
@@ -17,6 +19,7 @@
     - create, edit, delete
     - assign icons to issue types
 - user preferences
+  - iconPreference
   - "assign to me by default" option for new issues
 
 # LOW PRIORITY
@@ -36,13 +39,7 @@
 - time tracking:
   - add overlay in the bottom left for active timers if there are any. this should be minimal with the issue key (API-005), the time, and a play/pause + end button
 - user preferences
-  - icon style:
-    i think the best way to this is have an "Icon" component with "icon" param, and "type" param. for example: "trash", "pixel" will use the pixelarticons "Trash" icon.
-    types:
-    - Lucide
-    - Pixel - npm: @nsmr/pixelart-react & pixelarticons.com
-    - Phosphor - https://github.com/phosphor-icons/react
-    - HugeIcons - https://hugeicons.com/icons?style=Stroke&type=Rounded
+  - iconPreference
   - colour scheme
 - import existing jira data
 - git integration
