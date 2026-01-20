@@ -1,3 +1,4 @@
+import { calculateWorkTimeMs } from "@sprint/shared";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useInactiveTimers, useTimerState } from "@/lib/query/hooks";
@@ -7,6 +8,12 @@ import { formatTime } from "@/lib/utils";
 const FALLBACK_TIME = "--:--:--";
 const REFRESH_INTERVAL_MS = 10000;
 
+export function getWorkTimeMs(timestamps: string[] | undefined): number {
+    if (!timestamps?.length) return 0;
+    const dates = timestamps.map((t) => new Date(t));
+    return calculateWorkTimeMs(dates);
+}
+
 export function TimerDisplay({ issueId }: { issueId: number }) {
     const { data: timerState, error: timerError } = useTimerState(issueId, {
         refetchInterval: REFRESH_INTERVAL_MS,
@@ -15,7 +22,7 @@ export function TimerDisplay({ issueId }: { issueId: number }) {
         refetchInterval: REFRESH_INTERVAL_MS,
     });
 
-    const [workTimeMs, setWorkTimeMs] = useState(0);
+    const [tick, setTick] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
     const combinedError = timerError ?? inactiveError;
@@ -30,27 +37,26 @@ export function TimerDisplay({ issueId }: { issueId: number }) {
             return;
         }
         setError(null);
-        setWorkTimeMs(timerState?.workTimeMs ?? 0);
-    }, [combinedError, timerState]);
+    }, [combinedError]);
 
     useEffect(() => {
         if (!timerState?.isRunning) return;
 
-        const startTime = Date.now();
-        const baseWorkTime = timerState.workTimeMs;
         const interval = window.setInterval(() => {
-            setWorkTimeMs(baseWorkTime + (Date.now() - startTime));
+            setTick((t) => t + 1);
         }, 1000);
 
         return () => window.clearInterval(interval);
-    }, [timerState?.isRunning, timerState?.workTimeMs]);
+    }, [timerState?.isRunning]);
 
     const inactiveWorkTimeMs = useMemo(
-        () => inactiveTimers.reduce((total, session) => total + (session?.workTimeMs ?? 0), 0),
+        () => inactiveTimers.reduce((total, session) => total + getWorkTimeMs(session?.timestamps), 0),
         [inactiveTimers],
     );
 
-    const totalWorkTimeMs = inactiveWorkTimeMs + workTimeMs;
+    void tick;
+    const currentWorkTimeMs = getWorkTimeMs(timerState?.timestamps);
+    const totalWorkTimeMs = inactiveWorkTimeMs + currentWorkTimeMs;
     const displayWorkTime = error ? FALLBACK_TIME : formatTime(totalWorkTimeMs);
 
     return (

@@ -29,8 +29,8 @@ export function useToggleTimer() {
     return useMutation<TimerState, Error, TimerToggleRequest>({
         mutationKey: ["timers", "toggle"],
         mutationFn: timer.toggle,
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.timers.active(variables.issueId) });
+        onSuccess: (data, variables) => {
+            queryClient.setQueryData(queryKeys.timers.active(variables.issueId), data);
             queryClient.invalidateQueries({ queryKey: queryKeys.timers.inactive(variables.issueId) });
         },
     });
@@ -42,8 +42,8 @@ export function useEndTimer() {
     return useMutation<TimerState, Error, TimerEndRequest>({
         mutationKey: ["timers", "end"],
         mutationFn: timer.end,
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.timers.active(variables.issueId) });
+        onSuccess: (data, variables) => {
+            queryClient.setQueryData(queryKeys.timers.active(variables.issueId), data);
             queryClient.invalidateQueries({ queryKey: queryKeys.timers.inactive(variables.issueId) });
         },
     });

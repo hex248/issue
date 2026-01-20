@@ -1,5 +1,6 @@
 import type { TimerState } from "@sprint/shared";
 import { useEffect, useState } from "react";
+import { getWorkTimeMs } from "@/components/timer-display";
 import { Button } from "@/components/ui/button";
 import { useEndTimer, useTimerState, useToggleTimer } from "@/lib/query/hooks";
 import { parseError } from "@/lib/server";
@@ -9,39 +10,30 @@ export function IssueTimer({ issueId, onEnd }: { issueId: number; onEnd?: (data:
     const { data: timerState, error } = useTimerState(issueId);
     const toggleTimer = useToggleTimer();
     const endTimer = useEndTimer();
-    const [displayTime, setDisplayTime] = useState(0);
+    const [tick, setTick] = useState(0);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (timerState) {
-            setDisplayTime(timerState.workTimeMs);
-        }
-    }, [timerState]);
 
     useEffect(() => {
         if (!timerState?.isRunning) return;
 
-        const startTime = Date.now();
-        const baseTime = timerState.workTimeMs;
-
         const interval = setInterval(() => {
-            setDisplayTime(baseTime + (Date.now() - startTime));
+            setTick((t) => t + 1);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [timerState?.isRunning, timerState?.workTimeMs]);
+    }, [timerState?.isRunning]);
 
     useEffect(() => {
         if (!error) return;
         setErrorMessage(parseError(error as Error));
     }, [error]);
 
+    void tick;
+    const displayTime = getWorkTimeMs(timerState?.timestamps);
+
     const handleToggle = async () => {
         try {
-            const data = await toggleTimer.mutateAsync({ issueId });
-            if (data) {
-                setDisplayTime(data.workTimeMs);
-            }
+            await toggleTimer.mutateAsync({ issueId });
             setErrorMessage(null);
         } catch (err) {
             setErrorMessage(parseError(err as Error));
@@ -52,7 +44,6 @@ export function IssueTimer({ issueId, onEnd }: { issueId: number; onEnd?: (data:
         try {
             const data = await endTimer.mutateAsync({ issueId });
             if (data) {
-                setDisplayTime(data.workTimeMs);
                 onEnd?.(data);
             }
             setErrorMessage(null);
