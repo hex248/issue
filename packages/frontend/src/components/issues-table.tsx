@@ -1,22 +1,25 @@
-import type { IssueResponse } from "@sprint/shared";
+import { useMemo } from "react";
 import Avatar from "@/components/avatar";
+import { useSelection } from "@/components/selection-provider";
 import StatusTag from "@/components/status-tag";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useIssues, useSelectedOrganisation } from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
 
 export function IssuesTable({
-    issuesData,
     columns = {},
-    issueSelectAction,
-    statuses,
     className,
 }: {
-    issuesData: IssueResponse[];
     columns?: { id?: boolean; title?: boolean; description?: boolean; status?: boolean; assignee?: boolean };
-    issueSelectAction?: (issue: IssueResponse) => void;
-    statuses: Record<string, string>;
     className: string;
 }) {
+    const { selectedProjectId, selectedIssueId, selectIssue } = useSelection();
+    const { data: issuesData = [] } = useIssues(selectedProjectId);
+    const selectedOrganisation = useSelectedOrganisation();
+    const statuses = selectedOrganisation?.Organisation.statuses ?? {};
+
+    const issues = useMemo(() => [...issuesData].reverse(), [issuesData]);
+
     return (
         <Table className={cn("table-fixed", className)}>
             <TableHeader>
@@ -35,12 +38,16 @@ export function IssuesTable({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {issuesData.map((issueData) => (
+                {issues.map((issueData) => (
                     <TableRow
                         key={issueData.Issue.id}
                         className="cursor-pointer max-w-full"
                         onClick={() => {
-                            issueSelectAction?.(issueData);
+                            if (issueData.Issue.id === selectedIssueId) {
+                                selectIssue(null);
+                                return;
+                            }
+                            selectIssue(issueData);
                         }}
                     >
                         {(columns.id == null || columns.id === true) && (

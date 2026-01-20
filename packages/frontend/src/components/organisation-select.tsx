@@ -1,7 +1,7 @@
-import type { OrganisationRecord, OrganisationResponse } from "@sprint/shared";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { OrganisationModal } from "@/components/organisation-modal";
+import { useSelection } from "@/components/selection-provider";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -13,22 +13,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useOrganisations } from "@/lib/query/hooks";
 
 export function OrganisationSelect({
-    organisations,
-    selectedOrganisation,
-    onSelectedOrganisationChange,
-    onCreateOrganisation,
     placeholder = "Select Organisation",
     contentClass,
     showLabel = false,
     label = "Organisation",
     labelPosition = "top",
 }: {
-    organisations: OrganisationResponse[];
-    selectedOrganisation: OrganisationResponse | null;
-    onSelectedOrganisationChange: (organisation: OrganisationResponse | null) => void;
-    onCreateOrganisation?: (org: OrganisationRecord) => void | Promise<void>;
     placeholder?: string;
     contentClass?: string;
     showLabel?: boolean;
@@ -36,6 +29,28 @@ export function OrganisationSelect({
     labelPosition?: "top" | "bottom";
 }) {
     const [open, setOpen] = useState(false);
+    const [pendingOrganisationId, setPendingOrganisationId] = useState<number | null>(null);
+    const { data: organisationsData = [] } = useOrganisations();
+    const { selectedOrganisationId, selectOrganisation } = useSelection();
+
+    const organisations = useMemo(
+        () => [...organisationsData].sort((a, b) => a.Organisation.name.localeCompare(b.Organisation.name)),
+        [organisationsData],
+    );
+
+    const selectedOrganisation = useMemo(
+        () => organisations.find((org) => org.Organisation.id === selectedOrganisationId) ?? null,
+        [organisations, selectedOrganisationId],
+    );
+
+    useEffect(() => {
+        if (!pendingOrganisationId) return;
+        const organisation = organisations.find((org) => org.Organisation.id === pendingOrganisationId);
+        if (organisation) {
+            selectOrganisation(organisation);
+            setPendingOrganisationId(null);
+        }
+    }, [organisations, pendingOrganisationId, selectOrganisation]);
 
     return (
         <Select
@@ -46,7 +61,7 @@ export function OrganisationSelect({
                     console.error(`NO ORGANISATION FOUND FOR ID: ${value}`);
                     return;
                 }
-                onSelectedOrganisationChange(organisation);
+                selectOrganisation(organisation);
             }}
             onOpenChange={setOpen}
         >
@@ -82,7 +97,7 @@ export function OrganisationSelect({
                     }
                     completeAction={async (org) => {
                         try {
-                            await onCreateOrganisation?.(org);
+                            setPendingOrganisationId(org.id);
                         } catch (err) {
                             console.error(err);
                         }
