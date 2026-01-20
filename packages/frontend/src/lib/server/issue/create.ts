@@ -1,10 +1,8 @@
 import type { IssueCreateRequest, IssueRecord } from "@sprint/shared";
-import { toast } from "sonner";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function create(request: IssueCreateRequest & ServerQueryInput<IssueRecord>) {
-    const { onSuccess, onError, ...body } = request;
+export async function create(request: IssueCreateRequest): Promise<IssueRecord> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/issue/create`, {
@@ -13,23 +11,18 @@ export async function create(request: IssueCreateRequest & ServerQueryInput<Issu
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(request),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to create issue (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        if (!data.id) {
-            toast.error(`failed to create issue (${res.status})`);
-            onError?.(`failed to create issue (${res.status})`);
-            return;
-        }
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to create issue (${res.status})`);
+        throw new Error(message);
     }
+
+    const data = (await res.json()) as IssueRecord;
+    if (!data.id) {
+        throw new Error(`failed to create issue (${res.status})`);
+    }
+    return data;
 }

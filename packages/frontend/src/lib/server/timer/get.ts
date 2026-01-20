@@ -1,14 +1,8 @@
 import type { TimerState } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function get({
-    issueId,
-    onSuccess,
-    onError,
-}: {
-    issueId: number;
-} & ServerQueryInput<TimerState>) {
+export async function get(issueId: number): Promise<TimerState> {
     const url = new URL(`${getServerURL()}/timer/get`);
     url.searchParams.set("issueId", `${issueId}`);
 
@@ -17,12 +11,9 @@ export async function get({
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to get timer (${res.status})`;
-        onError?.(message);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get timer (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

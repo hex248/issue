@@ -1,23 +1,8 @@
-import type { SprintRecord } from "@sprint/shared";
-import { toast } from "sonner";
+import type { SprintCreateRequest, SprintRecord } from "@sprint/shared";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function create({
-    projectId,
-    name,
-    color,
-    startDate,
-    endDate,
-    onSuccess,
-    onError,
-}: {
-    projectId: number;
-    name: string;
-    color?: string;
-    startDate: Date;
-    endDate: Date;
-} & ServerQueryInput<SprintRecord>) {
+export async function create(input: SprintCreateRequest): Promise<SprintRecord> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/sprint/create`, {
@@ -27,28 +12,20 @@ export async function create({
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
         body: JSON.stringify({
-            projectId,
-            name: name.trim(),
-            color,
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString(),
+            ...input,
+            name: input.name.trim(),
         }),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to create sprint (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        if (!data.id) {
-            toast.error(`failed to create sprint (${res.status})`);
-            onError?.(`failed to create sprint (${res.status})`);
-            return;
-        }
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to create sprint (${res.status})`);
+        throw new Error(message);
     }
+
+    const data = (await res.json()) as SprintRecord;
+    if (!data.id) {
+        throw new Error(`failed to create sprint (${res.status})`);
+    }
+    return data;
 }

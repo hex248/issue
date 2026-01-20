@@ -1,12 +1,8 @@
 import type { IssuesReplaceStatusRequest, ReplaceStatusResponse } from "@sprint/shared";
-import { toast } from "sonner";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function replaceStatus(
-    request: IssuesReplaceStatusRequest & ServerQueryInput<ReplaceStatusResponse>,
-) {
-    const { onSuccess, onError, ...body } = request;
+export async function replaceStatus(request: IssuesReplaceStatusRequest): Promise<ReplaceStatusResponse> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/issues/replace-status`, {
@@ -15,18 +11,14 @@ export async function replaceStatus(
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(request),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to replace status (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to replace status (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

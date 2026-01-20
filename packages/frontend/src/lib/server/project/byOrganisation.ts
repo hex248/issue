@@ -1,13 +1,8 @@
+import type { ProjectResponse } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function byOrganisation({
-    organisationId,
-    onSuccess,
-    onError,
-}: {
-    organisationId: number;
-} & ServerQueryInput) {
+export async function byOrganisation(organisationId: number): Promise<ProjectResponse[]> {
     const url = new URL(`${getServerURL()}/projects/by-organisation`);
     url.searchParams.set("organisationId", `${organisationId}`);
 
@@ -16,11 +11,9 @@ export async function byOrganisation({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get projects by organisation (${res.status})`);
-    } else {
-        const data = await res.json();
-
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get projects by organisation (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

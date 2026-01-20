@@ -1,18 +1,15 @@
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function list({
-    limit,
-    offset,
-    onSuccess,
-    onError,
-}: {
+type TimerListInput = {
     limit?: number;
     offset?: number;
-} & ServerQueryInput) {
+};
+
+export async function list(input: TimerListInput = {}): Promise<unknown> {
     const url = new URL(`${getServerURL()}/timers`);
-    if (limit != null) url.searchParams.set("limit", `${limit}`);
-    if (offset != null) url.searchParams.set("offset", `${offset}`);
+    if (input.limit != null) url.searchParams.set("limit", `${input.limit}`);
+    if (input.offset != null) url.searchParams.set("offset", `${input.offset}`);
 
     const csrfToken = getCsrfToken();
     const headers: HeadersInit = {};
@@ -24,10 +21,9 @@ export async function list({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get timers (${res.status})`);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get timers (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

@@ -1,10 +1,8 @@
 import type { TimerState, TimerToggleRequest } from "@sprint/shared";
-import { toast } from "sonner";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function toggle(request: TimerToggleRequest & ServerQueryInput<TimerState>) {
-    const { onSuccess, onError, ...body } = request;
+export async function toggle(request: TimerToggleRequest): Promise<TimerState> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/timer/toggle`, {
@@ -13,18 +11,14 @@ export async function toggle(request: TimerToggleRequest & ServerQueryInput<Time
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(request),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to toggle timer (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to toggle timer (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

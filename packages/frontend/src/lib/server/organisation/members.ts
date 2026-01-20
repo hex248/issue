@@ -1,14 +1,8 @@
 import type { OrganisationMemberResponse } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function members({
-    organisationId,
-    onSuccess,
-    onError,
-}: {
-    organisationId: number;
-} & ServerQueryInput<OrganisationMemberResponse[]>) {
+export async function members(organisationId: number): Promise<OrganisationMemberResponse[]> {
     const url = new URL(`${getServerURL()}/organisation/members`);
     url.searchParams.set("organisationId", `${organisationId}`);
 
@@ -17,10 +11,9 @@ export async function members({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get members (${res.status})`);
-    } else {
-        const data = (await res.json()) as OrganisationMemberResponse[];
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get members (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

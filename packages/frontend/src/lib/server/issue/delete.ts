@@ -1,15 +1,8 @@
 import type { SuccessResponse } from "@sprint/shared";
-import { toast } from "sonner";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function remove({
-    issueId,
-    onSuccess,
-    onError,
-}: {
-    issueId: number;
-} & ServerQueryInput<SuccessResponse>) {
+export async function remove(issueId: number): Promise<SuccessResponse> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/issue/delete`, {
@@ -23,13 +16,9 @@ export async function remove({
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to delete issue (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to delete issue (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

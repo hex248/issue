@@ -1,15 +1,8 @@
+import type { StatusCountResponse } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function statusCount({
-    organisationId,
-    status,
-    onSuccess,
-    onError,
-}: {
-    organisationId: number;
-    status: string;
-} & ServerQueryInput) {
+export async function statusCount(organisationId: number, status: string): Promise<StatusCountResponse> {
     const url = new URL(`${getServerURL()}/issues/status-count`);
     url.searchParams.set("organisationId", `${organisationId}`);
     url.searchParams.set("status", status);
@@ -19,10 +12,9 @@ export async function statusCount({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get issue status count (${res.status})`);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get issue status count (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

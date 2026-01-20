@@ -1,24 +1,16 @@
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function uploadAvatar({
-    file,
-    onSuccess,
-    onError,
-}: {
-    file: File;
-} & ServerQueryInput<string>) {
+export async function uploadAvatar(file: File): Promise<string> {
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
     if (file.size > MAX_FILE_SIZE) {
-        onError?.("File size exceeds 5MB limit");
-        return;
+        throw new Error("File size exceeds 5MB limit");
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-        onError?.("Invalid file type. Allowed types: png, jpg, jpeg, webp, gif");
-        return;
+        throw new Error("Invalid file type. Allowed types: png, jpg, jpeg, webp, gif");
     }
 
     const formData = new FormData();
@@ -36,17 +28,14 @@ export async function uploadAvatar({
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `Failed to upload avatar (${res.status})`;
-        onError?.(message);
-        return;
+        const message = await getErrorMessage(res, `Failed to upload avatar (${res.status})`);
+        throw new Error(message);
     }
 
     const data = await res.json();
     if (data.avatarURL) {
-        onSuccess?.(data.avatarURL, res);
-    } else {
-        onError?.("Failed to upload avatar");
+        return data.avatarURL;
     }
+
+    throw new Error("Failed to upload avatar");
 }

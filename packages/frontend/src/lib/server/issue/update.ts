@@ -1,25 +1,8 @@
-import type { IssueRecord } from "@sprint/shared";
-import { toast } from "sonner";
+import type { IssueRecord, IssueUpdateRequest } from "@sprint/shared";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function update({
-    issueId,
-    title,
-    description,
-    sprintId,
-    assigneeIds,
-    status,
-    onSuccess,
-    onError,
-}: {
-    issueId: number;
-    title?: string;
-    description?: string;
-    sprintId?: number | null;
-    assigneeIds?: number[] | null;
-    status?: string;
-} & ServerQueryInput<IssueRecord>) {
+export async function update(input: IssueUpdateRequest): Promise<IssueRecord> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/issue/update`, {
@@ -28,25 +11,14 @@ export async function update({
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify({
-            id: issueId,
-            title,
-            description,
-            sprintId,
-            assigneeIds,
-            status,
-        }),
+        body: JSON.stringify(input),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to update issue (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to update issue (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

@@ -1,12 +1,10 @@
 import type { OrganisationMemberRecord, OrgUpdateMemberRoleRequest } from "@sprint/shared";
-import { toast } from "sonner";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
 export async function updateMemberRole(
-    request: OrgUpdateMemberRoleRequest & ServerQueryInput<OrganisationMemberRecord>,
-) {
-    const { onSuccess, onError, ...body } = request;
+    request: OrgUpdateMemberRoleRequest,
+): Promise<OrganisationMemberRecord> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/organisation/update-member-role`, {
@@ -15,18 +13,14 @@ export async function updateMemberRole(
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(request),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to update member role (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to update member role (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

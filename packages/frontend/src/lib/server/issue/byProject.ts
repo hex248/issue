@@ -1,13 +1,8 @@
+import type { IssueResponse } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function byProject({
-    projectId,
-    onSuccess,
-    onError,
-}: {
-    projectId: number;
-} & ServerQueryInput) {
+export async function byProject(projectId: number): Promise<IssueResponse[]> {
     const url = new URL(`${getServerURL()}/issues/by-project`);
     url.searchParams.set("projectId", `${projectId}`);
 
@@ -16,11 +11,9 @@ export async function byProject({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get issues by project (${res.status})`);
-    } else {
-        const data = await res.json();
-
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get issues by project (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

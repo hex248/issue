@@ -1,14 +1,8 @@
 import type { SprintRecord } from "@sprint/shared";
 import { getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function byProject({
-    projectId,
-    onSuccess,
-    onError,
-}: {
-    projectId: number;
-} & ServerQueryInput<SprintRecord[]>) {
+export async function byProject(projectId: number): Promise<SprintRecord[]> {
     const url = new URL(`${getServerURL()}/sprints/by-project`);
     url.searchParams.set("projectId", `${projectId}`);
 
@@ -17,10 +11,9 @@ export async function byProject({
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        onError?.(error || `failed to get sprints (${res.status})`);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to get sprints (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }

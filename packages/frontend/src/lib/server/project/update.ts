@@ -1,19 +1,8 @@
-import type { ProjectRecord } from "@sprint/shared";
-import { toast } from "sonner";
+import type { ProjectRecord, ProjectUpdateRequest } from "@sprint/shared";
 import { getCsrfToken, getServerURL } from "@/lib/utils";
-import type { ServerQueryInput } from "..";
+import { getErrorMessage } from "..";
 
-export async function update({
-    projectId,
-    key,
-    name,
-    onSuccess,
-    onError,
-}: {
-    projectId: number;
-    key?: string;
-    name?: string;
-} & ServerQueryInput<ProjectRecord>) {
+export async function update(input: ProjectUpdateRequest): Promise<ProjectRecord> {
     const csrfToken = getCsrfToken();
 
     const res = await fetch(`${getServerURL()}/project/update`, {
@@ -22,22 +11,14 @@ export async function update({
             "Content-Type": "application/json",
             ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
         },
-        body: JSON.stringify({
-            id: projectId,
-            key,
-            name,
-        }),
+        body: JSON.stringify(input),
         credentials: "include",
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => res.text());
-        const message =
-            typeof error === "string" ? error : error.error || `failed to update project (${res.status})`;
-        toast.error(message);
-        onError?.(error);
-    } else {
-        const data = await res.json();
-        onSuccess?.(data, res);
+        const message = await getErrorMessage(res, `failed to update project (${res.status})`);
+        throw new Error(message);
     }
+
+    return res.json();
 }
