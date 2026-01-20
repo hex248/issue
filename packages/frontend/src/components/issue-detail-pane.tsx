@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { issue } from "@/lib/server";
-import { issueID } from "@/lib/utils";
+import { cn, issueID } from "@/lib/utils";
 import SmallSprintDisplay from "./small-sprint-display";
 import { SprintSelect } from "./sprint-select";
 import { IconButton } from "./ui/icon-button";
@@ -366,7 +366,11 @@ export function IssueDetailPane({
                                 }
                             }}
                             disabled={isSavingTitle}
-                            className="w-full border-transparent hover:border-input focus:border-input h-auto py-0.5"
+                            className={cn(
+                                "w-full border-0 border-b-1 border-b-input/50",
+                                "hover:border-b-input focus:border-b-input h-auto",
+                            )}
+                            inputClassName={cn("bg-background px-1.5 font-600")}
                         />
                     </div>
                 </div>
@@ -387,7 +391,7 @@ export function IssueDetailPane({
                         }}
                         placeholder="Add a description..."
                         disabled={isSavingDescription}
-                        className="text-sm border-transparent hover:border-input focus:border-input resize-none"
+                        className="text-sm border-input/50 hover:border-input focus:border-input resize-none !bg-background"
                     />
                 ) : (
                     <Button

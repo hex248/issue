@@ -7,8 +7,13 @@ function Input({
     type,
     showCounter = true,
     showHashPrefix = false,
+    inputClassName,
     ...props
-}: React.ComponentProps<"input"> & { showCounter?: boolean; showHashPrefix?: boolean }) {
+}: React.ComponentProps<"input"> & {
+    showCounter?: boolean;
+    showHashPrefix?: boolean;
+    inputClassName?: string;
+}) {
     const maxLength = typeof props.maxLength === "number" ? props.maxLength : undefined;
     const currentLength = typeof props.value === "string" ? props.value.length : undefined;
 
@@ -37,6 +42,7 @@ function Input({
                     "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
                     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
                     showHashPrefix ? "pl-2 py-0" : "pl-3",
+                    inputClassName,
                 )}
                 {...props}
             />
