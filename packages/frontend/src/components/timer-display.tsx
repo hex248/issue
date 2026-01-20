@@ -1,72 +1,37 @@
-import type { TimerState } from "@sprint/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { parseError, timer } from "@/lib/server";
+import { useInactiveTimers, useTimerState } from "@/lib/query/hooks";
+import { parseError } from "@/lib/server";
 import { formatTime } from "@/lib/utils";
 
 const FALLBACK_TIME = "--:--:--";
 const REFRESH_INTERVAL_MS = 10000;
 
 export function TimerDisplay({ issueId }: { issueId: number }) {
-    const [timerState, setTimerState] = useState<TimerState>(null);
+    const { data: timerState, error: timerError } = useTimerState(issueId, {
+        refetchInterval: REFRESH_INTERVAL_MS,
+    });
+    const { data: inactiveTimers = [], error: inactiveError } = useInactiveTimers(issueId, {
+        refetchInterval: REFRESH_INTERVAL_MS,
+    });
+
     const [workTimeMs, setWorkTimeMs] = useState(0);
-    const [inactiveWorkTimeMs, setInactiveWorkTimeMs] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
+    const combinedError = timerError ?? inactiveError;
+
     useEffect(() => {
-        let isMounted = true;
-
-        const fetchTimer = () => {
-            timer.get({
-                issueId,
-                onSuccess: (data) => {
-                    if (!isMounted) return;
-                    setTimerState(data);
-                    setWorkTimeMs(data?.workTimeMs ?? 0);
-                    setError(null);
-                },
-                onError: (err) => {
-                    if (!isMounted) return;
-                    const message = parseError(err);
-                    setError(message);
-
-                    toast.error(`Error fetching timer data: ${message}`, {
-                        dismissible: false,
-                    });
-                },
+        if (combinedError) {
+            const message = parseError(combinedError as Error);
+            setError(message);
+            toast.error(`Error fetching timer data: ${message}`, {
+                dismissible: false,
             });
-
-            timer.getInactive({
-                issueId,
-                onSuccess: (data) => {
-                    if (!isMounted) return;
-                    const totalWorkTime = data.reduce(
-                        (total, session) => total + (session?.workTimeMs ?? 0),
-                        0,
-                    );
-                    setInactiveWorkTimeMs(totalWorkTime);
-                    setError(null);
-                },
-                onError: (err) => {
-                    if (!isMounted) return;
-                    const message = parseError(err);
-                    setError(message);
-
-                    toast.error(`Error fetching timer data: ${message}`, {
-                        dismissible: false,
-                    });
-                },
-            });
-        };
-
-        fetchTimer();
-        const refreshInterval = window.setInterval(fetchTimer, REFRESH_INTERVAL_MS);
-
-        return () => {
-            isMounted = false;
-            window.clearInterval(refreshInterval);
-        };
-    }, [issueId]);
+            return;
+        }
+        setError(null);
+        setWorkTimeMs(timerState?.workTimeMs ?? 0);
+    }, [combinedError, timerState]);
 
     useEffect(() => {
         if (!timerState?.isRunning) return;
@@ -79,6 +44,11 @@ export function TimerDisplay({ issueId }: { issueId: number }) {
 
         return () => window.clearInterval(interval);
     }, [timerState?.isRunning, timerState?.workTimeMs]);
+
+    const inactiveWorkTimeMs = useMemo(
+        () => inactiveTimers.reduce((total, session) => total + (session?.workTimeMs ?? 0), 0),
+        [inactiveTimers],
+    );
 
     const totalWorkTimeMs = inactiveWorkTimeMs + workTimeMs;
     const displayWorkTime = error ? FALLBACK_TIME : formatTime(totalWorkTimeMs);

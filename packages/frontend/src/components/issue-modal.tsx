@@ -1,14 +1,10 @@
-import {
-    ISSUE_DESCRIPTION_MAX_LENGTH,
-    ISSUE_TITLE_MAX_LENGTH,
-    type SprintRecord,
-    type UserRecord,
-} from "@sprint/shared";
+import { ISSUE_DESCRIPTION_MAX_LENGTH, ISSUE_TITLE_MAX_LENGTH } from "@sprint/shared";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { MultiAssigneeSelect } from "@/components/multi-assignee-select";
 import { useAuthenticatedSession } from "@/components/session-provider";
+import { SprintSelect } from "@/components/sprint-select";
 import { StatusSelect } from "@/components/status-select";
 import StatusTag from "@/components/status-tag";
 import { Button } from "@/components/ui/button";
@@ -23,35 +19,35 @@ import {
 import { Field } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { SelectTrigger } from "@/components/ui/select";
-import { issue, parseError } from "@/lib/server";
-import { cn } from "@/lib/utils";
-import { SprintSelect } from "./sprint-select";
+import {
+    useCreateIssue,
+    useOrganisationMembers,
+    useSelectedOrganisation,
+    useSelectedProject,
+    useSprints,
+} from "@/lib/query/hooks";
+import { parseError } from "@/lib/server";
+import { cn, issueID } from "@/lib/utils";
 
-export function IssueModal({
-    projectId,
-    sprints,
-    members,
-    statuses,
-    trigger,
-    completeAction,
-    errorAction,
-}: {
-    projectId?: number;
-    sprints?: SprintRecord[];
-    members?: UserRecord[];
-    statuses: Record<string, string>;
-    trigger?: React.ReactNode;
-    completeAction?: (issueNumber: number) => void | Promise<void>;
-    errorAction?: (errorMessage: string) => void | Promise<void>;
-}) {
+export function IssueModal({ trigger }: { trigger?: React.ReactNode }) {
     const { user } = useAuthenticatedSession();
+    const selectedOrganisation = useSelectedOrganisation();
+    const selectedProject = useSelectedProject();
+    const { data: sprints = [] } = useSprints(selectedProject?.Project.id);
+    const { data: membersData = [] } = useOrganisationMembers(selectedOrganisation?.Organisation.id);
+    const createIssue = useCreateIssue();
+
+    const members = useMemo(() => membersData.map((member) => member.User), [membersData]);
+    const statuses = selectedOrganisation?.Organisation.statuses ?? {};
+    const statusOptions = useMemo(() => Object.keys(statuses), [statuses]);
+    const defaultStatus = statusOptions[0] ?? "";
 
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [sprintId, setSprintId] = useState<string>("unassigned");
     const [assigneeIds, setAssigneeIds] = useState<string[]>(["unassigned"]);
-    const [status, setStatus] = useState<string>(Object.keys(statuses)[0] ?? "");
+    const [status, setStatus] = useState<string>(defaultStatus);
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -61,7 +57,7 @@ export function IssueModal({
         setDescription("");
         setSprintId("unassigned");
         setAssigneeIds(["unassigned"]);
-        setStatus(statuses?.[0] ?? "");
+        setStatus(defaultStatus);
         setSubmitAttempted(false);
         setSubmitting(false);
         setError(null);
@@ -74,8 +70,8 @@ export function IssueModal({
         }
     };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (event: FormEvent) => {
+        event.preventDefault();
         setError(null);
         setSubmitAttempted(true);
 
@@ -92,7 +88,7 @@ export function IssueModal({
             return;
         }
 
-        if (!projectId) {
+        if (!selectedProject) {
             setError("select a project first");
             return;
         }
@@ -100,42 +96,26 @@ export function IssueModal({
         setSubmitting(true);
 
         try {
-            await issue.create({
-                projectId,
+            const data = await createIssue.mutateAsync({
+                projectId: selectedProject.Project.id,
                 title,
                 description,
                 sprintId: sprintId === "unassigned" ? null : Number(sprintId),
                 assigneeIds: assigneeIds.filter((id) => id !== "unassigned").map((id) => Number(id)),
                 status: status.trim() === "" ? undefined : status,
-                onSuccess: async (data) => {
-                    setOpen(false);
-                    reset();
-                    try {
-                        await completeAction?.(data.number);
-                    } catch (actionErr) {
-                        console.error(actionErr);
-                    }
-                },
-                onError: async (err) => {
-                    const message = parseError(err);
-                    setError(message);
-                    setSubmitting(false);
-
-                    toast.error(`Error creating issue: ${message}`, {
-                        dismissible: false,
-                    });
-
-                    try {
-                        await errorAction?.(message);
-                    } catch (actionErr) {
-                        console.error(actionErr);
-                    }
-                },
+            });
+            setOpen(false);
+            reset();
+            toast.success(`Created ${issueID(selectedProject.Project.key, data.number)}`, {
+                dismissible: false,
             });
         } catch (err) {
-            console.error(err);
-            setError("failed to create issue");
+            const message = parseError(err as Error);
+            setError(message);
             setSubmitting(false);
+            toast.error(`Error creating issue: ${message}`, {
+                dismissible: false,
+            });
         }
     };
 
@@ -143,7 +123,7 @@ export function IssueModal({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button variant="outline" disabled={!projectId}>
+                    <Button variant="outline" disabled={!selectedProject}>
                         Create Issue
                     </Button>
                 )}
@@ -156,15 +136,14 @@ export function IssueModal({
 
                 <form onSubmit={handleSubmit}>
                     <div className="grid">
-                        {statuses && Object.keys(statuses).length > 0 && (
+                        {statusOptions.length > 0 && (
                             <div className="flex items-center gap-2 mb-4">
                                 <Label>Status</Label>
                                 <StatusSelect
                                     statuses={statuses}
                                     value={status}
                                     onChange={(newValue) => {
-                                        if (newValue.trim() === "") return; // TODO: handle this better
-                                        // unsure why an empty value is being sent, but preventing it this way for now
+                                        if (newValue.trim() === "") return;
                                         setStatus(newValue);
                                     }}
                                     trigger={({ isOpen, value }) => (
@@ -188,11 +167,11 @@ export function IssueModal({
                         <Field
                             label="Title"
                             value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            validate={(v) =>
-                                v.trim() === ""
+                            onChange={(event) => setTitle(event.target.value)}
+                            validate={(value) =>
+                                value.trim() === ""
                                     ? "Cannot be empty"
-                                    : v.trim().length > ISSUE_TITLE_MAX_LENGTH
+                                    : value.trim().length > ISSUE_TITLE_MAX_LENGTH
                                       ? `Too long (${ISSUE_TITLE_MAX_LENGTH} character limit)`
                                       : undefined
                             }
@@ -203,9 +182,9 @@ export function IssueModal({
                         <Field
                             label="Description (optional)"
                             value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            validate={(v) =>
-                                v.trim().length > ISSUE_DESCRIPTION_MAX_LENGTH
+                            onChange={(event) => setDescription(event.target.value)}
+                            validate={(value) =>
+                                value.trim().length > ISSUE_DESCRIPTION_MAX_LENGTH
                                     ? `Too long (${ISSUE_DESCRIPTION_MAX_LENGTH} character limit)`
                                     : undefined
                             }
@@ -214,14 +193,14 @@ export function IssueModal({
                             maxLength={ISSUE_DESCRIPTION_MAX_LENGTH}
                         />
 
-                        {sprints && sprints.length > 0 && (
+                        {sprints.length > 0 && (
                             <div className="flex items-center gap-2 mt-0">
                                 <Label className="text-sm">Sprint</Label>
                                 <SprintSelect sprints={sprints} value={sprintId} onChange={setSprintId} />
                             </div>
                         )}
 
-                        {members && members.length > 0 && (
+                        {members.length > 0 && (
                             <div className="flex items-start gap-2 mt-4">
                                 <Label className="text-sm pt-2">Assignees</Label>
                                 <MultiAssigneeSelect

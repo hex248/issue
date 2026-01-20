@@ -1,9 +1,11 @@
-import type { IssueResponse, ProjectResponse, SprintRecord, UserRecord } from "@sprint/shared";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { MultiAssigneeSelect } from "@/components/multi-assignee-select";
+import { useSelection } from "@/components/selection-provider";
 import { useSession } from "@/components/session-provider";
+import SmallSprintDisplay from "@/components/small-sprint-display";
 import SmallUserDisplay from "@/components/small-user-display";
+import { SprintSelect } from "@/components/sprint-select";
 import { StatusSelect } from "@/components/status-select";
 import StatusTag from "@/components/status-tag";
 import { TimerDisplay } from "@/components/timer-display";
@@ -11,16 +13,23 @@ import { TimerModal } from "@/components/timer-modal";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import Icon from "@/components/ui/icon";
+import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { issue } from "@/lib/server";
+import {
+    useDeleteIssue,
+    useOrganisationMembers,
+    useSelectedIssue,
+    useSelectedOrganisation,
+    useSelectedProject,
+    useSprints,
+    useUpdateIssue,
+} from "@/lib/query/hooks";
+import { parseError } from "@/lib/server";
 import { cn, issueID } from "@/lib/utils";
-import SmallSprintDisplay from "./small-sprint-display";
-import { SprintSelect } from "./sprint-select";
-import { IconButton } from "./ui/icon-button";
 
-function assigneesToStringArray(assignees: UserRecord[]): string[] {
+function assigneesToStringArray(assignees: { id: number }[]): string[] {
     if (assignees.length === 0) return ["unassigned"];
     return assignees.map((a) => a.id.toString());
 }
@@ -29,44 +38,39 @@ function stringArrayToAssigneeIds(assigneeIds: string[]): number[] {
     return assigneeIds.filter((id) => id !== "unassigned").map((id) => Number(id));
 }
 
-export function IssueDetailPane({
-    project,
-    sprints,
-    issueData,
-    members,
-    statuses,
-    close,
-    onIssueUpdate,
-    onIssueDelete,
-}: {
-    project: ProjectResponse;
-    sprints: SprintRecord[];
-    issueData: IssueResponse;
-    members: UserRecord[];
-    statuses: Record<string, string>;
-    close: () => void;
-    onIssueUpdate?: () => void;
-    onIssueDelete?: (issueId: number) => void | Promise<void>;
-}) {
+export function IssueDetailPane() {
     const { user } = useSession();
-    const [assigneeIds, setAssigneeIds] = useState<string[]>(assigneesToStringArray(issueData.Assignees));
-    const [sprintId, setSprintId] = useState<string>(issueData.Issue.sprintId?.toString() ?? "unassigned");
-    const [status, setStatus] = useState<string>(issueData.Issue.status);
+    const { selectIssue } = useSelection();
+    const selectedOrganisation = useSelectedOrganisation();
+    const selectedProject = useSelectedProject();
+    const issueData = useSelectedIssue();
+    const { data: sprints = [] } = useSprints(selectedProject?.Project.id);
+    const { data: membersData = [] } = useOrganisationMembers(selectedOrganisation?.Organisation.id);
+    const updateIssue = useUpdateIssue();
+    const deleteIssue = useDeleteIssue();
+
+    const members = useMemo(() => membersData.map((member) => member.User), [membersData]);
+    const statuses = selectedOrganisation?.Organisation.statuses ?? {};
+
+    const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
+    const [sprintId, setSprintId] = useState<string>("unassigned");
+    const [status, setStatus] = useState<string>("");
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
     const copyTimeoutRef = useRef<number | null>(null);
 
-    const [title, setTitle] = useState(issueData.Issue.title);
-    const [originalTitle, setOriginalTitle] = useState(issueData.Issue.title);
+    const [title, setTitle] = useState("");
+    const [originalTitle, setOriginalTitle] = useState("");
     const [isSavingTitle, setIsSavingTitle] = useState(false);
 
-    const [description, setDescription] = useState(issueData.Issue.description);
-    const [originalDescription, setOriginalDescription] = useState(issueData.Issue.description);
+    const [description, setDescription] = useState("");
+    const [originalDescription, setOriginalDescription] = useState("");
     const [isEditingDescription, setIsEditingDescription] = useState(false);
     const [isSavingDescription, setIsSavingDescription] = useState(false);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
+        if (!issueData) return;
         setSprintId(issueData.Issue.sprintId?.toString() ?? "unassigned");
         setAssigneeIds(assigneesToStringArray(issueData.Assignees));
         setStatus(issueData.Issue.status);
@@ -85,51 +89,51 @@ export function IssueDetailPane({
         };
     }, []);
 
+    if (!issueData || !selectedProject || !selectedOrganisation) {
+        return null;
+    }
+
     const handleSprintChange = async (value: string) => {
         setSprintId(value);
         const newSprintId = value === "unassigned" ? null : Number(value);
 
-        await issue.update({
-            issueId: issueData.Issue.id,
-            sprintId: newSprintId,
-            onSuccess: () => {
-                onIssueUpdate?.();
-
-                toast.success(
-                    <>
-                        Successfully updated sprint to{" "}
-                        {value === "unassigned" ? (
-                            "Unassigned"
-                        ) : (
-                            <SmallSprintDisplay sprint={sprints.find((s) => s.id === newSprintId)} />
-                        )}{" "}
-                        for {issueID(project.Project.key, issueData.Issue.number)}
-                    </>,
-                    {
-                        dismissible: false,
-                    },
-                );
-            },
-            onError: (error) => {
-                console.error("error updating sprint:", error);
-                setSprintId(issueData.Issue.sprintId?.toString() ?? "unassigned");
-
-                toast.error(
-                    <>
-                        Error updating sprint to{" "}
-                        {value === "unassigned" ? (
-                            "Unassigned"
-                        ) : (
-                            <SmallSprintDisplay sprint={sprints.find((s) => s.id === newSprintId)} />
-                        )}{" "}
-                        for {issueID(project.Project.key, issueData.Issue.number)}
-                    </>,
-                    {
-                        dismissible: false,
-                    },
-                );
-            },
-        });
+        try {
+            await updateIssue.mutateAsync({
+                id: issueData.Issue.id,
+                sprintId: newSprintId,
+            });
+            toast.success(
+                <>
+                    Successfully updated sprint to{" "}
+                    {value === "unassigned" ? (
+                        "Unassigned"
+                    ) : (
+                        <SmallSprintDisplay sprint={sprints.find((s) => s.id === newSprintId)} />
+                    )}{" "}
+                    for {issueID(selectedProject.Project.key, issueData.Issue.number)}
+                </>,
+                {
+                    dismissible: false,
+                },
+            );
+        } catch (error) {
+            console.error("error updating sprint:", error);
+            setSprintId(issueData.Issue.sprintId?.toString() ?? "unassigned");
+            toast.error(
+                <>
+                    Error updating sprint to{" "}
+                    {value === "unassigned" ? (
+                        "Unassigned"
+                    ) : (
+                        <SmallSprintDisplay sprint={sprints.find((s) => s.id === newSprintId)} />
+                    )}{" "}
+                    for {issueID(selectedProject.Project.key, issueData.Issue.number)}
+                </>,
+                {
+                    dismissible: false,
+                },
+            );
+        }
     };
 
     const handleAssigneeChange = async (newAssigneeIds: string[]) => {
@@ -147,64 +151,58 @@ export function IssueDetailPane({
             return;
         }
 
-        await issue.update({
-            issueId: issueData.Issue.id,
-            assigneeIds: newAssigneeIdNumbers,
-            onSuccess: () => {
-                const assignedUsers = members.filter((m) => newAssigneeIdNumbers.includes(m.id));
-                const displayText =
-                    assignedUsers.length === 0
-                        ? "Unassigned"
-                        : assignedUsers.length === 1
-                          ? assignedUsers[0].name
-                          : `${assignedUsers.length} assignees`;
-                toast.success(
-                    <div className={"flex items-center gap-2"}>
-                        Updated assignees to {displayText} for{" "}
-                        {issueID(project.Project.key, issueData.Issue.number)}
-                    </div>,
-                    {
-                        dismissible: false,
-                    },
-                );
-                onIssueUpdate?.();
-            },
-            onError: (error) => {
-                console.error("error updating assignees:", error);
-                setAssigneeIds(previousAssigneeIds);
-
-                toast.error(`Error updating assignees: ${error}`, {
+        try {
+            await updateIssue.mutateAsync({
+                id: issueData.Issue.id,
+                assigneeIds: newAssigneeIdNumbers,
+            });
+            const assignedUsers = members.filter((member) => newAssigneeIdNumbers.includes(member.id));
+            const displayText =
+                assignedUsers.length === 0
+                    ? "Unassigned"
+                    : assignedUsers.length === 1
+                      ? assignedUsers[0].name
+                      : `${assignedUsers.length} assignees`;
+            toast.success(
+                <div className={"flex items-center gap-2"}>
+                    Updated assignees to {displayText} for{" "}
+                    {issueID(selectedProject.Project.key, issueData.Issue.number)}
+                </div>,
+                {
                     dismissible: false,
-                });
-            },
-        });
+                },
+            );
+        } catch (error) {
+            console.error("error updating assignees:", error);
+            setAssigneeIds(previousAssigneeIds);
+            toast.error(`Error updating assignees: ${parseError(error as Error)}`, {
+                dismissible: false,
+            });
+        }
     };
 
     const handleStatusChange = async (value: string) => {
         setStatus(value);
 
-        await issue.update({
-            issueId: issueData.Issue.id,
-            status: value,
-            onSuccess: () => {
-                toast.success(
-                    <>
-                        {issueID(project.Project.key, issueData.Issue.number)}'s status updated to{" "}
-                        <StatusTag status={value} colour={statuses[value]} />
-                    </>,
-                    { dismissible: false },
-                );
-                onIssueUpdate?.();
-            },
-            onError: (error) => {
-                console.error("error updating status:", error);
-                setStatus(issueData.Issue.status);
-
-                toast.error(`Error updating status: ${error}`, {
-                    dismissible: false,
-                });
-            },
-        });
+        try {
+            await updateIssue.mutateAsync({
+                id: issueData.Issue.id,
+                status: value,
+            });
+            toast.success(
+                <>
+                    {issueID(selectedProject.Project.key, issueData.Issue.number)}'s status updated to{" "}
+                    <StatusTag status={value} colour={statuses[value]} />
+                </>,
+                { dismissible: false },
+            );
+        } catch (error) {
+            console.error("error updating status:", error);
+            setStatus(issueData.Issue.status);
+            toast.error(`Error updating status: ${parseError(error as Error)}`, {
+                dismissible: false,
+            });
+        }
     };
 
     const handleDelete = () => {
@@ -235,21 +233,19 @@ export function IssueDetailPane({
         }
 
         setIsSavingTitle(true);
-        await issue.update({
-            issueId: issueData.Issue.id,
-            title: trimmedTitle,
-            onSuccess: () => {
-                setOriginalTitle(trimmedTitle);
-                toast.success(`${issueID(project.Project.key, issueData.Issue.number)} Title updated`);
-                onIssueUpdate?.();
-                setIsSavingTitle(false);
-            },
-            onError: (error) => {
-                console.error("error updating title:", error);
-                setTitle(originalTitle);
-                setIsSavingTitle(false);
-            },
-        });
+        try {
+            await updateIssue.mutateAsync({
+                id: issueData.Issue.id,
+                title: trimmedTitle,
+            });
+            setOriginalTitle(trimmedTitle);
+            toast.success(`${issueID(selectedProject.Project.key, issueData.Issue.number)} Title updated`);
+        } catch (error) {
+            console.error("error updating title:", error);
+            setTitle(originalTitle);
+        } finally {
+            setIsSavingTitle(false);
+        }
     };
 
     const handleDescriptionSave = async () => {
@@ -262,52 +258,50 @@ export function IssueDetailPane({
         }
 
         setIsSavingDescription(true);
-        await issue.update({
-            issueId: issueData.Issue.id,
-            description: trimmedDescription,
-            onSuccess: () => {
-                setOriginalDescription(trimmedDescription);
-                setDescription(trimmedDescription);
-                toast.success(`${issueID(project.Project.key, issueData.Issue.number)} Description updated`);
-                onIssueUpdate?.();
-                setIsSavingDescription(false);
-                if (trimmedDescription === "") {
-                    setIsEditingDescription(false);
-                }
-            },
-            onError: (error) => {
-                console.error("error updating description:", error);
-                setDescription(originalDescription);
-                setIsSavingDescription(false);
-            },
-        });
+        try {
+            await updateIssue.mutateAsync({
+                id: issueData.Issue.id,
+                description: trimmedDescription,
+            });
+            setOriginalDescription(trimmedDescription);
+            setDescription(trimmedDescription);
+            toast.success(
+                `${issueID(selectedProject.Project.key, issueData.Issue.number)} Description updated`,
+            );
+            if (trimmedDescription === "") {
+                setIsEditingDescription(false);
+            }
+        } catch (error) {
+            console.error("error updating description:", error);
+            setDescription(originalDescription);
+        } finally {
+            setIsSavingDescription(false);
+        }
     };
 
     const handleConfirmDelete = async () => {
-        await issue.delete({
-            issueId: issueData.Issue.id,
-            onSuccess: async () => {
-                await onIssueDelete?.(issueData.Issue.id);
-
-                toast.success(`Deleted issue ${issueID(project.Project.key, issueData.Issue.number)}`, {
+        try {
+            await deleteIssue.mutateAsync(issueData.Issue.id);
+            selectIssue(null);
+            toast.success(`Deleted issue ${issueID(selectedProject.Project.key, issueData.Issue.number)}`, {
+                dismissible: false,
+            });
+        } catch (error) {
+            console.error(
+                `error deleting issue ${issueID(selectedProject.Project.key, issueData.Issue.number)}`,
+                error,
+            );
+            toast.error(
+                `Error deleting issue ${issueID(selectedProject.Project.key, issueData.Issue.number)}: ${parseError(
+                    error as Error,
+                )}`,
+                {
                     dismissible: false,
-                });
-            },
-            onError: (error) => {
-                console.error(
-                    `error deleting issue ${issueID(project.Project.key, issueData.Issue.number)}`,
-                    error,
-                );
-
-                toast.error(
-                    `Error deleting issue ${issueID(project.Project.key, issueData.Issue.number)}: ${error}`,
-                    {
-                        dismissible: false,
-                    },
-                );
-            },
-        });
-        setDeleteOpen(false);
+                },
+            );
+        } finally {
+            setDeleteOpen(false);
+        }
     };
 
     return (
@@ -315,7 +309,7 @@ export function IssueDetailPane({
             <div className="flex flex-row items-center justify-end border-b h-[25px]">
                 <span className="w-full">
                     <p className="text-sm w-fit px-1 font-700">
-                        {issueID(project.Project.key, issueData.Issue.number)}
+                        {issueID(selectedProject.Project.key, issueData.Issue.number)}
                     </p>
                 </span>
                 <div className="flex items-center">
@@ -325,7 +319,7 @@ export function IssueDetailPane({
                     <IconButton variant="destructive" onClick={handleDelete} title={"Delete issue"}>
                         <Icon icon="trash" />
                     </IconButton>
-                    <IconButton onClick={close} title={"Close"}>
+                    <IconButton onClick={() => selectIssue(null)} title={"Close"}>
                         <Icon icon="x" />
                     </IconButton>
                 </div>
@@ -355,14 +349,14 @@ export function IssueDetailPane({
                     <div className="flex w-full items-center min-w-0">
                         <Input
                             value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            onChange={(event) => setTitle(event.target.value)}
                             onBlur={handleTitleSave}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    e.currentTarget.blur();
-                                } else if (e.key === "Escape") {
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    event.currentTarget.blur();
+                                } else if (event.key === "Escape") {
                                     setTitle(originalTitle);
-                                    e.currentTarget.blur();
+                                    event.currentTarget.blur();
                                 }
                             }}
                             disabled={isSavingTitle}
@@ -378,15 +372,15 @@ export function IssueDetailPane({
                     <Textarea
                         ref={descriptionRef}
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(event) => setDescription(event.target.value)}
                         onBlur={handleDescriptionSave}
-                        onKeyDown={(e) => {
-                            if (e.key === "Escape" || (e.ctrlKey && e.key === "Enter")) {
+                        onKeyDown={(event) => {
+                            if (event.key === "Escape" || (event.ctrlKey && event.key === "Enter")) {
                                 setDescription(originalDescription);
                                 if (originalDescription === "") {
                                     setIsEditingDescription(false);
                                 }
-                                e.currentTarget.blur();
+                                event.currentTarget.blur();
                             }
                         }}
                         placeholder="Add a description..."

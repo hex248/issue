@@ -1,29 +1,23 @@
 import type { TimerState } from "@sprint/shared";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { parseError, timer } from "@/lib/server";
+import { useEndTimer, useTimerState, useToggleTimer } from "@/lib/query/hooks";
+import { parseError } from "@/lib/server";
 import { cn, formatTime } from "@/lib/utils";
 
 export function IssueTimer({ issueId, onEnd }: { issueId: number; onEnd?: (data: TimerState) => void }) {
-    const [timerState, setTimerState] = useState<TimerState>(null);
+    const { data: timerState, error } = useTimerState(issueId);
+    const toggleTimer = useToggleTimer();
+    const endTimer = useEndTimer();
     const [displayTime, setDisplayTime] = useState(0);
-    const [error, setError] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // fetch current timer state on mount
     useEffect(() => {
-        timer.get({
-            issueId,
-            onSuccess: (data) => {
-                setTimerState(data);
-                if (data) {
-                    setDisplayTime(data.workTimeMs);
-                }
-            },
-            onError: (err) => setError(parseError(err)),
-        });
-    }, [issueId]);
+        if (timerState) {
+            setDisplayTime(timerState.workTimeMs);
+        }
+    }, [timerState]);
 
-    // update display time every second when running
     useEffect(() => {
         if (!timerState?.isRunning) return;
 
@@ -37,33 +31,34 @@ export function IssueTimer({ issueId, onEnd }: { issueId: number; onEnd?: (data:
         return () => clearInterval(interval);
     }, [timerState?.isRunning, timerState?.workTimeMs]);
 
-    const handleToggle = () => {
-        timer.toggle({
-            issueId,
-            onSuccess: (data) => {
-                if (data) {
-                    setTimerState(data);
-                    setDisplayTime(data.workTimeMs);
-                }
-                setError(null);
-            },
-            onError: (err) => setError(parseError(err)),
-        });
+    useEffect(() => {
+        if (!error) return;
+        setErrorMessage(parseError(error as Error));
+    }, [error]);
+
+    const handleToggle = async () => {
+        try {
+            const data = await toggleTimer.mutateAsync({ issueId });
+            if (data) {
+                setDisplayTime(data.workTimeMs);
+            }
+            setErrorMessage(null);
+        } catch (err) {
+            setErrorMessage(parseError(err as Error));
+        }
     };
 
-    const handleEnd = () => {
-        timer.end({
-            issueId,
-            onSuccess: (data) => {
-                if (data) {
-                    setTimerState(data);
-                    setDisplayTime(data.workTimeMs);
-                    onEnd?.(data);
-                }
-                setError(null);
-            },
-            onError: (err) => setError(parseError(err)),
-        });
+    const handleEnd = async () => {
+        try {
+            const data = await endTimer.mutateAsync({ issueId });
+            if (data) {
+                setDisplayTime(data.workTimeMs);
+                onEnd?.(data);
+            }
+            setErrorMessage(null);
+        } catch (err) {
+            setErrorMessage(parseError(err as Error));
+        }
     };
 
     return (
@@ -72,7 +67,7 @@ export function IssueTimer({ issueId, onEnd }: { issueId: number; onEnd?: (data:
                 {formatTime(displayTime)}
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
 
             <div className="flex gap-4">
                 <Button onClick={handleToggle}>
