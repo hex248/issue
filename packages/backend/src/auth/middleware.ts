@@ -1,5 +1,6 @@
 import type { BunRequest } from "bun";
 import { getSession } from "../db/queries";
+import { GLOBAL_RATE_LIMIT, getClientIP, rateLimitResponse, recordRateLimitAttempt } from "./rate-limit";
 import { parseCookies, verifyToken } from "./utils";
 
 export type AuthedRequest<T extends BunRequest = BunRequest> = T & {
@@ -17,6 +18,19 @@ type AuthedRouteHandler<T extends BunRequest = BunRequest> = (
 const extractTokenFromCookie = (req: Request) => {
     const cookies = parseCookies(req.headers.get("Cookie"));
     return cookies.token || null;
+};
+
+export const withRateLimit = <T extends BunRequest>(handler: RouteHandler<T>): RouteHandler<T> => {
+    return async (req: T) => {
+        const ip = getClientIP(req);
+        const key = `global:ip:${ip}`;
+        const attempt = recordRateLimitAttempt(key, GLOBAL_RATE_LIMIT);
+        if (!attempt.allowed) {
+            return rateLimitResponse(attempt.retryAfterMs);
+        }
+
+        return handler(req);
+    };
 };
 
 export const withAuth = <T extends BunRequest>(handler: AuthedRouteHandler<T>): RouteHandler<T> => {
