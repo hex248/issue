@@ -34,7 +34,7 @@ const isValidURL = (url: string) => {
     }
 };
 
-export function ServerConfigurationDialog({ trigger }: { trigger?: ReactNode }) {
+export function ServerConfiguration({ trigger }: { trigger?: ReactNode }) {
     const [open, setOpen] = useState(false);
     const [serverURL, setServerURL] = useState(getServerURL());
     const [originalURL, setOriginalURL] = useState(getServerURL());

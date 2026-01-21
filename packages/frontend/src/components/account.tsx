@@ -15,7 +15,7 @@ import { parseError } from "@/lib/server";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./theme-toggle";
 
-function AccountDialog({ trigger }: { trigger?: ReactNode }) {
+function Account({ trigger }: { trigger?: ReactNode }) {
     const { user: currentUser, setUser } = useAuthenticatedSession();
     const updateUser = useUpdateUser();
 
@@ -175,4 +175,4 @@ function AccountDialog({ trigger }: { trigger?: ReactNode }) {
     );
 }
 
-export default AccountDialog;
+export default Account;

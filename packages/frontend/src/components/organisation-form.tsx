@@ -30,7 +30,7 @@ const slugify = (value: string) =>
         .replace(/^-+/, "")
         .replace(/-{2,}/g, "-");
 
-export function OrganisationModal({
+export function OrganisationForm({
     trigger,
     completeAction,
     errorAction,

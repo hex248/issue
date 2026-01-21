@@ -2,17 +2,17 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import AccountDialog from "@/components/account-dialog";
+import Account from "@/components/account";
+import { IssueForm } from "@/components/issue-form";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
-import { IssueModal } from "@/components/issue-modal";
 import { IssuesTable } from "@/components/issues-table";
 import LogOutButton from "@/components/log-out-button";
 import OrgIcon from "@/components/org-icon";
 import { OrganisationSelect } from "@/components/organisation-select";
-import OrganisationsDialog from "@/components/organisations-dialog";
+import Organisations from "@/components/organisations";
 import { ProjectSelect } from "@/components/project-select";
 import { useSelection } from "@/components/selection-provider";
-import { ServerConfigurationDialog } from "@/components/server-configuration-dialog";
+import { ServerConfiguration } from "@/components/server-configuration";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Button } from "@/components/ui/button";
@@ -199,14 +199,13 @@ export default function App() {
                                     )?.Organisation.slug || ""
                                 }
                                 size={7}
-                                className="hover:border hover:border-foreground/30"
                             />
                         }
                     />
 
                     {selectedOrganisationId && <ProjectSelect showLabel />}
                     {selectedOrganisationId && selectedProjectId && (
-                        <IssueModal
+                        <IssueForm
                             trigger={
                                 <IconButton variant={"outline"} className="w-9 h-9" title="Create Issue">
                                     <Icon icon="plus" />
@@ -222,13 +221,13 @@ export default function App() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align={"end"}>
                             <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <AccountDialog />
+                                <Account />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <OrganisationsDialog />
+                                <Organisations />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <ServerConfigurationDialog
+                                <ServerConfiguration
                                     trigger={
                                         <Button
                                             variant="ghost"

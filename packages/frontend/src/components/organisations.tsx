@@ -2,16 +2,16 @@ import { DEFAULT_STATUS_COLOUR, ISSUE_STATUS_MAX_LENGTH, type SprintRecord } fro
 import { useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { AddMemberDialog } from "@/components/add-member-dialog";
-import { OrganisationModal } from "@/components/organisation-modal";
+import { AddMember } from "@/components/add-member";
+import { OrganisationForm } from "@/components/organisation-form";
 import { OrganisationSelect } from "@/components/organisation-select";
-import { ProjectModal } from "@/components/project-modal";
+import { ProjectForm } from "@/components/project-form";
 import { ProjectSelect } from "@/components/project-select";
 import { useSelection } from "@/components/selection-provider";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallSprintDisplay from "@/components/small-sprint-display";
 import SmallUserDisplay from "@/components/small-user-display";
-import { SprintModal } from "@/components/sprint-modal";
+import { SprintForm } from "@/components/sprint-form";
 import StatusTag from "@/components/status-tag";
 import { Button } from "@/components/ui/button";
 import ColourPicker from "@/components/ui/colour-picker";
@@ -45,7 +45,7 @@ import { queryKeys } from "@/lib/query/keys";
 import { issue } from "@/lib/server";
 import { capitalise } from "@/lib/utils";
 
-function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
+function Organisations({ trigger }: { trigger?: ReactNode }) {
     const { user } = useAuthenticatedSession();
     const queryClient = useQueryClient();
     const { selectedOrganisationId, selectedProjectId } = useSelection();
@@ -540,7 +540,7 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
                                     )}
                                 </div>
 
-                                <OrganisationModal
+                                <OrganisationForm
                                     mode="edit"
                                     existingOrganisation={selectedOrganisation.Organisation}
                                     open={editOrgOpen}
@@ -621,7 +621,7 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
                                             ))}
                                         </div>
                                         {isAdmin && (
-                                            <AddMemberDialog
+                                            <AddMember
                                                 organisationId={selectedOrganisation.Organisation.id}
                                                 existingMembers={members.map((m) => m.User.username)}
                                                 onSuccess={(user) => {
@@ -827,7 +827,7 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
                                                             );
                                                         })}
                                                         {isAdmin && (
-                                                            <SprintModal
+                                                            <SprintForm
                                                                 projectId={selectedProject?.Project.id}
                                                                 trigger={
                                                                     <Button variant="outline" size="sm">
@@ -854,7 +854,7 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
 
                                 {selectedProject && (
                                     <>
-                                        <ProjectModal
+                                        <ProjectForm
                                             mode="edit"
                                             existingProject={selectedProject.Project}
                                             open={editProjectOpen}
@@ -863,7 +863,7 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
                                                 await invalidateProjects();
                                             }}
                                         />
-                                        <SprintModal
+                                        <SprintForm
                                             mode="edit"
                                             existingSprint={editingSprint ?? undefined}
                                             sprints={sprints}
@@ -1112,4 +1112,4 @@ function OrganisationsDialog({ trigger }: { trigger?: ReactNode }) {
     );
 }
 
-export default OrganisationsDialog;
+export default Organisations;

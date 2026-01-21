@@ -23,7 +23,7 @@ const keyify = (value: string) =>
         .replace(/[^A-Z0-9]/g, "")
         .slice(0, 4);
 
-export function ProjectModal({
+export function ProjectForm({
     organisationId,
     trigger,
     completeAction,

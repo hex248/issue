@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { OrganisationModal } from "@/components/organisation-modal";
+import { OrganisationForm } from "@/components/organisation-form";
 import { useSelection } from "@/components/selection-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,7 +102,7 @@ export function OrganisationSelect({
                     {organisations.length > 0 && <SelectSeparator />}
                 </SelectGroup>
 
-                <OrganisationModal
+                <OrganisationForm
                     trigger={
                         <Button variant="ghost" className={"w-full"} size={"sm"}>
                             Create Organisation

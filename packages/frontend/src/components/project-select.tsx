@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ProjectModal } from "@/components/project-modal";
+import { ProjectForm } from "@/components/project-form";
 import { useSelection } from "@/components/selection-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,7 +81,7 @@ export function ProjectSelect({
                     ))}
                     {projects.length > 0 && <SelectSeparator />}
                 </SelectGroup>
-                <ProjectModal
+                <ProjectForm
                     organisationId={selectedOrganisationId ?? undefined}
                     trigger={
                         <Button

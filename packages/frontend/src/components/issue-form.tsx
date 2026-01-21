@@ -29,7 +29,7 @@ import {
 import { parseError } from "@/lib/server";
 import { cn, issueID } from "@/lib/utils";
 
-export function IssueModal({ trigger }: { trigger?: React.ReactNode }) {
+export function IssueForm({ trigger }: { trigger?: React.ReactNode }) {
     const { user } = useAuthenticatedSession();
     const selectedOrganisation = useSelectedOrganisation();
     const selectedProject = useSelectedProject();

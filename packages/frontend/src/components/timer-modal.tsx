@@ -10,11 +10,7 @@ export function TimerModal({ issueId, disabled }: { issueId: number; disabled?: 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild disabled={disabled}>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={disabled}
-                >
+                <Button variant="outline" size="sm" disabled={disabled}>
                     <Icon icon="timer" className="size-4" />
                     Timer
                 </Button>

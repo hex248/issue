@@ -14,7 +14,7 @@ import { Field } from "@/components/ui/field";
 import { useAddOrganisationMember } from "@/lib/query/hooks";
 import { parseError, user } from "@/lib/server";
 
-export function AddMemberDialog({
+export function AddMember({
     organisationId,
     existingMembers,
     trigger,

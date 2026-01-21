@@ -48,7 +48,7 @@ const getDefaultDates = () => {
     };
 };
 
-export function SprintModal({
+export function SprintForm({
     projectId,
     sprints,
     trigger,
