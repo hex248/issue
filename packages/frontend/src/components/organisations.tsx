@@ -44,6 +44,7 @@ import {
 import { queryKeys } from "@/lib/query/keys";
 import { issue } from "@/lib/server";
 import { capitalise } from "@/lib/utils";
+import OrgIcon from "./org-icon";
 
 function Organisations({ trigger }: { trigger?: ReactNode }) {
     const { user } = useAuthenticatedSession();
@@ -473,16 +474,28 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
 
                             <TabsContent value="info">
                                 <div className="border p-2 min-w-0 overflow-hidden">
-                                    <h2 className="text-xl font-600 mb-2 break-all">
-                                        {selectedOrganisation.Organisation.name}
-                                    </h2>
+                                    <div className="flex justify-between">
+                                        <div className="flex flex-col gap-0 mb-2">
+                                            {" "}
+                                            <h2 className="text-xl font-600 break-all">
+                                                {selectedOrganisation.Organisation.name}
+                                            </h2>
+                                            <p className="text-sm text-muted-foreground break-all">
+                                                Slug: {selectedOrganisation.Organisation.slug}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground break-all">
+                                                Role: {selectedOrganisation.OrganisationMember.role}
+                                            </p>
+                                        </div>
+                                        <OrgIcon
+                                            name={selectedOrganisation.Organisation.name}
+                                            slug={selectedOrganisation.Organisation.slug}
+                                            size={16}
+                                            textClass="text-2xl"
+                                            className="rounded-lg"
+                                        />
+                                    </div>
                                     <div className="flex flex-col gap-1">
-                                        <p className="text-sm text-muted-foreground break-all">
-                                            Slug: {selectedOrganisation.Organisation.slug}
-                                        </p>
-                                        <p className="text-sm text-muted-foreground break-all">
-                                            Role: {selectedOrganisation.OrganisationMember.role}
-                                        </p>
                                         {selectedOrganisation.Organisation.description ? (
                                             <p className="text-sm break-words">
                                                 {selectedOrganisation.Organisation.description}
