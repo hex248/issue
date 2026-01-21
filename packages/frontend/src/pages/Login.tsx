@@ -11,7 +11,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      const next = searchParams.get("next") || "/app";
+      const next = searchParams.get("next") || "/issues";
       navigate(next, { replace: true });
     }
   }, [user, isLoading, navigate, searchParams]);

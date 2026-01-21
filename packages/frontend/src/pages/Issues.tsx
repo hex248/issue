@@ -10,7 +10,7 @@ import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/compo
 import { BREATHING_ROOM } from "@/lib/layout";
 import { useIssues, useOrganisations, useProjects, useSelectedIssue } from "@/lib/query/hooks";
 
-export default function App() {
+export default function Issues() {
   const {
     selectedOrganisationId,
     selectedProjectId,

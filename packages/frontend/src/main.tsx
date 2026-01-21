@@ -1,13 +1,13 @@
 import "./App.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryProvider } from "@/components/query-provider";
 import { SelectionProvider } from "@/components/selection-provider";
 import { RequireAuth, SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import App from "@/pages/App";
+import Issues from "@/pages/Issues";
 import Font from "@/pages/Font";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
@@ -33,7 +33,15 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                   path="/app"
                   element={
                     <RequireAuth>
-                      <App />
+                      <Navigate to="/issues" replace />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/issues"
+                  element={
+                    <RequireAuth>
+                      <Issues />
                     </RequireAuth>
                   }
                 />

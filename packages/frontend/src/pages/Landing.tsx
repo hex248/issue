@@ -19,7 +19,7 @@ export default function Landing() {
                 <h1 className="text-xl font-basteleur font-400">Welcome back {user.name.split(" ")[0]}!</h1>
               )}
               <Button asChild variant="outline" size="sm">
-                <Link to="/app">Open app</Link>
+                <Link to="/issues">Open app</Link>
               </Button>
             </>
           ) : (
@@ -44,7 +44,7 @@ export default function Landing() {
         <div className="flex flex-col items-center gap-8">
           {!isLoading && user ? (
             <Button asChild size="lg">
-              <Link to="/app">Open app</Link>
+              <Link to="/issues">Open app</Link>
             </Button>
           ) : (
             <Button asChild size="lg">
