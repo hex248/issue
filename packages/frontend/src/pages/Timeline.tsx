@@ -286,9 +286,9 @@ export default function Timeline() {
                           >
                             {sprint.name}
                           </span>
-                        </div>
-                        <div className="text-xs text-muted-foreground tabular-nums">
-                          {getSprintDateRange(sprint)}
+                          <div className="text-[12px] text-muted-foreground tabular-nums">
+                            {getSprintDateRange(sprint)}
+                          </div>
                         </div>
                         {sprintIssues.length === 0 && (
                           <div className="text-xs text-muted-foreground text-pretty">No issues assigned.</div>
@@ -348,7 +348,7 @@ export default function Timeline() {
                               <button
                                 type="button"
                                 aria-label={`Edit sprint ${sprint.name}`}
-                                className="absolute top-1/2 z-0 h-4 rounded cursor-pointer"
+                                className="absolute top-1/2 -translate-y-1/2 z-0 h-4 rounded cursor-pointer"
                                 style={barStyle}
                                 title={`${sprint.name}: ${getSprintDateRange(sprint)}`}
                               />

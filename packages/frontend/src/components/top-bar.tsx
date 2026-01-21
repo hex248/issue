@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Account from "@/components/account";
 import { IssueForm } from "@/components/issue-form";
+import { SprintForm } from "@/components/sprint-form";
 import LogOutButton from "@/components/log-out-button";
 import OrgIcon from "@/components/org-icon";
 import { OrganisationSelect } from "@/components/organisation-select";
@@ -23,12 +24,13 @@ import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BREATHING_ROOM } from "@/lib/layout";
-import { useOrganisations } from "@/lib/query/hooks";
+import { useOrganisations, useSprints } from "@/lib/query/hooks";
 
 export default function TopBar({ showIssueForm = true }: { showIssueForm?: boolean }) {
   const { user } = useAuthenticatedSession();
   const { selectedOrganisationId, selectedProjectId, selectIssue } = useSelection();
   const { data: organisationsData = [] } = useOrganisations();
+  const { data: sprintsData = [] } = useSprints(selectedProjectId);
   const location = useLocation();
   const navigate = useNavigate();
   const activeView = location.pathname.startsWith("/timeline") ? "timeline" : "issues";
@@ -85,7 +87,7 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
             </TabsList>
           </Tabs>
         )}
-        {selectedOrganisationId && selectedProjectId && showIssueForm && (
+        {selectedOrganisationId && selectedProjectId && showIssueForm && activeView === "issues" && (
           <IssueForm
             trigger={
               <IconButton
@@ -93,6 +95,22 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
                 className="w-9 h-9"
                 title="Create Issue"
                 aria-label="Create issue"
+              >
+                <Icon icon="plus" />
+              </IconButton>
+            }
+          />
+        )}
+        {selectedOrganisationId && selectedProjectId && showIssueForm && activeView === "timeline" && (
+          <SprintForm
+            projectId={selectedProjectId}
+            sprints={sprintsData}
+            trigger={
+              <IconButton
+                variant="outline"
+                className="w-9 h-9"
+                title="Create Sprint"
+                aria-label="Create sprint"
               >
                 <Icon icon="plus" />
               </IconButton>
