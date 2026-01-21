@@ -2,36 +2,16 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import Account from "@/components/account";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
-import { IssueForm } from "@/components/issue-form";
 import { IssuesTable } from "@/components/issues-table";
-import LogOutButton from "@/components/log-out-button";
-import OrgIcon from "@/components/org-icon";
-import { OrganisationSelect } from "@/components/organisation-select";
-import Organisations from "@/components/organisations";
-import { ProjectSelect } from "@/components/project-select";
 import { useSelection } from "@/components/selection-provider";
-import { ServerConfiguration } from "@/components/server-configuration";
-import { useAuthenticatedSession } from "@/components/session-provider";
-import SmallUserDisplay from "@/components/small-user-display";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Icon from "@/components/ui/icon";
-import { IconButton } from "@/components/ui/icon-button";
+import TopBar from "@/components/top-bar";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
 import { useIssues, useOrganisations, useProjects, useSelectedIssue } from "@/lib/query/hooks";
 
 const BREATHING_ROOM = 1;
 
 export default function App() {
-    const { user } = useAuthenticatedSession();
     const {
         selectedOrganisationId,
         selectedProjectId,
@@ -181,77 +161,7 @@ export default function App() {
 
     return (
         <main className={`w-full h-screen flex flex-col gap-${BREATHING_ROOM} p-${BREATHING_ROOM}`}>
-            <div className="flex gap-12 items-center justify-between">
-                <div className={`flex gap-${BREATHING_ROOM} items-center`}>
-                    <OrganisationSelect
-                        noDecoration
-                        triggerClassName="px-1 rounded-full hover:bg-transparent dark:hover:bg-transparent"
-                        trigger={
-                            <OrgIcon
-                                name={
-                                    organisations.find(
-                                        (org) => org.Organisation.id === selectedOrganisationId,
-                                    )?.Organisation.name || ""
-                                }
-                                slug={
-                                    organisations.find(
-                                        (org) => org.Organisation.id === selectedOrganisationId,
-                                    )?.Organisation.slug || ""
-                                }
-                                iconURL={
-                                    organisations.find(
-                                        (org) => org.Organisation.id === selectedOrganisationId,
-                                    )?.Organisation.iconURL || undefined
-                                }
-                                size={7}
-                            />
-                        }
-                    />
-
-                    {selectedOrganisationId && <ProjectSelect showLabel />}
-                    {selectedOrganisationId && selectedProjectId && (
-                        <IssueForm
-                            trigger={
-                                <IconButton variant={"outline"} className="w-9 h-9" title="Create Issue">
-                                    <Icon icon="plus" />
-                                </IconButton>
-                            }
-                        />
-                    )}
-                </div>
-                <div className={`flex gap-${BREATHING_ROOM} items-center`}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="text-sm">
-                            <SmallUserDisplay user={user} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align={"end"}>
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <Account />
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <Organisations />
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="flex items-end justify-end">
-                                <ServerConfiguration
-                                    trigger={
-                                        <Button
-                                            variant="ghost"
-                                            className="flex w-full items-center justify-end text-end px-2 py-1 m-0 h-auto"
-                                            title="Server Configuration"
-                                        >
-                                            Server Configuration
-                                        </Button>
-                                    }
-                                />
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="flex items-end justify-end p-0 m-0">
-                                <LogOutButton noStyle className={"flex w-full justify-end"} />
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </div>
+            <TopBar />
 
             {selectedOrganisationId && selectedProjectId && issuesData.length > 0 && (
                 <ResizablePanelGroup className={`flex-1`}>
