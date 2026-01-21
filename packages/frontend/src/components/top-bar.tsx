@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Account from "@/components/account";
 import { IssueForm } from "@/components/issue-form";
 import LogOutButton from "@/components/log-out-button";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BREATHING_ROOM } from "@/lib/layout";
 import { useOrganisations } from "@/lib/query/hooks";
 
@@ -27,6 +29,9 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
   const { user } = useAuthenticatedSession();
   const { selectedOrganisationId, selectedProjectId } = useSelection();
   const { data: organisationsData = [] } = useOrganisations();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeView = location.pathname.startsWith("/timeline") ? "timeline" : "issues";
 
   const selectedOrganisation = useMemo(
     () => organisationsData.find((org) => org.Organisation.id === selectedOrganisationId) ?? null,
@@ -50,6 +55,14 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
         />
 
         {selectedOrganisationId && <ProjectSelect showLabel />}
+        {selectedOrganisationId && (
+          <Tabs value={activeView} onValueChange={(value) => navigate(`/${value}`)}>
+            <TabsList>
+              <TabsTrigger value="issues">Issues</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
         {selectedOrganisationId && selectedProjectId && showIssueForm && (
           <IssueForm
             trigger={
