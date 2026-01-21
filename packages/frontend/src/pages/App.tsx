@@ -7,9 +7,8 @@ import { IssuesTable } from "@/components/issues-table";
 import { useSelection } from "@/components/selection-provider";
 import TopBar from "@/components/top-bar";
 import { ResizablePanel, ResizablePanelGroup, ResizableSeparator } from "@/components/ui/resizable";
+import { BREATHING_ROOM } from "@/lib/layout";
 import { useIssues, useOrganisations, useProjects, useSelectedIssue } from "@/lib/query/hooks";
-
-const BREATHING_ROOM = 1;
 
 export default function App() {
     const {
