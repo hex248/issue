@@ -35,6 +35,10 @@ export const withAuth = <T extends BunRequest>(handler: AuthedRouteHandler<T>): 
                 return new Response("Session expired", { status: 401 });
             }
 
+            if (session.userId !== userId) {
+                return new Response("Invalid session", { status: 401 });
+            }
+
             return handler(
                 Object.assign(req, {
                     userId,

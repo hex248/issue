@@ -1,6 +1,6 @@
 import { ProjectCreateRequestSchema } from "@sprint/shared";
 import type { AuthedRequest } from "../../auth/middleware";
-import { createProject, getProjectByKey, getUserById } from "../../db/queries";
+import { createProject, getOrganisationMemberRole, getProjectByKey, getUserById } from "../../db/queries";
 import { errorResponse, parseJsonBody } from "../../validation";
 
 export default async function projectCreate(req: AuthedRequest) {
@@ -12,6 +12,14 @@ export default async function projectCreate(req: AuthedRequest) {
     const existingProject = await getProjectByKey(key);
     if (existingProject?.organisationId === organisationId) {
         return errorResponse(`project with key ${key} already exists in this organisation`, "KEY_TAKEN", 400);
+    }
+
+    const membership = await getOrganisationMemberRole(organisationId, req.userId);
+    if (!membership) {
+        return errorResponse("not a member of this organisation", "NOT_MEMBER", 403);
+    }
+    if (membership.role !== "owner" && membership.role !== "admin") {
+        return errorResponse("only owners and admins can create projects", "PERMISSION_DENIED", 403);
     }
 
     const creator = await getUserById(req.userId);

@@ -2,8 +2,8 @@ import { integer, json, pgTable, timestamp, uniqueIndex, varchar } from "drizzle
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import {
-    ISSUE_DESCRIPTION_MAX_LENGTH,
     ISSUE_COMMENT_MAX_LENGTH,
+    ISSUE_DESCRIPTION_MAX_LENGTH,
     ISSUE_STATUS_MAX_LENGTH,
     ISSUE_TITLE_MAX_LENGTH,
     ORG_DESCRIPTION_MAX_LENGTH,

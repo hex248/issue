@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Account from "@/components/account";
 import { IssueForm } from "@/components/issue-form";
-import { SprintForm } from "@/components/sprint-form";
 import LogOutButton from "@/components/log-out-button";
 import OrgIcon from "@/components/org-icon";
 import { OrganisationSelect } from "@/components/organisation-select";
@@ -12,6 +11,7 @@ import { useSelection } from "@/components/selection-provider";
 import { ServerConfiguration } from "@/components/server-configuration";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import SmallUserDisplay from "@/components/small-user-display";
+import { SprintForm } from "@/components/sprint-form";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

@@ -190,3 +190,11 @@ export async function getIssueAssigneeCount(issueId: number): Promise<number> {
         .where(eq(IssueAssignee.issueId, issueId));
     return result?.count ?? 0;
 }
+
+export async function isIssueAssignee(issueId: number, userId: number): Promise<boolean> {
+    const [assignee] = await db
+        .select({ id: IssueAssignee.id })
+        .from(IssueAssignee)
+        .where(and(eq(IssueAssignee.issueId, issueId), eq(IssueAssignee.userId, userId)));
+    return Boolean(assignee);
+}

@@ -10,6 +10,10 @@ import {
     createTimedSession,
     getActiveTimedSession,
     getIssueAssigneeCount,
+    getIssueByID,
+    getOrganisationMemberRole,
+    getProjectByID,
+    isIssueAssignee,
 } from "../../db/queries";
 import { parseJsonBody } from "../../validation";
 
@@ -18,6 +22,35 @@ export default async function timerToggle(req: AuthedRequest) {
     if ("error" in parsed) return parsed.error;
 
     const { issueId } = parsed.data;
+
+    const issue = await getIssueByID(issueId);
+    if (!issue) {
+        return Response.json(
+            { error: `issue not found: ${issueId}`, code: "ISSUE_NOT_FOUND" },
+            { status: 404 },
+        );
+    }
+
+    const project = await getProjectByID(issue.projectId);
+    if (!project) {
+        return Response.json({ error: "project not found", code: "PROJECT_NOT_FOUND" }, { status: 404 });
+    }
+
+    const membership = await getOrganisationMemberRole(project.organisationId, req.userId);
+    if (!membership) {
+        return Response.json(
+            { error: "you are not a member of this organisation", code: "NOT_MEMBER" },
+            { status: 403 },
+        );
+    }
+
+    const isAssigned = await isIssueAssignee(issueId, req.userId);
+    if (!isAssigned) {
+        return Response.json(
+            { error: "you must be assigned to this issue", code: "NOT_ASSIGNEE" },
+            { status: 403 },
+        );
+    }
 
     const assigneeCount = await getIssueAssigneeCount(issueId);
     if (assigneeCount > 1) {
