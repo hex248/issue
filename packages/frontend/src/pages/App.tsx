@@ -206,7 +206,15 @@ export default function App() {
                     />
 
                     {selectedOrganisationId && <ProjectSelect showLabel />}
-                    {selectedOrganisationId && selectedProjectId && <IssueModal />}
+                    {selectedOrganisationId && selectedProjectId && (
+                        <IssueModal
+                            trigger={
+                                <IconButton variant={"outline"} className="w-9 h-9" title="Create Issue">
+                                    <Icon icon="plus" />
+                                </IconButton>
+                            }
+                        />
+                    )}
                 </div>
                 <div className={`flex gap-${BREATHING_ROOM} items-center`}>
                     <ThemeToggle />
