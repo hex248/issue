@@ -135,6 +135,7 @@ export const OrgUpdateRequestSchema = z.object({
         .max(ORG_SLUG_MAX_LENGTH)
         .regex(/^[a-z0-9-]+$/)
         .optional(),
+    iconURL: z.string().url().max(512).nullable().optional(),
     statuses: z
         .record(z.string())
         .refine((obj) => Object.keys(obj).length > 0, "Statuses must have at least one entry")

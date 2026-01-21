@@ -6,3 +6,4 @@ export { members } from "@/lib/server/organisation/members";
 export { removeMember } from "@/lib/server/organisation/removeMember";
 export { update } from "@/lib/server/organisation/update";
 export { updateMemberRole } from "@/lib/server/organisation/updateMemberRole";
+export { uploadIcon } from "@/lib/server/organisation/uploadIcon";

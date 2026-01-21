@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AddMember } from "@/components/add-member";
+import OrgIcon from "@/components/org-icon";
 import { OrganisationForm } from "@/components/organisation-form";
 import { OrganisationSelect } from "@/components/organisation-select";
 import { ProjectForm } from "@/components/project-form";
@@ -44,7 +45,6 @@ import {
 import { queryKeys } from "@/lib/query/keys";
 import { issue } from "@/lib/server";
 import { capitalise } from "@/lib/utils";
-import OrgIcon from "./org-icon";
 
 function Organisations({ trigger }: { trigger?: ReactNode }) {
     const { user } = useAuthenticatedSession();
@@ -490,6 +490,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                                         <OrgIcon
                                             name={selectedOrganisation.Organisation.name}
                                             slug={selectedOrganisation.Organisation.slug}
+                                            iconURL={selectedOrganisation.Organisation.iconURL}
                                             size={16}
                                             textClass="text-2xl"
                                             className="rounded-lg"

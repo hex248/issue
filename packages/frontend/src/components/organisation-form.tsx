@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
+import { UploadOrgIcon } from "@/components/upload-org-icon";
 import { useCreateOrganisation, useUpdateOrganisation } from "@/lib/query/hooks";
 import { parseError } from "@/lib/server";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,7 @@ export function OrganisationForm({
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
     const [description, setDescription] = useState("");
+    const [iconURL, setIconURL] = useState<string | null>(null);
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -71,6 +73,7 @@ export function OrganisationForm({
             setName(existingOrganisation.name);
             setSlug(existingOrganisation.slug);
             setDescription(existingOrganisation.description ?? "");
+            setIconURL(existingOrganisation.iconURL ?? null);
             setSlugManuallyEdited(true);
         }
     }, [isEdit, existingOrganisation, open]);
@@ -79,6 +82,7 @@ export function OrganisationForm({
         setName("");
         setSlug("");
         setDescription("");
+        setIconURL(null);
         setSlugManuallyEdited(false);
         setSubmitAttempted(false);
         setSubmitting(false);
@@ -161,6 +165,16 @@ export function OrganisationForm({
 
             <form onSubmit={handleSubmit}>
                 <div className="grid mt-2">
+                    {isEdit && existingOrganisation && (
+                        <UploadOrgIcon
+                            name={name || existingOrganisation.name}
+                            slug={slug || existingOrganisation.slug}
+                            iconURL={iconURL}
+                            organisationId={existingOrganisation.id}
+                            onIconUploaded={setIconURL}
+                            className="mb-4"
+                        />
+                    )}
                     <Field
                         label="Name"
                         value={name}

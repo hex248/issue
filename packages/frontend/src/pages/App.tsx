@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Account from "@/components/account";
-import { IssueForm } from "@/components/issue-form";
 import { IssueDetailPane } from "@/components/issue-detail-pane";
+import { IssueForm } from "@/components/issue-form";
 import { IssuesTable } from "@/components/issues-table";
 import LogOutButton from "@/components/log-out-button";
 import OrgIcon from "@/components/org-icon";
@@ -197,6 +197,11 @@ export default function App() {
                                     organisations.find(
                                         (org) => org.Organisation.id === selectedOrganisationId,
                                     )?.Organisation.slug || ""
+                                }
+                                iconURL={
+                                    organisations.find(
+                                        (org) => org.Organisation.id === selectedOrganisationId,
+                                    )?.Organisation.iconURL || undefined
                                 }
                                 size={7}
                             />

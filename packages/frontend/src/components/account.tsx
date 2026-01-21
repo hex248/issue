@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuthenticatedSession } from "@/components/session-provider";
+import ThemeToggle from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -13,7 +14,6 @@ import { UploadAvatar } from "@/components/upload-avatar";
 import { useUpdateUser } from "@/lib/query/hooks";
 import { parseError } from "@/lib/server";
 import { cn } from "@/lib/utils";
-import ThemeToggle from "./theme-toggle";
 
 function Account({ trigger }: { trigger?: ReactNode }) {
     const { user: currentUser, setUser } = useAuthenticatedSession();
