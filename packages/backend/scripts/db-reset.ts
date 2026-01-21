@@ -26,9 +26,9 @@ async function resetDatabase() {
 
         console.log("all tables dropped");
 
-        // push the schema to recreate tables
-        console.log("recreating schema...");
-        execSync("npx drizzle-kit push --force", {
+        // run migrations to recreate tables
+        console.log("running migrations...");
+        execSync("npx drizzle-kit migrate", {
             stdio: "inherit",
             cwd: `${import.meta.dir}/..`,
         });
