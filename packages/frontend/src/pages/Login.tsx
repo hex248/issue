@@ -5,28 +5,28 @@ import LogInForm from "@/components/login-form";
 import { useSession } from "@/components/session-provider";
 
 export default function Login() {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const { user, isLoading } = useSession();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user, isLoading } = useSession();
 
-    useEffect(() => {
-        if (!isLoading && user) {
-            const next = searchParams.get("next") || "/app";
-            navigate(next, { replace: true });
-        }
-    }, [user, isLoading, navigate, searchParams]);
-
-    if (isLoading) {
-        return <Loading message="Checking authentication" />;
+  useEffect(() => {
+    if (!isLoading && user) {
+      const next = searchParams.get("next") || "/app";
+      navigate(next, { replace: true });
     }
+  }, [user, isLoading, navigate, searchParams]);
 
-    if (user) {
-        return <Loading message="Redirecting" />;
-    }
+  if (isLoading) {
+    return <Loading message="Checking authentication" />;
+  }
 
-    return (
-        <div className="flex flex-col items-center justify-center gap-4 w-full h-[100vh]">
-            <LogInForm />
-        </div>
-    );
+  if (user) {
+    return <Loading message="Redirecting" />;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 w-full h-[100vh]">
+      <LogInForm />
+    </div>
+  );
 }

@@ -1,19 +1,19 @@
 {
-    "root": false,
-    "$schema": "https://biomejs.dev/schemas/latest/schema.json",
-    "formatter": {
-        "enabled": true,
-        "formatWithErrors": false,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineWidth": 110
-    },
-    "css": {
-        "parser": {
-            "tailwindDirectives": true
-        }
-    },
-    "files": {
-        "includes": ["**", "!dist", "!src-tauri/target", "!src-tauri/gen"]
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
+  },
+  "files": {
+    "includes": ["**", "!dist", "!src-tauri/target", "!src-tauri/gen"]
+  }
 }

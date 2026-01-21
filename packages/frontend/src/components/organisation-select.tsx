@@ -4,132 +4,129 @@ import { OrganisationForm } from "@/components/organisation-form";
 import { useSelection } from "@/components/selection-provider";
 import { Button } from "@/components/ui/button";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useOrganisations } from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
 import OrgIcon from "./org-icon";
 
 export function OrganisationSelect({
-    placeholder = "Select Organisation",
-    contentClass,
-    showLabel = false,
-    label = "Organisation",
-    labelPosition = "top",
-    triggerClassName,
-    noDecoration,
-    trigger,
+  placeholder = "Select Organisation",
+  contentClass,
+  showLabel = false,
+  label = "Organisation",
+  labelPosition = "top",
+  triggerClassName,
+  noDecoration,
+  trigger,
 }: {
-    placeholder?: string;
-    contentClass?: string;
-    showLabel?: boolean;
-    label?: string;
-    labelPosition?: "top" | "bottom";
-    triggerClassName?: string;
-    noDecoration?: boolean;
-    trigger?: React.ReactNode;
+  placeholder?: string;
+  contentClass?: string;
+  showLabel?: boolean;
+  label?: string;
+  labelPosition?: "top" | "bottom";
+  triggerClassName?: string;
+  noDecoration?: boolean;
+  trigger?: React.ReactNode;
 }) {
-    const [open, setOpen] = useState(false);
-    const [pendingOrganisationId, setPendingOrganisationId] = useState<number | null>(null);
-    const { data: organisationsData = [] } = useOrganisations();
-    const { selectedOrganisationId, selectOrganisation } = useSelection();
+  const [open, setOpen] = useState(false);
+  const [pendingOrganisationId, setPendingOrganisationId] = useState<number | null>(null);
+  const { data: organisationsData = [] } = useOrganisations();
+  const { selectedOrganisationId, selectOrganisation } = useSelection();
 
-    const organisations = useMemo(
-        () => [...organisationsData].sort((a, b) => a.Organisation.name.localeCompare(b.Organisation.name)),
-        [organisationsData],
-    );
+  const organisations = useMemo(
+    () => [...organisationsData].sort((a, b) => a.Organisation.name.localeCompare(b.Organisation.name)),
+    [organisationsData],
+  );
 
-    const selectedOrganisation = useMemo(
-        () => organisations.find((org) => org.Organisation.id === selectedOrganisationId) ?? null,
-        [organisations, selectedOrganisationId],
-    );
+  const selectedOrganisation = useMemo(
+    () => organisations.find((org) => org.Organisation.id === selectedOrganisationId) ?? null,
+    [organisations, selectedOrganisationId],
+  );
 
-    useEffect(() => {
-        if (!pendingOrganisationId) return;
-        const organisation = organisations.find((org) => org.Organisation.id === pendingOrganisationId);
-        if (organisation) {
-            selectOrganisation(organisation);
-            setPendingOrganisationId(null);
+  useEffect(() => {
+    if (!pendingOrganisationId) return;
+    const organisation = organisations.find((org) => org.Organisation.id === pendingOrganisationId);
+    if (organisation) {
+      selectOrganisation(organisation);
+      setPendingOrganisationId(null);
+    }
+  }, [organisations, pendingOrganisationId, selectOrganisation]);
+
+  return (
+    <Select
+      value={selectedOrganisation ? `${selectedOrganisation.Organisation.id}` : undefined}
+      onValueChange={(value) => {
+        const organisation = organisations.find((o) => o.Organisation.id === Number(value));
+        if (!organisation) {
+          console.error(`NO ORGANISATION FOUND FOR ID: ${value}`);
+          return;
         }
-    }, [organisations, pendingOrganisationId, selectOrganisation]);
+        selectOrganisation(organisation);
+      }}
+      onOpenChange={setOpen}
+    >
+      <SelectTrigger
+        className={cn(
+          "text-sm",
+          noDecoration &&
+            "bg-transparent border-0 px-0 focus:ring-0 hover:bg-transparent px-0 py-0 w-min h-min",
+          triggerClassName,
+        )}
+        isOpen={open}
+        label={showLabel ? label : undefined}
+        hasValue={!!selectedOrganisation}
+        labelPosition={labelPosition}
+        chevronClassName={cn(noDecoration && "hidden")}
+      >
+        {trigger ? trigger : <SelectValue placeholder={placeholder} />}
+      </SelectTrigger>
+      <SelectContent side="bottom" position="popper" className={contentClass}>
+        <SelectGroup>
+          <SelectLabel>Organisations</SelectLabel>
+          {organisations.map((organisation) => (
+            <SelectItem key={organisation.Organisation.id} value={`${organisation.Organisation.id}`}>
+              <OrgIcon
+                name={organisation.Organisation.name}
+                slug={organisation.Organisation.slug}
+                iconURL={organisation.Organisation.iconURL}
+                size={6}
+                textClass="text-sm"
+              />
+              {organisation.Organisation.name}
+            </SelectItem>
+          ))}
 
-    return (
-        <Select
-            value={selectedOrganisation ? `${selectedOrganisation.Organisation.id}` : undefined}
-            onValueChange={(value) => {
-                const organisation = organisations.find((o) => o.Organisation.id === Number(value));
-                if (!organisation) {
-                    console.error(`NO ORGANISATION FOUND FOR ID: ${value}`);
-                    return;
-                }
-                selectOrganisation(organisation);
-            }}
-            onOpenChange={setOpen}
-        >
-            <SelectTrigger
-                className={cn(
-                    "text-sm",
-                    noDecoration &&
-                        "bg-transparent border-0 px-0 focus:ring-0 hover:bg-transparent px-0 py-0 w-min h-min",
-                    triggerClassName,
-                )}
-                isOpen={open}
-                label={showLabel ? label : undefined}
-                hasValue={!!selectedOrganisation}
-                labelPosition={labelPosition}
-                chevronClassName={cn(noDecoration && "hidden")}
-            >
-                {trigger ? trigger : <SelectValue placeholder={placeholder} />}
-            </SelectTrigger>
-            <SelectContent side="bottom" position="popper" className={contentClass}>
-                <SelectGroup>
-                    <SelectLabel>Organisations</SelectLabel>
-                    {organisations.map((organisation) => (
-                        <SelectItem
-                            key={organisation.Organisation.id}
-                            value={`${organisation.Organisation.id}`}
-                        >
-                            <OrgIcon
-                                name={organisation.Organisation.name}
-                                slug={organisation.Organisation.slug}
-                                iconURL={organisation.Organisation.iconURL}
-                                size={6}
-                                textClass="text-sm"
-                            />
-                            {organisation.Organisation.name}
-                        </SelectItem>
-                    ))}
+          {organisations.length > 0 && <SelectSeparator />}
+        </SelectGroup>
 
-                    {organisations.length > 0 && <SelectSeparator />}
-                </SelectGroup>
-
-                <OrganisationForm
-                    trigger={
-                        <Button variant="ghost" className={"w-full"} size={"sm"}>
-                            Create Organisation
-                        </Button>
-                    }
-                    completeAction={async (org) => {
-                        try {
-                            setPendingOrganisationId(org.id);
-                        } catch (err) {
-                            console.error(err);
-                        }
-                    }}
-                    errorAction={async (errorMessage) => {
-                        toast.error(`Error creating organisation: ${errorMessage}`, {
-                            dismissible: false,
-                        });
-                    }}
-                />
-            </SelectContent>
-        </Select>
-    );
+        <OrganisationForm
+          trigger={
+            <Button variant="ghost" className={"w-full"} size={"sm"}>
+              Create Organisation
+            </Button>
+          }
+          completeAction={async (org) => {
+            try {
+              setPendingOrganisationId(org.id);
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+          errorAction={async (errorMessage) => {
+            toast.error(`Error creating organisation: ${errorMessage}`, {
+              dismissible: false,
+            });
+          }}
+        />
+      </SelectContent>
+    </Select>
+  );
 }

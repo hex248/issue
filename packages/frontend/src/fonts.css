@@ -1,65 +1,65 @@
 @font-face {
-    font-family: "Commit Mono";
-    src: url("/fonts/CommitMono-Variable.woff2") format("woff2");
-    font-weight: 200 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Commit Mono";
+  src: url("/fonts/CommitMono-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "Commit Mono";
-    src: url("/fonts/CommitMono-Variable.woff2") format("woff2");
-    font-weight: 200 700;
-    font-style: italic;
-    font-display: swap;
+  font-family: "Commit Mono";
+  src: url("/fonts/CommitMono-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "Basteleur";
-    src:
-        url("/fonts/Basteleur-Bold.woff2") format("woff2"),
-        url("/fonts/Basteleur-Bold.woff") format("woff");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Basteleur";
+  src:
+    url("/fonts/Basteleur-Bold.woff2") format("woff2"),
+    url("/fonts/Basteleur-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "Basteleur";
-    src:
-        url("/fonts/Basteleur-Moonlight.woff2") format("woff2"),
-        url("/fonts/Basteleur-Moonlight.woff") format("woff");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Basteleur";
+  src:
+    url("/fonts/Basteleur-Moonlight.woff2") format("woff2"),
+    url("/fonts/Basteleur-Moonlight.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "Sorts Mill Goudy";
-    src: url("/fonts/SortsMillGoudy-Regular.woff") format("woff");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Sorts Mill Goudy";
+  src: url("/fonts/SortsMillGoudy-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "Sorts Mill Goudy";
-    src: url("/fonts/SortsMillGoudy-Italic.woff") format("woff");
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
+  font-family: "Sorts Mill Goudy";
+  src: url("/fonts/SortsMillGoudy-Italic.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 .font-mono {
-    font-family: "Commit Mono", monospace;
+  font-family: "Commit Mono", monospace;
 }
 
 .font-basteleur {
-    font-family: "Basteleur", serif;
-    line-height: 1;
-    transform: translateY(0.1em);
+  font-family: "Basteleur", serif;
+  line-height: 1;
+  transform: translateY(0.1em);
 }
 
 .font-goudy {
-    font-family: "Sorts Mill Goudy", serif;
+  font-family: "Sorts Mill Goudy", serif;
 }

@@ -16,163 +16,160 @@ import { parseError } from "@/lib/server";
 import { cn } from "@/lib/utils";
 
 function Account({ trigger }: { trigger?: ReactNode }) {
-    const { user: currentUser, setUser } = useAuthenticatedSession();
-    const updateUser = useUpdateUser();
+  const { user: currentUser, setUser } = useAuthenticatedSession();
+  const updateUser = useUpdateUser();
 
-    const [open, setOpen] = useState(false);
-    const [name, setName] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [avatarURL, setAvatarUrl] = useState<string | null>(null);
-    const [iconPreference, setIconPreference] = useState<IconStyle>("lucide");
-    const [error, setError] = useState("");
-    const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [avatarURL, setAvatarUrl] = useState<string | null>(null);
+  const [iconPreference, setIconPreference] = useState<IconStyle>("lucide");
+  const [error, setError] = useState("");
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
-    useEffect(() => {
-        if (!open) return;
+  useEffect(() => {
+    if (!open) return;
 
-        setName(currentUser.name);
-        setUsername(currentUser.username);
-        setAvatarUrl(currentUser.avatarURL || null);
-        setIconPreference((currentUser.iconPreference as IconStyle) ?? "lucide");
+    setName(currentUser.name);
+    setUsername(currentUser.username);
+    setAvatarUrl(currentUser.avatarURL || null);
+    setIconPreference((currentUser.iconPreference as IconStyle) ?? "lucide");
 
-        setPassword("");
-        setError("");
-        setSubmitAttempted(false);
-    }, [open, currentUser]);
+    setPassword("");
+    setError("");
+    setSubmitAttempted(false);
+  }, [open, currentUser]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitAttempted(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitAttempted(true);
 
-        if (name.trim() === "") {
-            return;
-        }
+    if (name.trim() === "") {
+      return;
+    }
 
-        try {
-            const data = await updateUser.mutateAsync({
-                name: name.trim(),
-                password: password.trim() || undefined,
-                avatarURL,
-                iconPreference,
-            });
-            setError("");
-            setUser(data);
-            setPassword("");
-            setOpen(false);
+    try {
+      const data = await updateUser.mutateAsync({
+        name: name.trim(),
+        password: password.trim() || undefined,
+        avatarURL,
+        iconPreference,
+      });
+      setError("");
+      setUser(data);
+      setPassword("");
+      setOpen(false);
 
-            toast.success("Account updated successfully", {
-                dismissible: false,
-            });
-        } catch (err) {
-            const message = parseError(err as Error);
-            setError(message);
+      toast.success("Account updated successfully", {
+        dismissible: false,
+      });
+    } catch (err) {
+      const message = parseError(err as Error);
+      setError(message);
 
-            toast.error(`Error updating account: ${message}`, {
-                dismissible: false,
-            });
-        }
-    };
+      toast.error(`Error updating account: ${message}`, {
+        dismissible: false,
+      });
+    }
+  };
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
-                    <Button variant="ghost" className="flex w-full justify-end px-2 py-1 m-0 h-auto">
-                        My Account
-                    </Button>
-                )}
-            </DialogTrigger>
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="ghost" className="flex w-full justify-end px-2 py-1 m-0 h-auto">
+            My Account
+          </Button>
+        )}
+      </DialogTrigger>
 
-            <DialogContent className={cn("sm:max-w-sm", error !== "" && "border border-destructive")}>
-                <DialogHeader>
-                    <DialogTitle>Account</DialogTitle>
-                </DialogHeader>
+      <DialogContent className={cn("sm:max-w-sm", error !== "" && "border border-destructive")}>
+        <DialogHeader>
+          <DialogTitle>Account</DialogTitle>
+        </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-                    <UploadAvatar
-                        name={name}
-                        username={username}
-                        avatarURL={avatarURL}
-                        onAvatarUploaded={setAvatarUrl}
-                    />
-                    {avatarURL && (
-                        <Button
-                            variant={"dummy"}
-                            type={"button"}
-                            onClick={() => {
-                                setAvatarUrl(null);
-                            }}
-                            className="-mt-2 hover:text-personality"
-                        >
-                            Remove Avatar
-                        </Button>
-                    )}
-                    <Field
-                        label="Full Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        validate={(v) => (v.trim() === "" ? "Cannot be empty" : undefined)}
-                        submitAttempted={submitAttempted}
-                    />
-                    <Field
-                        label="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Leave empty to keep current password"
-                        hidden={true}
-                    />
-                    <Label className="text-lg -mt-2">Preferences</Label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <UploadAvatar
+            name={name}
+            username={username}
+            avatarURL={avatarURL}
+            onAvatarUploaded={setAvatarUrl}
+          />
+          {avatarURL && (
+            <Button
+              variant={"dummy"}
+              type={"button"}
+              onClick={() => {
+                setAvatarUrl(null);
+              }}
+              className="-mt-2 hover:text-personality"
+            >
+              Remove Avatar
+            </Button>
+          )}
+          <Field
+            label="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            validate={(v) => (v.trim() === "" ? "Cannot be empty" : undefined)}
+            submitAttempted={submitAttempted}
+          />
+          <Field
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Leave empty to keep current password"
+            hidden={true}
+          />
+          <Label className="text-lg -mt-2">Preferences</Label>
 
-                    <div className="flex gap-8 justify w-full">
-                        <div className="flex flex-col items-start gap-1">
-                            <Label className="text-sm">Light/Dark Mode</Label>
-                            <ThemeToggle withText />
-                        </div>
-                        <div className="flex flex-col items-start gap-1">
-                            <Label className="text-sm">Icon Style</Label>
-                            <Select
-                                value={iconPreference}
-                                onValueChange={(v) => setIconPreference(v as IconStyle)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent position="popper" side="bottom" align="start">
-                                    <SelectItem value="lucide">
-                                        <div className="flex items-center gap-2">
-                                            <Icon icon="sun" iconStyle="lucide" size={16} />
-                                            Lucide
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="pixel">
-                                        <div className="flex items-center gap-2">
-                                            <Icon icon="sun" iconStyle="pixel" size={16} />
-                                            Pixel
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="phosphor">
-                                        <div className="flex items-center gap-2">
-                                            <Icon icon="sun" iconStyle="phosphor" size={16} />
-                                            Phosphor
-                                        </div>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+          <div className="flex gap-8 justify w-full">
+            <div className="flex flex-col items-start gap-1">
+              <Label className="text-sm">Light/Dark Mode</Label>
+              <ThemeToggle withText />
+            </div>
+            <div className="flex flex-col items-start gap-1">
+              <Label className="text-sm">Icon Style</Label>
+              <Select value={iconPreference} onValueChange={(v) => setIconPreference(v as IconStyle)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" align="start">
+                  <SelectItem value="lucide">
+                    <div className="flex items-center gap-2">
+                      <Icon icon="sun" iconStyle="lucide" size={16} />
+                      Lucide
                     </div>
-
-                    {error !== "" && <Label className="text-destructive text-sm">{error}</Label>}
-
-                    <div className="flex justify-end mt-4">
-                        <Button variant={"outline"} type={"submit"} className="px-12">
-                            Save
-                        </Button>
+                  </SelectItem>
+                  <SelectItem value="pixel">
+                    <div className="flex items-center gap-2">
+                      <Icon icon="sun" iconStyle="pixel" size={16} />
+                      Pixel
                     </div>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
+                  </SelectItem>
+                  <SelectItem value="phosphor">
+                    <div className="flex items-center gap-2">
+                      <Icon icon="sun" iconStyle="phosphor" size={16} />
+                      Phosphor
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {error !== "" && <Label className="text-destructive text-sm">{error}</Label>}
+
+          <div className="flex justify-end mt-4">
+            <Button variant={"outline"} type={"submit"} className="px-12">
+              Save
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default Account;
