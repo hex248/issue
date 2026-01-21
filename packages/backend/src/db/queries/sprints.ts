@@ -48,7 +48,6 @@ export async function hasOverlappingSprints(
     ];
 
     if (excludeSprintId !== undefined) {
-        console.log("Excluding sprint ID:", excludeSprintId);
         conditions.push(ne(Sprint.id, excludeSprintId));
     }
 
@@ -58,7 +57,6 @@ export async function hasOverlappingSprints(
         .where(and(...conditions))
         .limit(1);
 
-    console.log(overlapping);
     return overlapping.length > 0;
 }
 
