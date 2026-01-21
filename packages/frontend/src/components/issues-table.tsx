@@ -41,7 +41,7 @@ export function IssuesTable({
     return (
         <Table className={cn("table-fixed", className)}>
             <TableHeader>
-                <TableRow hoverEffect={false}>
+                <TableRow hoverEffect={false} className="bg-muted/20">
                     {(columns.id == null || columns.id === true) && (
                         <TableHead className="text-right w-10 border-r">ID</TableHead>
                     )}
