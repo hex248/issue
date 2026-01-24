@@ -208,7 +208,7 @@ export function SprintForm({
     isEdit && existingSprint ? sprints.filter((s) => s.id !== existingSprint.id) : sprints;
 
   const dialogContent = (
-    <DialogContent className={cn("w-md", (error || dateError) && "border-destructive")}>
+    <DialogContent className={cn("w-sm", (error || dateError) && "border-destructive")}>
       <DialogHeader>
         <DialogTitle>{isEdit ? "Edit Sprint" : "Create Sprint"}</DialogTitle>
       </DialogHeader>

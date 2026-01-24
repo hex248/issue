@@ -65,3 +65,7 @@ export const isLight = (hex: string): boolean => {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > THRESHOLD;
 };
+
+export const unCamelCase = (str: string): string => {
+  return str.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (char) => char.toUpperCase());
+};

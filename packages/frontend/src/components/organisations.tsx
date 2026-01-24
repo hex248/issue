@@ -1,4 +1,9 @@
-import { DEFAULT_STATUS_COLOUR, ISSUE_STATUS_MAX_LENGTH, type SprintRecord } from "@sprint/shared";
+import {
+  DEFAULT_FEATURES,
+  DEFAULT_STATUS_COLOUR,
+  ISSUE_STATUS_MAX_LENGTH,
+  type SprintRecord,
+} from "@sprint/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -44,7 +49,8 @@ import {
 } from "@/lib/query/hooks";
 import { queryKeys } from "@/lib/query/keys";
 import { issue } from "@/lib/server";
-import { capitalise } from "@/lib/utils";
+import { capitalise, unCamelCase } from "@/lib/utils";
+import { Switch } from "./ui/switch";
 
 function Organisations({ trigger }: { trigger?: ReactNode }) {
   const { user } = useAuthenticatedSession();
@@ -440,7 +446,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-md max-w-md">
         <DialogHeader>
           <DialogTitle>Organisations</DialogTitle>
         </DialogHeader>
@@ -457,6 +463,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                   <TabsTrigger value="users">Users</TabsTrigger>
                   <TabsTrigger value="projects">Projects</TabsTrigger>
                   <TabsTrigger value="issues">Issues</TabsTrigger>
+                  <TabsTrigger value="features">Features</TabsTrigger>
                 </TabsList>
               </div>
 
@@ -914,6 +921,37 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                           Create status <Icon icon="plus" className="size-4" />
                         </Button>
                       ))}
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="features">
+                <div className="border p-2 min-w-0 overflow-hidden">
+                  <h2 className="text-xl font-600 mb-2">Features</h2>
+                  <div className="flex flex-col gap-2 w-full">
+                    {Object.keys(DEFAULT_FEATURES).map((feature) => (
+                      <div key={feature}>
+                        {unCamelCase(feature)}:{" "}
+                        <Switch
+                          checked={Boolean(selectedOrganisation?.Organisation.features[feature])}
+                          onCheckedChange={async (checked) => {
+                            if (!selectedOrganisation) return;
+                            const newFeatures = selectedOrganisation.Organisation.features;
+                            newFeatures[feature] = checked;
+
+                            await updateOrganisation.mutateAsync({
+                              id: selectedOrganisation.Organisation.id,
+                              features: newFeatures,
+                            });
+                            toast.success(
+                              `${capitalise(unCamelCase(feature))} ${
+                                checked ? "enabled" : "disabled"
+                              } for ${selectedOrganisation.Organisation.name}`,
+                            );
+                            await invalidateOrganisations();
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </TabsContent>
