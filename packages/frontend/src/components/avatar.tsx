@@ -1,5 +1,6 @@
 import { useSession } from "@/components/session-provider";
 import Icon from "@/components/ui/icon";
+import { useSelectedOrganisation } from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_COLOURS = [
@@ -59,6 +60,7 @@ export default function Avatar({
   className?: string;
 }) {
   // if the username matches the authed user, use their avatarURL and name (avoid stale data)
+  const selectedOrganisation = useSelectedOrganisation();
   const { user } = useSession();
   const avatarURL = !strong && username && user && username === user.username ? user.avatarURL : _avatarURL;
   const name = !strong && username && user && username === user.username ? user.name : _name;
@@ -73,14 +75,15 @@ export default function Avatar({
         "flex items-center justify-center rounded-full",
         "text-white font-medium select-none",
         name && "border",
-        !avatarURL && backgroundClass,
+        (!avatarURL || !selectedOrganisation?.Organisation.features.userAvatars) && backgroundClass,
+
         "transition-colors",
         `w-${size || 6}`,
         `h-${size || 6}`,
         className,
       )}
     >
-      {avatarURL ? (
+      {selectedOrganisation?.Organisation.features.userAvatars && avatarURL ? (
         <img
           src={avatarURL}
           alt="Avatar"

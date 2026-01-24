@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Account from "@/components/account";
 import { IssueForm } from "@/components/issue-form";
@@ -38,6 +38,11 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
     [organisationsData, selectedOrganisationId],
   );
 
+  useEffect(() => {
+    if (selectedOrganisation?.Organisation.features.sprints === false && activeView === "timeline") {
+      navigate("/issues");
+    }
+  }, [selectedOrganisation, activeView, navigate]);
   return (
     <div className="flex gap-12 items-center justify-between">
       <div className={`flex gap-${BREATHING_ROOM} items-center`}>
@@ -55,7 +60,7 @@ export default function TopBar({ showIssueForm = true }: { showIssueForm?: boole
         />
 
         {selectedOrganisationId && <ProjectSelect showLabel />}
-        {selectedOrganisationId && (
+        {selectedOrganisation?.Organisation.features.sprints && selectedOrganisationId && (
           <Tabs
             value={activeView}
             onValueChange={(value) => {

@@ -18,7 +18,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useDeleteIssue, useUpdateIssue } from "@/lib/query/hooks";
+import { useDeleteIssue, useSelectedOrganisation, useUpdateIssue } from "@/lib/query/hooks";
 import { parseError } from "@/lib/server";
 import { cn, issueID } from "@/lib/utils";
 
@@ -51,6 +51,7 @@ export function IssueDetails({
   showHeader?: boolean;
 }) {
   const { user } = useSession();
+  const organisation = useSelectedOrganisation();
   const updateIssue = useUpdateIssue();
   const deleteIssue = useDeleteIssue();
 
@@ -320,21 +321,23 @@ export function IssueDetails({
 
       <div className="flex flex-col w-full p-2 py-2 gap-2 max-h-[75vh] overflow-y-scroll">
         <div className="flex gap-2">
-          <StatusSelect
-            statuses={statuses}
-            value={status}
-            onChange={handleStatusChange}
-            trigger={({ isOpen, value }) => (
-              <SelectTrigger
-                className="group w-auto flex items-center"
-                variant="unstyled"
-                chevronClassName="hidden"
-                isOpen={isOpen}
-              >
-                <StatusTag status={value} colour={statuses[value]} className="hover:opacity-85" />
-              </SelectTrigger>
-            )}
-          />
+          {organisation?.Organisation.features.issueStatus && (
+            <StatusSelect
+              statuses={statuses}
+              value={status}
+              onChange={handleStatusChange}
+              trigger={({ isOpen, value }) => (
+                <SelectTrigger
+                  className="group w-auto flex items-center"
+                  variant="unstyled"
+                  chevronClassName="hidden"
+                  isOpen={isOpen}
+                >
+                  <StatusTag status={value} colour={statuses[value]} className="hover:opacity-85" />
+                </SelectTrigger>
+              )}
+            />
+          )}
           <div className="flex w-full items-center min-w-0">
             <Input
               value={title}
@@ -357,59 +360,67 @@ export function IssueDetails({
             />
           </div>
         </div>
-        {description || isEditingDescription ? (
-          <Textarea
-            ref={descriptionRef}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            onBlur={handleDescriptionSave}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" || (event.ctrlKey && event.key === "Enter")) {
-                setDescription(originalDescription);
-                if (originalDescription === "") {
-                  setIsEditingDescription(false);
+        {organisation?.Organisation.features.description &&
+          (description || isEditingDescription ? (
+            <Textarea
+              ref={descriptionRef}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              onBlur={handleDescriptionSave}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" || (event.ctrlKey && event.key === "Enter")) {
+                  setDescription(originalDescription);
+                  if (originalDescription === "") {
+                    setIsEditingDescription(false);
+                  }
+                  event.currentTarget.blur();
                 }
-                event.currentTarget.blur();
-              }
-            }}
-            placeholder="Add a description..."
-            disabled={isSavingDescription}
-            className="text-sm border-input/50 hover:border-input focus:border-input resize-none !bg-background min-h-fit"
-          />
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground justify-start px-2"
-            onClick={() => {
-              setIsEditingDescription(true);
-              setTimeout(() => descriptionRef.current?.focus(), 0);
-            }}
-          >
-            Add description
-          </Button>
+              }}
+              placeholder="Add a description..."
+              disabled={isSavingDescription}
+              className="text-sm border-input/50 hover:border-input focus:border-input resize-none !bg-background min-h-fit"
+            />
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground justify-start px-2"
+              onClick={() => {
+                setIsEditingDescription(true);
+                setTimeout(() => descriptionRef.current?.focus(), 0);
+              }}
+            >
+              Add description
+            </Button>
+          ))}
+
+        {organisation?.Organisation.features.sprints && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Sprint:</span>
+            <SprintSelect sprints={sprints} value={sprintId} onChange={handleSprintChange} />
+          </div>
         )}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Sprint:</span>
-          <SprintSelect sprints={sprints} value={sprintId} onChange={handleSprintChange} />
-        </div>
 
-        <div className="flex items-start gap-2">
-          <span className="text-sm pt-2">Assignees:</span>
-          <MultiAssigneeSelect
-            users={members}
-            assigneeIds={assigneeIds}
-            onChange={handleAssigneeChange}
-            fallbackUsers={issueData.Assignees}
-          />
-        </div>
+        {organisation?.Organisation.features.issueAssignees && (
+          <div className="flex items-start gap-2">
+            <span className="text-sm pt-2">Assignees:</span>
+            <MultiAssigneeSelect
+              users={members}
+              assigneeIds={assigneeIds}
+              onChange={handleAssigneeChange}
+              fallbackUsers={issueData.Assignees}
+            />
+          </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Created by:</span>
-          <SmallUserDisplay user={issueData.Creator} className={"text-sm"} />
-        </div>
+        {organisation?.Organisation.features.issueCreator && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Created by:</span>
+            <SmallUserDisplay user={issueData.Creator} className={"text-sm"} />
+          </div>
+        )}
 
-        {isAssignee && (
+        {organisation?.Organisation.features.issueTimeTracking && isAssignee && (
           <div className={cn("flex flex-col gap-2", hasMultipleAssignees && "cursor-not-allowed")}>
             <div className="flex items-center gap-2">
               <TimerModal issueId={issueData.Issue.id} disabled={hasMultipleAssignees} />
@@ -423,7 +434,9 @@ export function IssueDetails({
           </div>
         )}
 
-        <IssueComments issueId={issueData.Issue.id} className="pt-2" />
+        {organisation?.Organisation.features.issueComments && (
+          <IssueComments issueId={issueData.Issue.id} className="pt-2" />
+        )}
 
         <ConfirmDialog
           open={deleteOpen}

@@ -90,9 +90,10 @@ export function IssuesTable({
                   onClick={handleLinkClick}
                   className="flex items-center gap-2 min-w-0 w-full h-full px-2 py-1 text-inherit hover:underline decoration-transparent"
                 >
-                  {(columns.status == null || columns.status === true) && (
-                    <StatusTag status={issueData.Issue.status} colour={statuses[issueData.Issue.status]} />
-                  )}
+                  {selectedOrganisation?.Organisation.features.issueStatus &&
+                    (columns.status == null || columns.status === true) && (
+                      <StatusTag status={issueData.Issue.status} colour={statuses[issueData.Issue.status]} />
+                    )}
                   <span className="truncate">{issueData.Issue.title}</span>
                 </a>
               </TableCell>
@@ -115,25 +116,27 @@ export function IssuesTable({
                   onClick={handleLinkClick}
                   className="flex items-center justify-end w-full h-full px-2"
                 >
-                  {issueData.Assignees && issueData.Assignees.length > 0 && (
-                    <div className="flex items-center -space-x-2 pr-1.5">
-                      {issueData.Assignees.slice(0, 3).map((assignee) => (
-                        <Avatar
-                          key={assignee.id}
-                          name={assignee.name}
-                          username={assignee.username}
-                          avatarURL={assignee.avatarURL}
-                          textClass="text-xs"
-                          className="ring-1 ring-background"
-                        />
-                      ))}
-                      {issueData.Assignees.length > 3 && (
-                        <span className="flex items-center justify-center w-6 h-6 text-[10px] font-medium bg-muted text-muted-foreground rounded-full ring-1 ring-background">
-                          +{issueData.Assignees.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {selectedOrganisation?.Organisation.features.issueAssigneesShownInTable &&
+                    issueData.Assignees &&
+                    issueData.Assignees.length > 0 && (
+                      <div className="flex items-center -space-x-2 pr-1.5">
+                        {issueData.Assignees.slice(0, 3).map((assignee) => (
+                          <Avatar
+                            key={assignee.id}
+                            name={assignee.name}
+                            username={assignee.username}
+                            avatarURL={assignee.avatarURL}
+                            textClass="text-xs"
+                            className="ring-1 ring-background"
+                          />
+                        ))}
+                        {issueData.Assignees.length > 3 && (
+                          <span className="flex items-center justify-center w-6 h-6 text-[10px] font-medium bg-muted text-muted-foreground rounded-full ring-1 ring-background">
+                            +{issueData.Assignees.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
                 </a>
               </TableCell>
             )}

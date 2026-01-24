@@ -929,8 +929,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                   <h2 className="text-xl font-600 mb-2">Features</h2>
                   <div className="flex flex-col gap-2 w-full">
                     {Object.keys(DEFAULT_FEATURES).map((feature) => (
-                      <div key={feature}>
-                        {unCamelCase(feature)}:{" "}
+                      <div key={feature} className="flex items-center gap-2 p-1">
                         <Switch
                           checked={Boolean(selectedOrganisation?.Organisation.features[feature])}
                           onCheckedChange={async (checked) => {
@@ -949,7 +948,9 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                             );
                             await invalidateOrganisations();
                           }}
+                          color={"#ff0000"}
                         />
+                        <span className={"text-sm"}>{unCamelCase(feature)}</span>
                       </div>
                     ))}
                   </div>

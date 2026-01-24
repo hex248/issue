@@ -12,12 +12,9 @@
 
 # LOW PRIORITY
 
-- disable self-hosting stuff
-- make closed source
 - dedicated /register route (currently login/register are combined on /login)
 - real logo
 - org settings
-  - disable individual features
   - manage issue types, default is [bug, feature]
     - create, edit, delete
     - assign icons to issue types (ensure each available icon is in EACH icon set)

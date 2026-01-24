@@ -30,14 +30,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
                 {/* authed routes */}
                 <Route
-                  path="/app"
-                  element={
-                    <RequireAuth>
-                      <Navigate to="/issues" replace />
-                    </RequireAuth>
-                  }
-                />
-                <Route
                   path="/issues"
                   element={
                     <RequireAuth>

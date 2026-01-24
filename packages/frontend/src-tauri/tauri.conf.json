@@ -5,7 +5,7 @@
   "identifier": "com.hex248.sprint",
   "build": {
     "beforeDevCommand": "bun run dev",
-    "devUrl": "http://localhost:1420/app",
+    "devUrl": "http://localhost:1420/issues",
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"
   },
@@ -18,7 +18,7 @@
         "minWidth": 640,
         "minHeight": 360,
         "decorations": false,
-        "url": "/app"
+        "url": "/issues"
       }
     ],
     "security": {
