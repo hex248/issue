@@ -5,7 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
-function Calendar({
+export function Calendar({
   className,
   classNames,
   showOutsideDays = true,
@@ -15,11 +15,13 @@ function Calendar({
   components,
   sprints,
   isEnd,
+  currentSprint,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"];
   sprints?: SprintRecord[];
   isEnd?: boolean;
+  currentSprint?: { colour: string; startDate: Date; endDate: Date };
 }) {
   const defaultClassNames = getDefaultClassNames();
 
@@ -112,7 +114,9 @@ function Calendar({
 
           return <Icon icon="chevronDownIcon" className={cn("size-4", className)} {...props} />;
         },
-        DayButton: (props) => <CalendarDayButton {...props} sprints={sprints} isEnd={isEnd} />,
+        DayButton: (props) => (
+          <CalendarDayButton {...props} sprints={sprints} isEnd={isEnd} currentSprint={currentSprint} />
+        ),
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
@@ -129,7 +133,7 @@ function Calendar({
   );
 }
 
-function CalendarDayButton({
+export function CalendarDayButton({
   className,
   day,
   modifiers,
@@ -137,8 +141,13 @@ function CalendarDayButton({
   style,
   disabled,
   isEnd,
+  currentSprint,
   ...props
-}: React.ComponentProps<typeof DayButton> & { sprints?: SprintRecord[]; isEnd?: boolean }) {
+}: React.ComponentProps<typeof DayButton> & {
+  sprints?: SprintRecord[];
+  isEnd?: boolean;
+  currentSprint?: { colour: string; startDate: Date; endDate: Date };
+}) {
   const defaultClassNames = getDefaultClassNames();
 
   const ref = React.useRef<HTMLButtonElement>(null);
@@ -172,11 +181,47 @@ function CalendarDayButton({
         "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal",
         "[&>span]:text-xs [&>span]:opacity-70",
         !sprint?.color && "hover:bg-primary/90 hover:text-foreground",
-        "data-[selected-single=true]:!bg-foreground data-[selected-single=true]:!text-background data-[selected-single=true]:hover:!bg-foreground/90",
+        !currentSprint?.startDate &&
+          "data-[selected-single=true]:!bg-foreground data-[selected-single=true]:!text-background data-[selected-single=true]:hover:!bg-foreground/90",
         "data-[range-start=true]:!bg-foreground data-[range-start=true]:!text-background",
         "data-[range-middle=true]:!bg-foreground data-[range-middle=true]:!text-background",
         "data-[range-end=true]:!bg-foreground data-[range-end=true]:!text-background",
+
         sprint?.color && "border-t border-b !border-(--sprint-color) !bg-(--sprint-color)/5",
+
+        // part of new sprint
+        currentSprint?.startDate &&
+          currentSprint?.endDate &&
+          day.date >= currentSprint?.startDate &&
+          day.date <= currentSprint?.endDate &&
+          "!border-t !border-b !border-(--current-sprint-color) !bg-(--current-sprint-color)/5 hover:!bg-(--current-sprint-color)/50 border-dashed",
+
+        // is start of new sprint
+        currentSprint?.startDate &&
+          day.date.getDate() === currentSprint?.startDate.getDate() &&
+          day.date.getMonth() === currentSprint?.startDate.getMonth() &&
+          "!border-l !border-(--current-sprint-color)",
+
+        // is start of new sprint
+        currentSprint?.endDate &&
+          day.date.getDate() === currentSprint?.endDate.getDate() &&
+          day.date.getMonth() === currentSprint?.endDate.getMonth() &&
+          "!border-r !border-(--current-sprint-color)",
+
+        // is selected
+        "data-[selected-single=true]:!bg-(--current-sprint-color)/75 data-[selected-single=true]:hover:!bg-(--current-sprint-color)/60",
+
+        // is start and after end date (disable)
+        !isEnd &&
+          currentSprint?.endDate &&
+          day.date > currentSprint?.endDate &&
+          "opacity-50 pointer-events-none cursor-not-allowed",
+        // isEnd and before start date (disable)
+        isEnd &&
+          currentSprint?.startDate &&
+          day.date < currentSprint?.startDate &&
+          "opacity-50 pointer-events-none cursor-not-allowed",
+
         defaultClassNames.day,
         className,
       )}
@@ -184,6 +229,7 @@ function CalendarDayButton({
         {
           ...style,
           "--sprint-color": sprint?.color ? sprint.color : null,
+          "--current-sprint-color": currentSprint?.colour ? currentSprint.colour : null,
           borderLeft:
             sprint && day.date.getUTCDate() === new Date(sprint.startDate).getUTCDate()
               ? `1px solid ${sprint?.color}`
@@ -203,5 +249,3 @@ function CalendarDayButton({
     />
   );
 }
-
-export { Calendar, CalendarDayButton };

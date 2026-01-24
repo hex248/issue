@@ -1,19 +1,19 @@
 # HIGH PRIORITY
 
-- BUGS:
-- date picker opens at today's date instead of the selected date
-- january: date picker is above, february: date picker is below (likely due to how many rows worth of sprints are displayed) - -my-1/-m-px on dates that have a sprint
 - FEATURES:
 - issues
   - issue type (options stored on Organisation)
 - filters
-
-# LOW PRIORITY
-
-- setup guide
+- time tracking:
+  - add overlay in the bottom left for active timers if there are any. this should be minimal with the issue key (API-005), the time, and a play/pause + end button
 - pricing page
   - see jira and other competitors
     - explore payment providers (stripe is the only one i know)
+
+# LOW PRIORITY
+
+- disable self-hosting stuff
+- make closed source
 - dedicated /register route (currently login/register are combined on /login)
 - real logo
 - org settings
@@ -26,8 +26,6 @@
   - deadline
   - comments
     - admins are capable of deleting comments from members who are at their permission level or below (not sure if this should apply, or if ANYONE should have control over others' comments - people in an org tend to be trusted to not be trolls)
-- time tracking:
-  - add overlay in the bottom left for active timers if there are any. this should be minimal with the issue key (API-005), the time, and a play/pause + end button
 - user preferences
   - colour scheme
   - "assign to me by default" option for new issues

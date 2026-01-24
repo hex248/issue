@@ -243,6 +243,7 @@ export function SprintForm({
                 <PopoverContent className="w-auto p-0" align="center">
                   <Calendar
                     mode="single"
+                    currentSprint={{ colour, startDate, endDate }}
                     selected={startDate}
                     onSelect={(value) => {
                       if (!value) return;
@@ -250,6 +251,9 @@ export function SprintForm({
                     }}
                     autoFocus
                     sprints={calendarSprints}
+                    showWeekNumber
+                    showOutsideDays={false}
+                    defaultMonth={startDate}
                   />
                 </PopoverContent>
               </Popover>
@@ -266,6 +270,7 @@ export function SprintForm({
                 <PopoverContent className="w-auto p-0" align="center">
                   <Calendar
                     mode="single"
+                    currentSprint={{ colour, startDate, endDate }}
                     selected={endDate}
                     onSelect={(value) => {
                       if (!value) return;
@@ -274,6 +279,9 @@ export function SprintForm({
                     autoFocus
                     sprints={calendarSprints}
                     isEnd
+                    showWeekNumber
+                    showOutsideDays={false}
+                    defaultMonth={endDate}
                   />
                 </PopoverContent>
               </Popover>
