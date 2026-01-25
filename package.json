@@ -12,6 +12,7 @@
         "dev:backend": "bun --filter @sprint/backend dev",
         "dev": "concurrently -n FRONTEND,BACKEND -c blue,green \"bun dev:frontend\" \"bun dev:backend\"",
         "dev:desktop": "concurrently -n TAURI,BACKEND -c magenta,green \"bun dev:frontend:tauri\" \"bun dev:backend\"",
+        "build": "bun --filter @sprint/frontend build",
         "reset-and-seed": "bun --filter @sprint/backend db:reset && bun --filter @sprint/backend db:seed"
     },
     "workspaces": [
