@@ -2,6 +2,7 @@ import authLogin from "./auth/login";
 import authLogout from "./auth/logout";
 import authMe from "./auth/me";
 import authRegister from "./auth/register";
+import issueById from "./issue/by-id";
 import issueCreate from "./issue/create";
 import issueDelete from "./issue/delete";
 import issueUpdate from "./issue/update";
@@ -56,6 +57,7 @@ export const routes = {
     userUploadAvatar,
 
     issueCreate,
+    issueById,
     issueDelete,
     issueUpdate,
 

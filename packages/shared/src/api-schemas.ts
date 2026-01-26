@@ -101,6 +101,12 @@ export const IssuesByProjectQuerySchema = z.object({
 
 export type IssuesByProjectQuery = z.infer<typeof IssuesByProjectQuerySchema>;
 
+export const IssueByIdQuerySchema = z.object({
+    issueId: z.coerce.number().int().positive("issueId must be a positive integer"),
+});
+
+export type IssueByIdQuery = z.infer<typeof IssueByIdQuerySchema>;
+
 export const IssuesStatusCountQuerySchema = z.object({
     organisationId: z.coerce.number().int().positive("organisationId must be a positive integer"),
     status: z.string().min(1, "Status is required").max(ISSUE_STATUS_MAX_LENGTH),
@@ -511,6 +517,24 @@ export const TimerStateSchema = z
     .nullable();
 
 export type TimerStateType = z.infer<typeof TimerStateSchema>;
+
+export const TimerListItemSchema = z.object({
+    id: z.number(),
+    issueId: z.number(),
+    issueNumber: z.number(),
+    projectKey: z.string(),
+    workTimeMs: z.number(),
+    breakTimeMs: z.number(),
+    isRunning: z.boolean(),
+    timestamps: z.array(z.string()),
+    endedAt: z.string().nullable(),
+});
+
+export type TimerListItem = z.infer<typeof TimerListItemSchema>;
+
+export const TimerListResponseSchema = z.array(TimerListItemSchema);
+
+export type TimerListResponse = z.infer<typeof TimerListResponseSchema>;
 
 export const StatusCountResponseSchema = z.array(
     z.object({

@@ -43,6 +43,7 @@ const main = async () => {
             "/user/upload-avatar": withGlobal(withAuth(withCSRF(routes.userUploadAvatar))),
 
             "/issue/create": withGlobal(withAuth(withCSRF(routes.issueCreate))),
+            "/issue/by-id": withGlobal(withAuth(routes.issueById)),
             "/issue/update": withGlobal(withAuth(withCSRF(routes.issueUpdate))),
             "/issue/delete": withGlobal(withAuth(withCSRF(routes.issueDelete))),
             "/issue-comment/create": withGlobal(withAuth(withCSRF(routes.issueCommentCreate))),

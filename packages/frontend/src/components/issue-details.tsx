@@ -9,8 +9,8 @@ import SmallUserDisplay from "@/components/small-user-display";
 import { SprintSelect } from "@/components/sprint-select";
 import { StatusSelect } from "@/components/status-select";
 import StatusTag from "@/components/status-tag";
-import { TimerDisplay } from "@/components/timer-display";
-import { TimerModal } from "@/components/timer-modal";
+import { TimerControls } from "@/components/timer-controls";
+import { getWorkTimeMs } from "@/components/timer-display";
 import { TypeSelect } from "@/components/type-select";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -19,7 +19,13 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useDeleteIssue, useSelectedOrganisation, useUpdateIssue } from "@/lib/query/hooks";
+import {
+  useDeleteIssue,
+  useInactiveTimers,
+  useSelectedOrganisation,
+  useTimerState,
+  useUpdateIssue,
+} from "@/lib/query/hooks";
 import { parseError } from "@/lib/server";
 import { cn, issueID } from "@/lib/utils";
 
@@ -55,6 +61,9 @@ export function IssueDetails({
   const organisation = useSelectedOrganisation();
   const updateIssue = useUpdateIssue();
   const deleteIssue = useDeleteIssue();
+  const { data: timerState } = useTimerState(issueData.Issue.id, { refetchInterval: 10000 });
+  const { data: inactiveTimers = [] } = useInactiveTimers(issueData.Issue.id, { refetchInterval: 10000 });
+  const [timerTick, setTimerTick] = useState(0);
 
   const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
   const [sprintId, setSprintId] = useState<string>("unassigned");
@@ -96,12 +105,31 @@ export function IssueDetails({
   }, [issueData]);
 
   useEffect(() => {
+    if (!timerState?.isRunning) return;
+
+    const interval = window.setInterval(() => {
+      setTimerTick((value) => value + 1);
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [timerState?.isRunning]);
+
+  useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) {
         window.clearTimeout(copyTimeoutRef.current);
       }
     };
   }, []);
+
+  void timerTick;
+
+  const inactiveWorkTimeMs = inactiveTimers.reduce(
+    (total, session) => total + getWorkTimeMs(session?.timestamps),
+    0,
+  );
+  const currentWorkTimeMs = getWorkTimeMs(timerState?.timestamps);
+  const totalWorkTimeMs = inactiveWorkTimeMs + currentWorkTimeMs;
 
   const handleSprintChange = async (value: string) => {
     setSprintId(value);
@@ -486,10 +514,17 @@ export function IssueDetails({
 
         {organisation?.Organisation.features.issueTimeTracking && isAssignee && (
           <div className={cn("flex flex-col gap-2", hasMultipleAssignees && "cursor-not-allowed")}>
-            <div className="flex items-center gap-2">
-              <TimerModal issueId={issueData.Issue.id} disabled={hasMultipleAssignees} />
-              <TimerDisplay issueId={issueData.Issue.id} />
-            </div>
+            <TimerControls
+              issueId={issueData.Issue.id}
+              // biome-ignore lint/complexity/noUselessFragments: <needed to represent absence>
+              issueKey={<></>}
+              timestamps={timerState?.timestamps}
+              isRunning={timerState?.isRunning}
+              totalTimeMs={totalWorkTimeMs}
+              disabled={hasMultipleAssignees}
+              size="sm"
+              className="self-start w-fit border bg-background/95 pl-0 pr-1 py-1"
+            />
             {hasMultipleAssignees && (
               <span className="text-xs text-destructive/85 font-600">
                 Timers cannot be used on issues with multiple assignees

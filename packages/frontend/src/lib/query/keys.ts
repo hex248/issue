@@ -13,6 +13,7 @@ export const queryKeys = {
   issues: {
     all: ["issues"] as const,
     byProject: (projectId: number) => [...queryKeys.issues.all, "by-project", projectId] as const,
+    byId: (issueId: number) => [...queryKeys.issues.all, "by-id", issueId] as const,
     statusCount: (organisationId: number, status: string) =>
       [...queryKeys.issues.all, "status-count", organisationId, status] as const,
     typeCount: (organisationId: number, type: string) =>
@@ -30,7 +31,7 @@ export const queryKeys = {
     all: ["timers"] as const,
     active: (issueId: number) => [...queryKeys.timers.all, "active", issueId] as const,
     inactive: (issueId: number) => [...queryKeys.timers.all, "inactive", issueId] as const,
-    list: (issueId: number) => [...queryKeys.timers.all, "list", issueId] as const,
+    list: () => [...queryKeys.timers.all, "list"] as const,
   },
   users: {
     all: ["users"] as const,

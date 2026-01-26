@@ -97,6 +97,35 @@ export async function getIssueByID(id: number) {
     return issue;
 }
 
+export async function getIssueWithUsersById(issueId: number): Promise<IssueResponse | null> {
+    const Creator = aliasedTable(User, "Creator");
+
+    const [issueWithCreator] = await db
+        .select({
+            Issue: Issue,
+            Creator: Creator,
+        })
+        .from(Issue)
+        .where(eq(Issue.id, issueId))
+        .innerJoin(Creator, eq(Issue.creatorId, Creator.id));
+
+    if (!issueWithCreator) return null;
+
+    const assigneesData = await db
+        .select({
+            User: User,
+        })
+        .from(IssueAssignee)
+        .innerJoin(User, eq(IssueAssignee.userId, User.id))
+        .where(eq(IssueAssignee.issueId, issueId));
+
+    return {
+        Issue: issueWithCreator.Issue,
+        Creator: issueWithCreator.Creator,
+        Assignees: assigneesData.map((row) => row.User),
+    };
+}
+
 export async function getIssueByNumber(projectId: number, number: number) {
     const [issue] = await db
         .select()

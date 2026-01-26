@@ -1,3 +1,4 @@
+export { byId } from "@/lib/server/issue/byId";
 export { byProject } from "@/lib/server/issue/byProject";
 export { create } from "@/lib/server/issue/create";
 export { remove as delete } from "@/lib/server/issue/delete";

@@ -1,4 +1,4 @@
-import { TimedSession } from "@sprint/shared";
+import { Issue, Project, TimedSession } from "@sprint/shared";
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import { db } from "../client";
 
@@ -77,6 +77,26 @@ export async function getUserTimedSessions(userId: number, limit = 50, offset = 
         .orderBy(desc(TimedSession.createdAt))
         .limit(limit)
         .offset(offset);
+    return timedSessions;
+}
+
+export async function getActiveTimedSessionsWithIssue(userId: number) {
+    const timedSessions = await db
+        .select({
+            id: TimedSession.id,
+            userId: TimedSession.userId,
+            issueId: TimedSession.issueId,
+            timestamps: TimedSession.timestamps,
+            endedAt: TimedSession.endedAt,
+            createdAt: TimedSession.createdAt,
+            issueNumber: Issue.number,
+            projectKey: Project.key,
+        })
+        .from(TimedSession)
+        .innerJoin(Issue, eq(TimedSession.issueId, Issue.id))
+        .innerJoin(Project, eq(Issue.projectId, Project.id))
+        .where(and(eq(TimedSession.userId, userId), isNull(TimedSession.endedAt)))
+        .orderBy(desc(TimedSession.createdAt));
     return timedSessions;
 }
 

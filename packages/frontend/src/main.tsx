@@ -2,6 +2,7 @@ import "./App.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ActiveTimersOverlay } from "@/components/active-timers-overlay";
 import { QueryProvider } from "@/components/query-provider";
 import { SelectionProvider } from "@/components/selection-provider";
 import { RequireAuth, SessionProvider } from "@/components/session-provider";
@@ -57,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            <ActiveTimersOverlay />
             <Toaster visibleToasts={1} duration={2000} />
           </SelectionProvider>
         </SessionProvider>

@@ -15,6 +15,7 @@ const iconButtonVariants = cva(
         outline: "border bg-transparent dark:hover:bg-muted/40",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+        dummy: "",
       },
       size: {
         default: "w-6 h-6",

@@ -1,4 +1,5 @@
 import type {
+  IssueByIdQuery,
   IssueCreateRequest,
   IssueRecord,
   IssueResponse,
@@ -18,6 +19,14 @@ export function useIssues(projectId?: number | null) {
     queryKey: queryKeys.issues.byProject(projectId ?? 0),
     queryFn: () => issue.byProject(projectId ?? 0),
     enabled: Boolean(projectId),
+  });
+}
+
+export function useIssueById(issueId?: IssueByIdQuery["issueId"] | null) {
+  return useQuery<IssueResponse>({
+    queryKey: queryKeys.issues.byId(issueId ?? 0),
+    queryFn: () => issue.byId(issueId ?? 0),
+    enabled: Boolean(issueId),
   });
 }
 
