@@ -1,4 +1,4 @@
-import { Issue, IssueComment, type IssueCommentResponse, Project, User } from "@sprint/shared";
+import { Issue, IssueComment, type IssueCommentResponseRecord, Project, User } from "@sprint/shared";
 import { asc, eq } from "drizzle-orm";
 import { db } from "../client";
 
@@ -23,7 +23,7 @@ export async function getIssueCommentById(id: number) {
     return comment;
 }
 
-export async function getIssueCommentsByIssueId(issueId: number): Promise<IssueCommentResponse[]> {
+export async function getIssueCommentsByIssueId(issueId: number): Promise<IssueCommentResponseRecord[]> {
     const comments = await db
         .select({
             Comment: IssueComment,

@@ -1,4 +1,4 @@
-import type { SprintRecord, UserRecord } from "@sprint/shared";
+import type { SprintRecord } from "@sprint/shared";
 import { useState } from "react";
 import SmallSprintDisplay from "@/components/small-sprint-display";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,7 +12,6 @@ export function SprintSelect({
   sprints: SprintRecord[];
   value: string;
   onChange: (value: string) => void;
-  fallbackUser?: UserRecord | null;
   placeholder?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);

@@ -2,7 +2,7 @@ import {
   ORG_DESCRIPTION_MAX_LENGTH,
   ORG_NAME_MAX_LENGTH,
   ORG_SLUG_MAX_LENGTH,
-  type OrganisationRecord,
+  type OrganisationRecordType,
 } from "@sprint/shared";
 import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -41,10 +41,10 @@ export function OrganisationForm({
   onOpenChange: controlledOnOpenChange,
 }: {
   trigger?: React.ReactNode;
-  completeAction?: (org: OrganisationRecord) => void | Promise<void>;
+  completeAction?: (org: OrganisationRecordType) => void | Promise<void>;
   errorAction?: (errorMessage: string) => void | Promise<void>;
   mode?: "create" | "edit";
-  existingOrganisation?: OrganisationRecord;
+  existingOrganisation?: OrganisationRecordType;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {

@@ -1,4 +1,4 @@
-import type { UserRecord } from "@sprint/shared";
+import type { UserResponse } from "@sprint/shared";
 import Icon from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { UserSelect } from "@/components/user-select";
@@ -9,10 +9,10 @@ export function MultiAssigneeSelect({
   onChange,
   fallbackUsers = [],
 }: {
-  users: UserRecord[];
+  users: UserResponse[];
   assigneeIds: string[];
   onChange: (assigneeIds: string[]) => void;
-  fallbackUsers?: UserRecord[];
+  fallbackUsers?: UserResponse[];
 }) {
   const handleAssigneeChange = (index: number, value: string) => {
     // if set to "unassigned" and there are other rows, remove this row

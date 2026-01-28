@@ -51,7 +51,7 @@ import {
   useUpdateOrganisationMemberRole,
 } from "@/lib/query/hooks";
 import { queryKeys } from "@/lib/query/keys";
-import { issue } from "@/lib/server";
+import { apiClient } from "@/lib/server";
 import { capitalise, unCamelCase } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 
@@ -370,8 +370,12 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
   const handleRemoveStatusClick = async (status: string) => {
     if (Object.keys(statuses).length <= 1 || !selectedOrganisation) return;
     try {
-      const data = await issue.statusCount(selectedOrganisation.Organisation.id, status);
-      const count = data.find((item) => item.status === status)?.count ?? 0;
+      const { data, error } = await apiClient.issuesStatusCount({
+        query: { organisationId: selectedOrganisation.Organisation.id, status },
+      });
+      if (error) throw new Error(error);
+      const statusCounts = (data ?? []) as { status: string; count: number }[];
+      const count = statusCounts.find((item) => item.status === status)?.count ?? 0;
       if (count > 0) {
         setStatusToRemove(status);
         setIssuesUsingStatus(count);
@@ -546,8 +550,12 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
   const handleRemoveTypeClick = async (typeName: string) => {
     if (Object.keys(issueTypes).length <= 1 || !selectedOrganisation) return;
     try {
-      const data = await issue.typeCount(selectedOrganisation.Organisation.id, typeName);
-      const count = data.count ?? 0;
+      const { data, error } = await apiClient.issuesTypeCount({
+        query: { organisationId: selectedOrganisation.Organisation.id, type: typeName },
+      });
+      if (error) throw new Error(error);
+      const typeCount = (data ?? { count: 0 }) as { count: number };
+      const count = typeCount.count ?? 0;
       if (count > 0) {
         setTypeToRemove(typeName);
         setIssuesUsingType(count);

@@ -12,12 +12,18 @@ import type {
 } from "@sprint/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
-import { issue } from "@/lib/server";
+import { apiClient } from "@/lib/server";
 
 export function useIssues(projectId?: number | null) {
   return useQuery<IssueResponse[]>({
     queryKey: queryKeys.issues.byProject(projectId ?? 0),
-    queryFn: () => issue.byProject(projectId ?? 0),
+    queryFn: async () => {
+      const { data, error } = await apiClient.issuesByProject({
+        query: { projectId: projectId ?? 0 },
+      });
+      if (error) throw new Error(error);
+      return (data ?? []) as IssueResponse[];
+    },
     enabled: Boolean(projectId),
   });
 }
@@ -25,7 +31,14 @@ export function useIssues(projectId?: number | null) {
 export function useIssueById(issueId?: IssueByIdQuery["issueId"] | null) {
   return useQuery<IssueResponse>({
     queryKey: queryKeys.issues.byId(issueId ?? 0),
-    queryFn: () => issue.byId(issueId ?? 0),
+    queryFn: async () => {
+      const { data, error } = await apiClient.issueById({
+        query: { issueId: issueId ?? 0 },
+      });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("issue not found");
+      return data as IssueResponse;
+    },
     enabled: Boolean(issueId),
   });
 }
@@ -33,7 +46,13 @@ export function useIssueById(issueId?: IssueByIdQuery["issueId"] | null) {
 export function useIssueStatusCount(organisationId?: number | null, status?: string | null) {
   return useQuery<StatusCountResponse>({
     queryKey: queryKeys.issues.statusCount(organisationId ?? 0, status ?? ""),
-    queryFn: () => issue.statusCount(organisationId ?? 0, status ?? ""),
+    queryFn: async () => {
+      const { data, error } = await apiClient.issuesStatusCount({
+        query: { organisationId: organisationId ?? 0, status: status ?? "" },
+      });
+      if (error) throw new Error(error);
+      return (data ?? []) as StatusCountResponse;
+    },
     enabled: Boolean(organisationId && status),
   });
 }
@@ -43,7 +62,12 @@ export function useCreateIssue() {
 
   return useMutation<IssueRecord, Error, IssueCreateRequest>({
     mutationKey: ["issues", "create"],
-    mutationFn: issue.create,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.issueCreate({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to create issue");
+      return data as IssueRecord;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.issues.byProject(variables.projectId),
@@ -57,7 +81,12 @@ export function useUpdateIssue() {
 
   return useMutation<IssueRecord, Error, IssueUpdateRequest>({
     mutationKey: ["issues", "update"],
-    mutationFn: issue.update,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.issueUpdate({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to update issue");
+      return data as IssueRecord;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.all });
     },
@@ -69,7 +98,12 @@ export function useDeleteIssue() {
 
   return useMutation<SuccessResponse, Error, number>({
     mutationKey: ["issues", "delete"],
-    mutationFn: issue.delete,
+    mutationFn: async (issueId) => {
+      const { data, error } = await apiClient.issueDelete({ body: { id: issueId } });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to delete issue");
+      return data as SuccessResponse;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.all });
     },
@@ -81,7 +115,11 @@ export function useReplaceIssueStatus() {
 
   return useMutation<unknown, Error, IssuesReplaceStatusRequest>({
     mutationKey: ["issues", "replace-status"],
-    mutationFn: issue.replaceStatus,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.issuesReplaceStatus({ body: input });
+      if (error) throw new Error(error);
+      return data as unknown;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.all });
     },
@@ -91,7 +129,14 @@ export function useReplaceIssueStatus() {
 export function useIssueTypeCount(organisationId?: number | null, type?: string | null) {
   return useQuery<TypeCountResponse>({
     queryKey: queryKeys.issues.typeCount(organisationId ?? 0, type ?? ""),
-    queryFn: () => issue.typeCount(organisationId ?? 0, type ?? ""),
+    queryFn: async () => {
+      const { data, error } = await apiClient.issuesTypeCount({
+        query: { organisationId: organisationId ?? 0, type: type ?? "" },
+      });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to get type count");
+      return data as TypeCountResponse;
+    },
     enabled: Boolean(organisationId && type),
   });
 }
@@ -101,7 +146,11 @@ export function useReplaceIssueType() {
 
   return useMutation<unknown, Error, IssuesReplaceTypeRequest>({
     mutationKey: ["issues", "replace-type"],
-    mutationFn: issue.replaceType,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.issuesReplaceType({ body: input });
+      if (error) throw new Error(error);
+      return data as unknown;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.all });
     },

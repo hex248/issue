@@ -1,8 +1,8 @@
-import type { UserRecord } from "@sprint/shared";
+import type { UserResponse } from "@sprint/shared";
 import Avatar from "@/components/avatar";
 import { cn } from "@/lib/utils";
 
-export default function SmallUserDisplay({ user, className }: { user: UserRecord; className?: string }) {
+export default function SmallUserDisplay({ user, className }: { user: UserResponse; className?: string }) {
   return (
     <div className={cn("flex gap-2 items-center", className)}>
       <Avatar

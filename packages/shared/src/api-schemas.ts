@@ -57,6 +57,7 @@ export const AuthResponseSchema = z.object({
         name: z.string(),
         username: z.string(),
         avatarURL: z.string().nullable(),
+        iconPreference: z.enum(["lucide", "pixel", "phosphor"]),
     }),
     csrfToken: z.string(),
 });
@@ -410,6 +411,7 @@ export const UserResponseSchema = z.object({
     name: z.string(),
     username: z.string(),
     avatarURL: z.string().nullable(),
+    iconPreference: z.enum(["lucide", "pixel", "phosphor"]),
     createdAt: z.string().nullable().optional(),
     updatedAt: z.string().nullable().optional(),
 });
@@ -434,7 +436,7 @@ export const IssueResponseSchema = z.object({
     Assignees: z.array(UserResponseSchema),
 });
 
-export type IssueResponseType = z.infer<typeof IssueResponseSchema>;
+export type IssueResponse = z.infer<typeof IssueResponseSchema>;
 
 export const IssueCommentRecordSchema = z.object({
     id: z.number(),
@@ -450,17 +452,22 @@ export const IssueCommentResponseSchema = z.object({
     User: UserResponseSchema,
 });
 
-export type IssueCommentResponseType = z.infer<typeof IssueCommentResponseSchema>;
+export type IssueCommentResponse = z.infer<typeof IssueCommentResponseSchema>;
 
 export const OrganisationRecordSchema = z.object({
     id: z.number(),
     name: z.string(),
     description: z.string().nullable(),
     slug: z.string(),
+    iconURL: z.string().nullable().optional(),
     statuses: z.record(z.string()),
+    features: z.record(z.boolean()),
+    issueTypes: z.record(z.object({ icon: z.string(), color: z.string() })),
     createdAt: z.string().nullable().optional(),
     updatedAt: z.string().nullable().optional(),
 });
+
+export type OrganisationRecordType = z.infer<typeof OrganisationRecordSchema>;
 
 export const OrganisationMemberRecordSchema = z.object({
     id: z.number(),
@@ -470,12 +477,22 @@ export const OrganisationMemberRecordSchema = z.object({
     createdAt: z.string().nullable().optional(),
 });
 
+export type OrganisationMemberRecordType = z.infer<typeof OrganisationMemberRecordSchema>;
+
 export const OrganisationResponseSchema = z.object({
     Organisation: OrganisationRecordSchema,
     OrganisationMember: OrganisationMemberRecordSchema,
 });
 
-export type OrganisationResponseType = z.infer<typeof OrganisationResponseSchema>;
+export type OrganisationResponse = z.infer<typeof OrganisationResponseSchema>;
+
+export const OrganisationMemberResponseSchema = z.object({
+    OrganisationMember: OrganisationMemberRecordSchema,
+    Organisation: OrganisationRecordSchema,
+    User: UserResponseSchema,
+});
+
+export type OrganisationMemberResponse = z.infer<typeof OrganisationMemberResponseSchema>;
 
 export const ProjectRecordSchema = z.object({
     id: z.number(),
@@ -491,7 +508,14 @@ export const ProjectResponseSchema = z.object({
     User: UserResponseSchema,
 });
 
-export type ProjectResponseType = z.infer<typeof ProjectResponseSchema>;
+export type ProjectResponse = z.infer<typeof ProjectResponseSchema>;
+
+export const ProjectWithCreatorResponseSchema = z.object({
+    Project: ProjectRecordSchema,
+    User: UserResponseSchema,
+});
+
+export type ProjectWithCreatorResponse = z.infer<typeof ProjectWithCreatorResponseSchema>;
 
 export const SprintRecordSchema = z.object({
     id: z.number(),
@@ -503,7 +527,7 @@ export const SprintRecordSchema = z.object({
     createdAt: z.string().nullable().optional(),
 });
 
-export type SprintResponseType = z.infer<typeof SprintRecordSchema>;
+export type SprintResponse = z.infer<typeof SprintRecordSchema>;
 
 export const TimerStateSchema = z
     .object({

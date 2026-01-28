@@ -34,10 +34,8 @@ export function IssueComments({ issueId, className }: { issueId: number; classNa
 
   const sortedComments = useMemo(() => {
     return [...data].sort((a, b) => {
-      const aDate =
-        a.Comment.createdAt instanceof Date ? a.Comment.createdAt : new Date(a.Comment.createdAt ?? 0);
-      const bDate =
-        b.Comment.createdAt instanceof Date ? b.Comment.createdAt : new Date(b.Comment.createdAt ?? 0);
+      const aDate = a.Comment.createdAt ? new Date(a.Comment.createdAt) : new Date(0);
+      const bDate = b.Comment.createdAt ? new Date(b.Comment.createdAt) : new Date(0);
       return aDate.getTime() - bDate.getTime();
     });
   }, [data]);
