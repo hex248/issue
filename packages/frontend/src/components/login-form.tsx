@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 
-import { USER_NAME_MAX_LENGTH, USER_USERNAME_MAX_LENGTH } from "@sprint/shared";
+import { USER_EMAIL_MAX_LENGTH, USER_NAME_MAX_LENGTH, USER_USERNAME_MAX_LENGTH } from "@sprint/shared";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Avatar from "@/components/avatar";
@@ -36,6 +36,7 @@ export default function LogInForm({
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatarURL, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -75,7 +76,7 @@ export default function LogInForm({
   };
 
   const register = () => {
-    if (name.trim() === "" || username.trim() === "" || password.trim() === "") {
+    if (name.trim() === "" || username.trim() === "" || email.trim() === "" || password.trim() === "") {
       return;
     }
 
@@ -85,6 +86,7 @@ export default function LogInForm({
       body: JSON.stringify({
         name,
         username,
+        email,
         password,
         avatarURL,
       }),
@@ -129,6 +131,7 @@ export default function LogInForm({
     setError("");
     setSubmitAttempted(false);
     setAvatarUrl(null);
+    setEmail("");
     requestAnimationFrame(() => focusFirstInput());
   };
 
@@ -248,6 +251,15 @@ export default function LogInForm({
                     submitAttempted={submitAttempted}
                     spellcheck={false}
                     maxLength={USER_NAME_MAX_LENGTH}
+                  />
+                  <Field
+                    label="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    validate={(v) => (v.trim() === "" ? "Cannot be empty" : undefined)}
+                    submitAttempted={submitAttempted}
+                    spellcheck={false}
+                    maxLength={USER_EMAIL_MAX_LENGTH}
                   />
                 </>
               )}

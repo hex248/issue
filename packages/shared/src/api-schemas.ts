@@ -9,6 +9,7 @@ import {
     ORG_NAME_MAX_LENGTH,
     ORG_SLUG_MAX_LENGTH,
     PROJECT_NAME_MAX_LENGTH,
+    USER_EMAIL_MAX_LENGTH,
     USER_NAME_MAX_LENGTH,
     USER_USERNAME_MAX_LENGTH,
 } from "./constants";
@@ -40,6 +41,7 @@ export const RegisterRequestSchema = z.object({
         .min(1, "Username is required")
         .max(USER_USERNAME_MAX_LENGTH)
         .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens"),
+    email: z.string().min(1, "Email is required").email("Invalid email address").max(USER_EMAIL_MAX_LENGTH),
     password: z
         .string()
         .min(8, "Password must be at least 8 characters")

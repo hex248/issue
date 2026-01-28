@@ -39,10 +39,8 @@ async function handler(req: AuthedRequest) {
         const quantity = Math.max(1, totalMembers - 5);
         const priceId = billingPeriod === "annual" ? STRIPE_PRICE_ANNUAL : STRIPE_PRICE_MONTHLY;
 
-        // build customer data - use username as email if no email field exists
-        const customerEmail = user.username.includes("@")
-            ? user.username
-            : `${user.username}@localhost.local`;
+        // use the user's email from the database
+        const customerEmail = user.email;
 
         const session = await stripe.checkout.sessions.create({
             customer_email: customerEmail,

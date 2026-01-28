@@ -5,10 +5,14 @@ import { db } from "../client";
 export async function createUser(
     name: string,
     username: string,
+    email: string,
     passwordHash: string,
     avatarURL?: string | null,
 ) {
-    const [user] = await db.insert(User).values({ name, username, passwordHash, avatarURL }).returning();
+    const [user] = await db
+        .insert(User)
+        .values({ name, username, email, passwordHash, avatarURL })
+        .returning();
     return user;
 }
 
@@ -19,6 +23,11 @@ export async function getUserById(id: number) {
 
 export async function getUserByUsername(username: string) {
     const [user] = await db.select().from(User).where(eq(User.username, username));
+    return user;
+}
+
+export async function getUserByEmail(email: string) {
+    const [user] = await db.select().from(User).where(eq(User.email, email));
     return user;
 }
 
