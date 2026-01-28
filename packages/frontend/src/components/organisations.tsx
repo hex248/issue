@@ -22,6 +22,7 @@ import SmallUserDisplay from "@/components/small-user-display";
 import { SprintForm } from "@/components/sprint-form";
 import StatusTag from "@/components/status-tag";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import ColourPicker from "@/components/ui/colour-picker";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -34,6 +35,7 @@ import {
 import Icon, { type IconName, iconNames } from "@/components/ui/icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -41,6 +43,7 @@ import {
   useDeleteProject,
   useDeleteSprint,
   useOrganisationMembers,
+  useOrganisationMemberTimeTracking,
   useOrganisations,
   useProjects,
   useRemoveOrganisationMember,
@@ -52,7 +55,7 @@ import {
 } from "@/lib/query/hooks";
 import { queryKeys } from "@/lib/query/keys";
 import { apiClient } from "@/lib/server";
-import { capitalise, unCamelCase } from "@/lib/utils";
+import { capitalise, formatDuration, unCamelCase } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 
 function Organisations({ trigger }: { trigger?: ReactNode }) {
@@ -104,6 +107,15 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
   );
   const invalidateSprints = () =>
     queryClient.invalidateQueries({ queryKey: queryKeys.sprints.byProject(selectedProjectId ?? 0) });
+  // time tracking state - must be before membersWithTimeTracking useMemo
+  const [fromDate, setFromDate] = useState<Date>(() => {
+    // default to same day of previous month
+    const now = new Date();
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    return prevMonth;
+  });
+  const { data: timeTrackingData = [] } = useOrganisationMemberTimeTracking(selectedOrganisationId, fromDate);
+
   const members = useMemo(() => {
     const roleOrder: Record<string, number> = { owner: 0, admin: 1, member: 2 };
     return [...membersData].sort((a, b) => {
@@ -113,6 +125,126 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
       return a.User.name.localeCompare(b.User.name);
     });
   }, [membersData]);
+
+  // Calculate total time per member and sort by time (greatest to smallest)
+  const membersWithTimeTracking = useMemo(() => {
+    // Calculate total time per user
+    const timePerUser = new Map<number, number>();
+    for (const session of timeTrackingData) {
+      const current = timePerUser.get(session.userId) ?? 0;
+      timePerUser.set(session.userId, current + (session.workTimeMs ?? 0));
+    }
+
+    // Map members with their total time
+    const membersWithTime = members.map((member) => ({
+      ...member,
+      totalTimeMs: timePerUser.get(member.User.id) ?? 0,
+    }));
+
+    // Sort by total time (greatest to smallest), then by role, then by name
+    const roleOrder: Record<string, number> = { owner: 0, admin: 1, member: 2 };
+    return membersWithTime.sort((a, b) => {
+      // First sort by total time (descending)
+      if (b.totalTimeMs !== a.totalTimeMs) {
+        return b.totalTimeMs - a.totalTimeMs;
+      }
+      // Then by role
+      const roleA = roleOrder[a.OrganisationMember.role] ?? 3;
+      const roleB = roleOrder[b.OrganisationMember.role] ?? 3;
+      if (roleA !== roleB) return roleA - roleB;
+      // Finally by name
+      return a.User.name.localeCompare(b.User.name);
+    });
+  }, [members, timeTrackingData]);
+
+  // Download time tracking data as CSV or JSON
+  const downloadTimeTrackingData = (format: "csv" | "json") => {
+    if (!selectedOrganisation) return;
+
+    // Aggregate data per user
+    const userData = new Map<
+      number,
+      {
+        userId: number;
+        name: string;
+        username: string;
+        totalTimeMs: number;
+        sessions: typeof timeTrackingData;
+      }
+    >();
+
+    for (const member of members) {
+      userData.set(member.User.id, {
+        userId: member.User.id,
+        name: member.User.name,
+        username: member.User.username,
+        totalTimeMs: 0,
+        sessions: [],
+      });
+    }
+
+    for (const session of timeTrackingData) {
+      const user = userData.get(session.userId);
+      if (user) {
+        user.totalTimeMs += session.workTimeMs;
+        user.sessions.push(session);
+      }
+    }
+
+    const data = Array.from(userData.values()).sort((a, b) => b.totalTimeMs - a.totalTimeMs);
+
+    if (format === "csv") {
+      // Generate CSV
+      const headers = ["User ID", "Name", "Username", "Total Time (ms)", "Total Time (formatted)"];
+      const rows = data.map((user) => [
+        user.userId,
+        user.name,
+        user.username,
+        user.totalTimeMs,
+        formatDuration(user.totalTimeMs),
+      ]);
+      const csv = [headers.join(","), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(","))].join(
+        "\n",
+      );
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${selectedOrganisation.Organisation.slug}-time-tracking-${fromDate.toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      // Generate JSON
+      const json = JSON.stringify(
+        {
+          organisation: selectedOrganisation.Organisation.name,
+          fromDate: fromDate.toISOString(),
+          generatedAt: new Date().toISOString(),
+          members: data.map((user) => ({
+            ...user,
+            totalTimeFormatted: formatDuration(user.totalTimeMs),
+          })),
+        },
+        null,
+        2,
+      );
+
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${selectedOrganisation.Organisation.slug}-time-tracking-${fromDate.toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    toast.success(`Downloaded time tracking data as ${format.toUpperCase()}`);
+  };
 
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
@@ -753,12 +885,52 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
 
               <TabsContent value="users">
                 <div className="border p-2 min-w-0 overflow-hidden">
-                  <h2 className="text-xl font-600 mb-2">
-                    {members.length} Member{members.length !== 1 ? "s" : ""}
-                  </h2>
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-xl font-600">
+                      {members.length} Member{members.length !== 1 ? "s" : ""}
+                    </h2>
+                    {isAdmin && (
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Icon icon="calendar" className="size-4 mr-1" />
+                              From: {fromDate.toLocaleDateString()}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="end">
+                            <Calendar
+                              mode="single"
+                              selected={fromDate}
+                              onSelect={(date) => date && setFromDate(date)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Icon icon="download" className="size-4 mr-1" />
+                              Export
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => downloadTimeTrackingData("csv")}>
+                              <Icon icon="fileSpreadsheet" className="size-4 mr-2" />
+                              Download CSV
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => downloadTimeTrackingData("json")}>
+                              <Icon icon="fileJson" className="size-4 mr-2" />
+                              Download JSON
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex flex-col gap-2 w-full">
                     <div className="flex flex-col gap-2 max-h-56 overflow-y-scroll">
-                      {members.map((member) => (
+                      {membersWithTimeTracking.map((member) => (
                         <div
                           key={member.OrganisationMember.id}
                           className="flex items-center justify-between p-2 border"
@@ -770,6 +942,11 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
+                            {isAdmin && (
+                              <span className="text-sm font-mono text-muted-foreground mr-2">
+                                {formatDuration(member.totalTimeMs)}
+                              </span>
+                            )}
                             {isAdmin &&
                               member.OrganisationMember.role !== "owner" &&
                               member.User.id !== user.id && (
