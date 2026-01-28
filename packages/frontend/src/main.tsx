@@ -21,8 +21,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryProvider>
         <SessionProvider>
-          <SelectionProvider>
-            <BrowserRouter>
+          <BrowserRouter>
+            <SelectionProvider>
               <Routes>
                 {/* public routes */}
                 <Route path="/" element={<Landing />} />
@@ -57,10 +57,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-            <ActiveTimersOverlay />
-            <Toaster visibleToasts={1} duration={2000} />
-          </SelectionProvider>
+            </SelectionProvider>
+          </BrowserRouter>
+          <ActiveTimersOverlay />
+          <Toaster visibleToasts={1} duration={2000} />
         </SessionProvider>
       </QueryProvider>
     </ThemeProvider>
