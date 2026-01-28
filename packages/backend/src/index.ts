@@ -68,6 +68,9 @@ const main = async () => {
             "/organisation/upload-icon": withGlobalAuthed(withAuth(withCSRF(routes.organisationUploadIcon))),
             "/organisation/add-member": withGlobalAuthed(withAuth(withCSRF(routes.organisationAddMember))),
             "/organisation/members": withGlobalAuthed(withAuth(routes.organisationMembers)),
+            "/organisation/member-time-tracking": withGlobalAuthed(
+                withAuth(routes.organisationMemberTimeTracking),
+            ),
             "/organisation/remove-member": withGlobalAuthed(
                 withAuth(withCSRF(routes.organisationRemoveMember)),
             ),
@@ -97,6 +100,16 @@ const main = async () => {
             "/timer/get": withGlobalAuthed(withAuth(withCSRF(routes.timerGet))),
             "/timer/get-inactive": withGlobalAuthed(withAuth(withCSRF(routes.timerGetInactive))),
             "/timers": withGlobalAuthed(withAuth(withCSRF(routes.timers))),
+
+            // subscription routes - webhook has no auth
+            "/subscription/create-checkout-session": withGlobalAuthed(
+                withAuth(withCSRF(routes.subscriptionCreateCheckoutSession)),
+            ),
+            "/subscription/create-portal-session": withGlobalAuthed(
+                withAuth(withCSRF(routes.subscriptionCreatePortalSession)),
+            ),
+            "/subscription/get": withGlobalAuthed(withAuth(routes.subscriptionGet)),
+            "/subscription/webhook": withGlobal(routes.subscriptionWebhook),
         },
     });
 

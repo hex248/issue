@@ -29,6 +29,7 @@ import {
     OrgCreateRequestSchema,
     OrgDeleteRequestSchema,
     OrgMembersQuerySchema,
+    OrgMemberTimeTrackingQuerySchema,
     OrgRemoveMemberRequestSchema,
     OrgUpdateMemberRoleRequestSchema,
     OrgUpdateRequestSchema,
@@ -377,6 +378,30 @@ export const apiContract = c.router({
         query: OrgMembersQuerySchema,
         responses: {
             200: z.array(OrganisationMemberResponseSchema),
+        },
+    },
+    organisationMemberTimeTracking: {
+        method: "GET",
+        path: "/organisation/member-time-tracking",
+        query: OrgMemberTimeTrackingQuerySchema,
+        responses: {
+            200: z.array(
+                z.object({
+                    id: z.number(),
+                    userId: z.number(),
+                    issueId: z.number(),
+                    issueNumber: z.number(),
+                    projectKey: z.string(),
+                    timestamps: z.array(z.string()),
+                    endedAt: z.string().nullable(),
+                    createdAt: z.string().nullable(),
+                    workTimeMs: z.number(),
+                    breakTimeMs: z.number(),
+                    isRunning: z.boolean(),
+                }),
+            ),
+            403: ApiErrorSchema,
+            404: ApiErrorSchema,
         },
     },
     organisationRemoveMember: {

@@ -227,6 +227,13 @@ export const OrgMembersQuerySchema = z.object({
 
 export type OrgMembersQuery = z.infer<typeof OrgMembersQuerySchema>;
 
+export const OrgMemberTimeTrackingQuerySchema = z.object({
+    organisationId: z.coerce.number().int().positive("organisationId must be a positive integer"),
+    fromDate: z.coerce.date().optional(),
+});
+
+export type OrgMemberTimeTrackingQuery = z.infer<typeof OrgMemberTimeTrackingQuerySchema>;
+
 export const OrgAddMemberRequestSchema = z.object({
     organisationId: z.number().int().positive("organisationId must be a positive integer"),
     userId: z.number().int().positive("userId must be a positive integer"),
