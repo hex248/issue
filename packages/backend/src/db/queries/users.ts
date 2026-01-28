@@ -29,8 +29,14 @@ export async function updateById(
         passwordHash?: string;
         avatarURL?: string | null;
         iconPreference?: IconStyle;
+        plan?: string;
     },
 ): Promise<UserRecord | undefined> {
+    const [user] = await db.update(User).set(updates).where(eq(User.id, id)).returning();
+    return user;
+}
+
+export async function updateUser(id: number, updates: { plan?: string }) {
     const [user] = await db.update(User).set(updates).where(eq(User.id, id)).returning();
     return user;
 }

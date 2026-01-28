@@ -12,6 +12,8 @@ import Font from "@/pages/Font";
 import Issues from "@/pages/Issues";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
+import Plans from "@/pages/Plans";
+import StripeTest from "@/pages/StripeTest";
 import Test from "@/pages/Test";
 import Timeline from "@/pages/Timeline";
 
@@ -29,6 +31,14 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
                 {/* authed routes */}
                 <Route
+                  path="/plans"
+                  element={
+                    <RequireAuth>
+                      <Plans />
+                    </RequireAuth>
+                  }
+                />
+                <Route
                   path="/issues"
                   element={
                     <RequireAuth>
@@ -41,6 +51,14 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                   element={
                     <RequireAuth>
                       <Test />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/stripe-test"
+                  element={
+                    <RequireAuth>
+                      <StripeTest />
                     </RequireAuth>
                   }
                 />

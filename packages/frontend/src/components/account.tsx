@@ -1,6 +1,7 @@
 import type { IconStyle } from "@sprint/shared";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthenticatedSession } from "@/components/session-provider";
 import ThemeToggle from "@/components/theme-toggle";
@@ -161,7 +162,20 @@ function Account({ trigger }: { trigger?: ReactNode }) {
 
           {error !== "" && <Label className="text-destructive text-sm">{error}</Label>}
 
-          <div className="flex justify-end mt-4">
+          {/* Show subscription management link */}
+          <div className="pt-2">
+            {currentUser.plan === "pro" ? (
+              <Button asChild className="w-fit bg-personality hover:bg-personality/90 font-700">
+                <Link to="/plans">Manage subscription</Link>
+              </Button>
+            ) : (
+              <Button asChild className="w-fit bg-personality hover:bg-personality/90 font-700">
+                <Link to="/plans">Upgrade to Pro</Link>
+              </Button>
+            )}
+          </div>
+
+          <div className="flex justify-end mt-2">
             <Button variant={"outline"} type={"submit"} className="px-12">
               Save
             </Button>
