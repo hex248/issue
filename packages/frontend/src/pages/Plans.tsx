@@ -216,7 +216,7 @@ export default function Plans() {
           </div>
 
           {user && isProUser && (
-            <div className="w-full max-w-4xl mx-auto border rounded-md p-6">
+            <div className="w-full max-w-4xl mx-auto border p-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                   <p className="font-700">Cancel subscription</p>
@@ -264,7 +264,7 @@ export default function Plans() {
           )}
 
           {/* trust signals */}
-          <div className="grid md:grid-cols-3 gap-8 w-full border-t pt-16 pb-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 w-full border-t pt-16 pb-4 max-w-4xl mx-auto">
             <div className="flex flex-col items-center text-center gap-2">
               <Icon icon="eyeClosed" iconStyle={"pixel"} className="size-8" color="var(--personality)" />
               <p className="font-700">Secure & Encrypted</p>
@@ -284,33 +284,6 @@ export default function Plans() {
               <Icon icon="rotateCcw" iconStyle={"pixel"} className="size-8" color="var(--personality)" />
               <p className="font-700">Money Back Guarantee</p>
               <p className="text-sm text-muted-foreground">30-day no-risk policy</p>
-            </div>
-          </div>
-
-          {/* FAQ */}
-          <div className="max-w-2xl mx-auto space-y-8 border-t pt-16">
-            <h2 className="text-3xl font-basteleur font-700 text-center">Frequently Asked Questions</h2>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="font-700">Can I switch plans?</h3>
-                <p className="text-muted-foreground">
-                  Yes, you can upgrade or downgrade at any time. Changes take effect immediately.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-700">What happens when I add team members?</h3>
-                <p className="text-muted-foreground">
-                  Pro plan pricing scales with your team. Add or remove users anytime, and we'll adjust your
-                  billing automatically.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-700">Can I cancel my subscription?</h3>
-                <p className="text-muted-foreground">
-                  Absolutely. Cancel anytime with no questions asked. You'll keep access until the end of your
-                  billing period.
-                </p>
-              </div>
             </div>
           </div>
         </div>

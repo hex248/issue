@@ -7,3 +7,11 @@ export * from "./sprints";
 export * from "./subscriptions";
 export * from "./timed-sessions";
 export * from "./users";
+
+// free tier limits
+export const FREE_TIER_LIMITS = {
+    organisationsPerUser: 1,
+    projectsPerOrganisation: 1,
+    issuesPerOrganisation: 100,
+    membersPerOrganisation: 5,
+} as const;

@@ -8,8 +8,10 @@ import {
 } from "@sprint/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { AddMember } from "@/components/add-member";
+import { FreeTierLimit } from "@/components/free-tier-limit";
 import OrgIcon from "@/components/org-icon";
 import { OrganisationForm } from "@/components/organisation-form";
 import { OrganisationSelect } from "@/components/organisation-select";
@@ -42,6 +44,7 @@ import {
   useDeleteOrganisation,
   useDeleteProject,
   useDeleteSprint,
+  useIssues,
   useOrganisationMembers,
   useOrganisationMemberTimeTracking,
   useOrganisations,
@@ -58,6 +61,13 @@ import { apiClient } from "@/lib/server";
 import { capitalise, formatDuration, unCamelCase } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 
+const FREE_TIER_LIMITS = {
+  organisationsPerUser: 1,
+  projectsPerOrganisation: 1,
+  issuesPerOrganisation: 100,
+  membersPerOrganisation: 5,
+} as const;
+
 function Organisations({ trigger }: { trigger?: ReactNode }) {
   const { user } = useAuthenticatedSession();
   const queryClient = useQueryClient();
@@ -66,6 +76,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
   const { data: projectsData = [] } = useProjects(selectedOrganisationId);
   const { data: sprints = [] } = useSprints(selectedProjectId);
   const { data: membersData = [] } = useOrganisationMembers(selectedOrganisationId);
+  const { data: issues = [] } = useIssues(selectedProjectId);
   const updateOrganisation = useUpdateOrganisation();
   const updateMemberRole = useUpdateOrganisationMemberRole();
   const removeMember = useRemoveOrganisationMember();
@@ -74,6 +85,12 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
   const deleteSprint = useDeleteSprint();
   const replaceIssueStatus = useReplaceIssueStatus();
   const replaceIssueType = useReplaceIssueType();
+
+  const isPro = user.plan === "pro";
+  const orgCount = organisationsData.length;
+  const projectCount = projectsData.length;
+  const issueCount = issues.length;
+  const memberCount = membersData.length;
 
   const organisations = useMemo(
     () => [...organisationsData].sort((a, b) => a.Organisation.name.localeCompare(b.Organisation.name)),
@@ -823,6 +840,49 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                       <p className="text-sm text-muted-foreground break-words">No description</p>
                     )}
                   </div>
+
+                  {/* Free tier limits section */}
+                  {!isPro && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-600">Plan Limits</h3>
+                        <Button asChild variant="link" size="sm" className="h-auto p-0 text-xs">
+                          <Link to="/plans">Upgrade to Pro</Link>
+                        </Button>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <FreeTierLimit
+                          current={orgCount}
+                          limit={FREE_TIER_LIMITS.organisationsPerUser}
+                          itemName="organisation"
+                          isPro={isPro}
+                          showUpgrade={false}
+                        />
+                        <FreeTierLimit
+                          current={projectCount}
+                          limit={FREE_TIER_LIMITS.projectsPerOrganisation}
+                          itemName="project"
+                          isPro={isPro}
+                          showUpgrade={false}
+                        />
+                        <FreeTierLimit
+                          current={issueCount}
+                          limit={FREE_TIER_LIMITS.issuesPerOrganisation}
+                          itemName="issue"
+                          isPro={isPro}
+                          showUpgrade={false}
+                        />
+                        <FreeTierLimit
+                          current={memberCount}
+                          limit={FREE_TIER_LIMITS.membersPerOrganisation}
+                          itemName="member"
+                          isPro={isPro}
+                          showUpgrade={false}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {isAdmin && (
                     <div className="flex gap-2 mt-3">
                       <Button variant="outline" size="sm" onClick={() => setEditOrgOpen(true)}>
@@ -968,25 +1028,46 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                       ))}
                     </div>
                     {isAdmin && (
-                      <AddMember
-                        organisationId={selectedOrganisation.Organisation.id}
-                        existingMembers={members.map((m) => m.User.username)}
-                        onSuccess={(user) => {
-                          toast.success(
-                            `${user.name} added to ${selectedOrganisation.Organisation.name} successfully`,
-                            {
-                              dismissible: false,
-                            },
-                          );
+                      <>
+                        {!isPro && (
+                          <div className="px-1">
+                            <FreeTierLimit
+                              current={memberCount}
+                              limit={FREE_TIER_LIMITS.membersPerOrganisation}
+                              itemName="member"
+                              isPro={isPro}
+                              showUpgrade={memberCount >= FREE_TIER_LIMITS.membersPerOrganisation}
+                            />
+                          </div>
+                        )}
+                        <AddMember
+                          organisationId={selectedOrganisation.Organisation.id}
+                          existingMembers={members.map((m) => m.User.username)}
+                          onSuccess={(user) => {
+                            toast.success(
+                              `${user.name} added to ${selectedOrganisation.Organisation.name} successfully`,
+                              {
+                                dismissible: false,
+                              },
+                            );
 
-                          void invalidateMembers();
-                        }}
-                        trigger={
-                          <Button variant="outline">
-                            Add user <Icon icon="plus" className="size-4" />
-                          </Button>
-                        }
-                      />
+                            void invalidateMembers();
+                          }}
+                          trigger={
+                            <Button
+                              variant="outline"
+                              disabled={!isPro && memberCount >= FREE_TIER_LIMITS.membersPerOrganisation}
+                              title={
+                                !isPro && memberCount >= FREE_TIER_LIMITS.membersPerOrganisation
+                                  ? "Free tier limited to 5 members per organisation. Upgrade to Pro for unlimited."
+                                  : undefined
+                              }
+                            >
+                              Add user <Icon icon="plus" className="size-4" />
+                            </Button>
+                          }
+                        />
+                      </>
                     )}
                   </div>
                 </div>

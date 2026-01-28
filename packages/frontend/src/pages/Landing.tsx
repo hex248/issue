@@ -11,11 +11,6 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    question: "Can I switch plans?",
-    answer:
-      "Yes, you can upgrade or downgrade at any time. Changes take effect immediately, and we'll prorate any charges.",
-  },
-  {
     question: "What payment methods do you accept?",
     answer: "We accept all major credit cards.",
   },
