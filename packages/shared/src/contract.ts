@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
     ApiErrorSchema,
     AuthResponseSchema,
+    CancelSubscriptionResponseSchema,
     CreateCheckoutSessionRequestSchema,
     CreateCheckoutSessionResponseSchema,
     CreatePortalSessionResponseSchema,
@@ -623,6 +624,17 @@ export const apiContract = c.router({
         body: emptyBodySchema,
         responses: {
             200: CreatePortalSessionResponseSchema,
+            404: ApiErrorSchema,
+            500: ApiErrorSchema,
+        },
+        headers: csrfHeaderSchema,
+    },
+    subscriptionCancel: {
+        method: "POST",
+        path: "/subscription/cancel",
+        body: emptyBodySchema,
+        responses: {
+            200: CancelSubscriptionResponseSchema,
             404: ApiErrorSchema,
             500: ApiErrorSchema,
         },

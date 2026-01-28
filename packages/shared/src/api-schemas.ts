@@ -647,3 +647,9 @@ export const GetSubscriptionResponseSchema = z.object({
 });
 
 export type GetSubscriptionResponse = z.infer<typeof GetSubscriptionResponseSchema>;
+
+export const CancelSubscriptionResponseSchema = z.object({
+    subscription: SubscriptionRecordSchema,
+});
+
+export type CancelSubscriptionResponse = z.infer<typeof CancelSubscriptionResponseSchema>;

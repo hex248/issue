@@ -11,6 +11,15 @@ import { stripe } from "../../stripe/client";
 
 const webhookSecret = requireEnv("STRIPE_WEBHOOK_SECRET");
 
+function toStripeDate(seconds: number | null | undefined, field: string) {
+    if (seconds === null || seconds === undefined) return undefined;
+    if (!Number.isFinite(seconds)) {
+        console.warn(`invalid ${field} timestamp:`, seconds);
+        return undefined;
+    }
+    return new Date(seconds * 1000);
+}
+
 function requireEnv(name: string): string {
     const value = process.env[name];
     if (!value) {
@@ -71,8 +80,8 @@ export default async function webhook(req: BunRequest) {
 
                 // stripe types use snake_case for these fields
                 const sub = stripeSubscription as unknown as {
-                    current_period_start: number;
-                    current_period_end: number;
+                    current_period_start: number | null;
+                    current_period_end: number | null;
                     trial_end: number | null;
                 };
 
@@ -84,9 +93,9 @@ export default async function webhook(req: BunRequest) {
                     stripePriceId: session.metadata?.priceId || "",
                     status: stripeSubscription.status,
                     quantity: parseInt(session.metadata?.quantity || "1", 10),
-                    currentPeriodStart: new Date(sub.current_period_start * 1000),
-                    currentPeriodEnd: new Date(sub.current_period_end * 1000),
-                    trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000) : undefined,
+                    currentPeriodStart: toStripeDate(sub.current_period_start, "current_period_start"),
+                    currentPeriodEnd: toStripeDate(sub.current_period_end, "current_period_end"),
+                    trialEnd: toStripeDate(sub.trial_end, "trial_end"),
                 });
 
                 await updateUser(userId, { plan: "pro" });
@@ -117,12 +126,8 @@ export default async function webhook(req: BunRequest) {
                     current_period_start: number | null;
                     current_period_end: number | null;
                 };
-                const currentPeriodStart = sub.current_period_start
-                    ? new Date(sub.current_period_start * 1000)
-                    : undefined;
-                const currentPeriodEnd = sub.current_period_end
-                    ? new Date(sub.current_period_end * 1000)
-                    : undefined;
+                const currentPeriodStart = toStripeDate(sub.current_period_start, "current_period_start");
+                const currentPeriodEnd = toStripeDate(sub.current_period_end, "current_period_end");
 
                 await updateSubscription(localSub.id, {
                     status: subscription.status,

@@ -38,6 +38,7 @@ import sprintCreate from "./sprint/create";
 import sprintDelete from "./sprint/delete";
 import sprintUpdate from "./sprint/update";
 import sprintsByProject from "./sprints/by-project";
+import subscriptionCancel from "./subscription/cancel";
 import subscriptionCreateCheckoutSession from "./subscription/create-checkout-session";
 import subscriptionCreatePortalSession from "./subscription/create-portal-session";
 import subscriptionGet from "./subscription/get";
@@ -113,6 +114,7 @@ export const routes = {
 
     subscriptionCreateCheckoutSession,
     subscriptionCreatePortalSession,
+    subscriptionCancel,
     subscriptionGet,
     subscriptionWebhook,
 };

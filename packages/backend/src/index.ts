@@ -108,6 +108,7 @@ const main = async () => {
             "/subscription/create-portal-session": withGlobalAuthed(
                 withAuth(withCSRF(routes.subscriptionCreatePortalSession)),
             ),
+            "/subscription/cancel": withGlobalAuthed(withAuth(withCSRF(routes.subscriptionCancel))),
             "/subscription/get": withGlobalAuthed(withAuth(routes.subscriptionGet)),
             "/subscription/webhook": withGlobal(routes.subscriptionWebhook),
         },

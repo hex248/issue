@@ -1,10 +1,11 @@
 import type {
+  CancelSubscriptionResponse,
   CreateCheckoutSessionRequest,
   CreateCheckoutSessionResponse,
   CreatePortalSessionResponse,
   GetSubscriptionResponse,
 } from "@sprint/shared";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
 import { apiClient } from "@/lib/server";
 
@@ -39,6 +40,23 @@ export function useCreatePortalSession() {
       if (error) throw new Error(error);
       if (!data) throw new Error("failed to create portal session");
       return data as CreatePortalSessionResponse;
+    },
+  });
+}
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CancelSubscriptionResponse, Error>({
+    mutationKey: ["subscription", "cancel"],
+    mutationFn: async () => {
+      const { data, error } = await apiClient.subscriptionCancel({ body: {} });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to cancel subscription");
+      return data as CancelSubscriptionResponse;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.subscription.current() });
     },
   });
 }

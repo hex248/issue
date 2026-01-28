@@ -1,6 +1,7 @@
 export type {
     ApiError,
     AuthResponse,
+    CancelSubscriptionResponse,
     CreateCheckoutSessionRequest,
     CreateCheckoutSessionResponse,
     CreatePortalSessionResponse,
@@ -67,6 +68,7 @@ export type {
 export {
     ApiErrorSchema,
     AuthResponseSchema,
+    CancelSubscriptionResponseSchema,
     CreateCheckoutSessionRequestSchema,
     CreateCheckoutSessionResponseSchema,
     CreatePortalSessionResponseSchema,

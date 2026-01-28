@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { format } from "date-fns";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginModal } from "@/components/login-modal";
 import { PricingCard, pricingTiers } from "@/components/pricing-card";
 import { useSession } from "@/components/session-provider";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Switch } from "@/components/ui/switch";
-import { useCreateCheckoutSession, useCreatePortalSession, useSubscription } from "@/lib/query/hooks";
+import {
+  useCancelSubscription,
+  useCreateCheckoutSession,
+  useCreatePortalSession,
+  useSubscription,
+} from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
 
 export default function Plans() {
@@ -19,9 +36,21 @@ export default function Plans() {
   const { data: subscriptionData } = useSubscription();
   const createCheckoutSession = useCreateCheckoutSession();
   const createPortalSession = useCreatePortalSession();
+  const cancelSubscription = useCancelSubscription();
 
   const subscription = subscriptionData?.subscription ?? null;
-  const hasProSubscription = subscription?.status === "active";
+  const isProUser =
+    user?.plan === "pro" || subscription?.status === "active" || subscription?.status === "trialing";
+  const isCancellationScheduled = Boolean(subscription?.cancelAtPeriodEnd);
+  const isCanceled = subscription?.status === "canceled";
+  const cancellationEndDate = useMemo(() => {
+    if (!subscription?.currentPeriodEnd) return null;
+    const date = new Date(subscription.currentPeriodEnd);
+    if (Number.isNaN(date.getTime())) return null;
+    return format(date, "d MMM yyyy");
+  }, [subscription?.currentPeriodEnd]);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const handleTierAction = async (tierName: string) => {
     if (!user) {
@@ -30,7 +59,7 @@ export default function Plans() {
     }
 
     if (tierName === "Pro") {
-      if (hasProSubscription) {
+      if (isProUser) {
         // open customer portal
         setProcessingTier(tierName);
         try {
@@ -64,14 +93,25 @@ export default function Plans() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    setCancelError(null);
+    try {
+      await cancelSubscription.mutateAsync();
+      setCancelDialogOpen(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "failed to cancel subscription";
+      setCancelError(message);
+    }
+  };
+
   // modify pricing tiers based on user's current plan
   const modifiedTiers = pricingTiers.map((tier) => {
-    const isCurrentPlan = tier.name === "Pro" && hasProSubscription;
-    const isStarterCurrent = tier.name === "Starter" && !hasProSubscription;
+    const isCurrentPlan = tier.name === "Pro" && isProUser;
+    const isStarterCurrent = tier.name === "Starter" && !!user && !isProUser;
 
     return {
       ...tier,
-      highlighted: isCurrentPlan || (!hasProSubscription && tier.name === "Pro"),
+      highlighted: isCurrentPlan || (!isProUser && tier.name === "Pro"),
       cta: isCurrentPlan
         ? "Manage subscription"
         : isStarterCurrent
@@ -120,7 +160,7 @@ export default function Plans() {
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {user
-                ? hasProSubscription
+                ? isProUser
                   ? "You are currently on the Pro plan. Manage your subscription or switch plans below."
                   : "You are currently on the Starter plan. Upgrade to Pro for unlimited access."
                 : "Choose the plan that fits your team. Scale as you grow."}
@@ -174,6 +214,54 @@ export default function Plans() {
               />
             ))}
           </div>
+
+          {user && isProUser && (
+            <div className="w-full max-w-4xl mx-auto border rounded-md p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <p className="font-700">Cancel subscription</p>
+                  <p className="text-sm text-muted-foreground">
+                    {isCancellationScheduled || isCanceled
+                      ? `Cancelled, benefits end on ${cancellationEndDate ?? "your billing end date"}.`
+                      : "Canceling will keep access until the end of your billing period."}
+                  </p>
+                </div>
+                <AlertDialog
+                  open={cancelDialogOpen}
+                  onOpenChange={(open: boolean) => {
+                    setCancelDialogOpen(open);
+                    if (!open) setCancelError(null);
+                  }}
+                >
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      disabled={cancelSubscription.isPending || isCancellationScheduled || isCanceled}
+                    >
+                      {isCancellationScheduled || isCanceled
+                        ? "Cancellation scheduled"
+                        : "Cancel subscription"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        You will keep Pro access until the end of your current billing period.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep subscription</AlertDialogCancel>
+                      <AlertDialogAction variant="destructive" onClick={handleCancelSubscription}>
+                        {cancelSubscription.isPending ? "Canceling..." : "Confirm cancel"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                    {cancelError && <p className="text-sm text-destructive">{cancelError}</p>}
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          )}
 
           {/* trust signals */}
           <div className="grid md:grid-cols-3 gap-8 w-full border-t pt-16 pb-8 max-w-4xl mx-auto">
