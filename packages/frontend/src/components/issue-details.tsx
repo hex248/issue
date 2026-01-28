@@ -1,4 +1,4 @@
-import type { IssueResponse, SprintRecord, UserRecord } from "@sprint/shared";
+import type { IssueResponse, SprintRecord, UserResponse } from "@sprint/shared";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { IssueComments } from "@/components/issue-comments";
@@ -51,7 +51,7 @@ export function IssueDetails({
   issueData: IssueResponse;
   projectKey: string;
   sprints: SprintRecord[];
-  members: UserRecord[];
+  members: UserResponse[];
   statuses: Record<string, string>;
   onClose: () => void;
   onDelete?: () => void;

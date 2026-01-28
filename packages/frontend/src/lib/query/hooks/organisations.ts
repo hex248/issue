@@ -2,22 +2,39 @@ import type {
   OrgAddMemberRequest,
   OrganisationMemberRecord,
   OrganisationMemberResponse,
+  OrganisationRecordType,
+  OrganisationResponse,
+  OrgCreateRequest,
+  OrgRemoveMemberRequest,
+  OrgUpdateMemberRoleRequest,
+  OrgUpdateRequest,
+  SuccessResponse,
 } from "@sprint/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
-import { organisation } from "@/lib/server";
+import { apiClient } from "@/lib/server";
 
 export function useOrganisations() {
-  return useQuery({
+  return useQuery<OrganisationResponse[]>({
     queryKey: queryKeys.organisations.byUser(),
-    queryFn: organisation.byUser,
+    queryFn: async () => {
+      const { data, error } = await apiClient.organisationsByUser();
+      if (error) throw new Error(error);
+      return (data ?? []) as OrganisationResponse[];
+    },
   });
 }
 
 export function useOrganisationMembers(organisationId?: number | null) {
   return useQuery<OrganisationMemberResponse[]>({
     queryKey: queryKeys.organisations.members(organisationId ?? 0),
-    queryFn: () => organisation.members(organisationId ?? 0),
+    queryFn: async () => {
+      const { data, error } = await apiClient.organisationMembers({
+        query: { organisationId: organisationId ?? 0 },
+      });
+      if (error) throw new Error(error);
+      return (data ?? []) as OrganisationMemberResponse[];
+    },
     enabled: Boolean(organisationId),
   });
 }
@@ -25,9 +42,14 @@ export function useOrganisationMembers(organisationId?: number | null) {
 export function useCreateOrganisation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<OrganisationRecordType, Error, OrgCreateRequest>({
     mutationKey: ["organisations", "create"],
-    mutationFn: organisation.create,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.organisationCreate({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to create organisation");
+      return data as OrganisationRecordType;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organisations.byUser() });
     },
@@ -37,9 +59,14 @@ export function useCreateOrganisation() {
 export function useUpdateOrganisation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<OrganisationRecordType, Error, OrgUpdateRequest>({
     mutationKey: ["organisations", "update"],
-    mutationFn: organisation.update,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.organisationUpdate({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to update organisation");
+      return data as OrganisationRecordType;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organisations.byUser() });
     },
@@ -49,9 +76,14 @@ export function useUpdateOrganisation() {
 export function useDeleteOrganisation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<SuccessResponse, Error, number>({
     mutationKey: ["organisations", "delete"],
-    mutationFn: organisation.remove,
+    mutationFn: async (orgId) => {
+      const { data, error } = await apiClient.organisationDelete({ body: { id: orgId } });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to delete organisation");
+      return data as SuccessResponse;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organisations.byUser() });
     },
@@ -63,7 +95,12 @@ export function useAddOrganisationMember() {
 
   return useMutation<OrganisationMemberRecord, Error, OrgAddMemberRequest>({
     mutationKey: ["organisations", "members", "add"],
-    mutationFn: organisation.addMember,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.organisationAddMember({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to add member");
+      return data as OrganisationMemberRecord;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.organisations.members(variables.organisationId),
@@ -75,9 +112,14 @@ export function useAddOrganisationMember() {
 export function useRemoveOrganisationMember() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<SuccessResponse, Error, OrgRemoveMemberRequest>({
     mutationKey: ["organisations", "members", "remove"],
-    mutationFn: organisation.removeMember,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.organisationRemoveMember({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to remove member");
+      return data as SuccessResponse;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.organisations.members(variables.organisationId),
@@ -89,9 +131,14 @@ export function useRemoveOrganisationMember() {
 export function useUpdateOrganisationMemberRole() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<OrganisationMemberRecord, Error, OrgUpdateMemberRoleRequest>({
     mutationKey: ["organisations", "members", "update-role"],
-    mutationFn: organisation.updateMemberRole,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.organisationUpdateMemberRole({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to update member role");
+      return data as OrganisationMemberRecord;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.organisations.members(variables.organisationId),
@@ -105,7 +152,15 @@ export function useUploadOrganisationIcon() {
 
   return useMutation<string, Error, { file: File; organisationId: number }>({
     mutationKey: ["organisations", "upload-icon"],
-    mutationFn: ({ file, organisationId }) => organisation.uploadIcon(file, organisationId),
+    mutationFn: async ({ file, organisationId }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("organisationId", `${organisationId}`);
+      const { data, error } = await apiClient.organisationUploadIcon({ body: formData });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to upload organisation icon");
+      return (data as { iconURL: string }).iconURL;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organisations.byUser() });
     },

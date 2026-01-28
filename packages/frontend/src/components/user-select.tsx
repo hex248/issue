@@ -1,4 +1,4 @@
-import type { UserRecord } from "@sprint/shared";
+import type { UserResponse } from "@sprint/shared";
 import { useState } from "react";
 import SmallUserDisplay from "@/components/small-user-display";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,10 +10,10 @@ export function UserSelect({
   fallbackUser,
   placeholder = "Select user",
 }: {
-  users: UserRecord[];
+  users: UserResponse[];
   value: string;
   onChange: (value: string) => void;
-  fallbackUser?: UserRecord | null;
+  fallbackUser?: UserResponse | null;
   placeholder?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);

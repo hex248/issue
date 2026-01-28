@@ -1,9 +1,13 @@
 import type { TimerEndRequest, TimerListItem, TimerState, TimerToggleRequest } from "@sprint/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
-import { timer } from "@/lib/server";
+import { apiClient } from "@/lib/server";
 
-const activeTimersQueryFn = () => timer.list({ activeOnly: true });
+const activeTimersQueryFn = async () => {
+  const { data, error } = await apiClient.timers({ query: { activeOnly: true } });
+  if (error) throw new Error(error);
+  return (data ?? []) as TimerListItem[];
+};
 
 export function useActiveTimers(options?: { refetchInterval?: number; enabled?: boolean }) {
   return useQuery<TimerListItem[]>({
@@ -29,7 +33,13 @@ export function useTimerState(issueId?: number | null, options?: { refetchInterv
 export function useInactiveTimers(issueId?: number | null, options?: { refetchInterval?: number }) {
   return useQuery<TimerState[]>({
     queryKey: queryKeys.timers.inactive(issueId ?? 0),
-    queryFn: () => timer.getInactive(issueId ?? 0),
+    queryFn: async () => {
+      const { data, error } = await apiClient.timerGetInactive({
+        query: { issueId: issueId ?? 0 },
+      });
+      if (error) throw new Error(error);
+      return (data ?? []) as TimerState[];
+    },
     enabled: Boolean(issueId),
     refetchInterval: options?.refetchInterval,
     refetchIntervalInBackground: false,
@@ -41,7 +51,12 @@ export function useToggleTimer() {
 
   return useMutation<TimerState, Error, TimerToggleRequest>({
     mutationKey: ["timers", "toggle"],
-    mutationFn: timer.toggle,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.timerToggle({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to toggle timer");
+      return data as TimerState;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.timers.inactive(variables.issueId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.timers.list() });
@@ -54,7 +69,12 @@ export function useEndTimer() {
 
   return useMutation<TimerState, Error, TimerEndRequest>({
     mutationKey: ["timers", "end"],
-    mutationFn: timer.end,
+    mutationFn: async (input) => {
+      const { data, error } = await apiClient.timerEnd({ body: input });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("failed to end timer");
+      return data as TimerState;
+    },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.timers.inactive(variables.issueId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.timers.list() });

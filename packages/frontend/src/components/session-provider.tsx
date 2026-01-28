@@ -1,4 +1,4 @@
-import type { UserRecord } from "@sprint/shared";
+import type { UserResponse } from "@sprint/shared";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import Loading from "@/components/loading";
@@ -6,8 +6,8 @@ import { LoginModal } from "@/components/login-modal";
 import { clearAuth, getServerURL, setCsrfToken } from "@/lib/utils";
 
 interface SessionContextValue {
-  user: UserRecord | null;
-  setUser: (user: UserRecord) => void;
+  user: UserResponse | null;
+  setUser: (user: UserResponse) => void;
   isLoading: boolean;
 }
 
@@ -28,7 +28,7 @@ export function useSessionSafe(): SessionContextValue | null {
 }
 
 // for use inside RequireAuth
-export function useAuthenticatedSession(): { user: UserRecord; setUser: (user: UserRecord) => void } {
+export function useAuthenticatedSession(): { user: UserResponse; setUser: (user: UserResponse) => void } {
   const { user, setUser } = useSession();
   if (!user) {
     throw new Error("useAuthenticatedSession must be used within RequireAuth");
@@ -37,11 +37,11 @@ export function useAuthenticatedSession(): { user: UserRecord; setUser: (user: U
 }
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUserState] = useState<UserRecord | null>(null);
+  const [user, setUserState] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const fetched = useRef(false);
 
-  const setUser = useCallback((user: UserRecord) => {
+  const setUser = useCallback((user: UserResponse) => {
     setUserState(user);
     localStorage.setItem("user", JSON.stringify(user));
   }, []);
@@ -57,7 +57,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (!res.ok) {
           throw new Error(`auth check failed: ${res.status}`);
         }
-        const data = (await res.json()) as { user: UserRecord; csrfToken: string };
+        const data = (await res.json()) as { user: UserResponse; csrfToken: string };
         setUser(data.user);
         setCsrfToken(data.csrfToken);
       })

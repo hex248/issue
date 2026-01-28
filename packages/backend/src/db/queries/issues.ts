@@ -1,4 +1,4 @@
-import { Issue, IssueAssignee, type IssueResponse, User, type UserRecord } from "@sprint/shared";
+import { Issue, IssueAssignee, type IssueResponseRecord, User, type UserRecord } from "@sprint/shared";
 import { aliasedTable, and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 
@@ -97,7 +97,7 @@ export async function getIssueByID(id: number) {
     return issue;
 }
 
-export async function getIssueWithUsersById(issueId: number): Promise<IssueResponse | null> {
+export async function getIssueWithUsersById(issueId: number): Promise<IssueResponseRecord | null> {
     const Creator = aliasedTable(User, "Creator");
 
     const [issueWithCreator] = await db
@@ -212,7 +212,7 @@ export async function replaceIssueType(organisationId: number, oldType: string, 
     return { updated: result.rowCount ?? 0 };
 }
 
-export async function getIssuesWithUsersByProject(projectId: number): Promise<IssueResponse[]> {
+export async function getIssuesWithUsersByProject(projectId: number): Promise<IssueResponseRecord[]> {
     const Creator = aliasedTable(User, "Creator");
 
     const issuesWithCreators = await db

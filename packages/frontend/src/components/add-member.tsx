@@ -1,4 +1,4 @@
-import type { UserRecord } from "@sprint/shared";
+import type { UserResponse } from "@sprint/shared";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { useAddOrganisationMember } from "@/lib/query/hooks";
-import { parseError, user } from "@/lib/server";
+import { apiClient, parseError } from "@/lib/server";
 
 export function AddMember({
   organisationId,
@@ -23,7 +23,7 @@ export function AddMember({
   organisationId: number;
   existingMembers: string[];
   trigger?: React.ReactNode;
-  onSuccess?: (user: UserRecord) => void | Promise<void>;
+  onSuccess?: (user: UserResponse) => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const [username, setUsername] = useState("");
@@ -62,7 +62,10 @@ export function AddMember({
 
     setSubmitting(true);
     try {
-      const userData: UserRecord = await user.byUsername(username);
+      const { data, error } = await apiClient.userByUsername({ query: { username } });
+      if (error) throw new Error(error);
+      if (!data) throw new Error("user not found");
+      const userData = data as UserResponse;
       const userId = userData.id;
       await addMember.mutateAsync({ organisationId, userId, role: "member" });
       setOpen(false);
