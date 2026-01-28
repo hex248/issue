@@ -419,6 +419,7 @@ export const UserResponseSchema = z.object({
     username: z.string(),
     avatarURL: z.string().nullable(),
     iconPreference: z.enum(["lucide", "pixel", "phosphor"]),
+    plan: z.string().nullable().optional(),
     createdAt: z.string().nullable().optional(),
     updatedAt: z.string().nullable().optional(),
 });

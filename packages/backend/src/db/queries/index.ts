@@ -4,5 +4,6 @@ export * from "./organisations";
 export * from "./projects";
 export * from "./sessions";
 export * from "./sprints";
+export * from "./subscriptions";
 export * from "./timed-sessions";
 export * from "./users";

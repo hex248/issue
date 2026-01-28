@@ -126,42 +126,33 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
     });
   }, [membersData]);
 
-  // Calculate total time per member and sort by time (greatest to smallest)
   const membersWithTimeTracking = useMemo(() => {
-    // Calculate total time per user
     const timePerUser = new Map<number, number>();
     for (const session of timeTrackingData) {
       const current = timePerUser.get(session.userId) ?? 0;
       timePerUser.set(session.userId, current + (session.workTimeMs ?? 0));
     }
 
-    // Map members with their total time
     const membersWithTime = members.map((member) => ({
       ...member,
       totalTimeMs: timePerUser.get(member.User.id) ?? 0,
     }));
 
-    // Sort by total time (greatest to smallest), then by role, then by name
     const roleOrder: Record<string, number> = { owner: 0, admin: 1, member: 2 };
     return membersWithTime.sort((a, b) => {
-      // First sort by total time (descending)
       if (b.totalTimeMs !== a.totalTimeMs) {
         return b.totalTimeMs - a.totalTimeMs;
       }
-      // Then by role
       const roleA = roleOrder[a.OrganisationMember.role] ?? 3;
       const roleB = roleOrder[b.OrganisationMember.role] ?? 3;
       if (roleA !== roleB) return roleA - roleB;
-      // Finally by name
       return a.User.name.localeCompare(b.User.name);
     });
   }, [members, timeTrackingData]);
 
-  // Download time tracking data as CSV or JSON
   const downloadTimeTrackingData = (format: "csv" | "json") => {
     if (!selectedOrganisation) return;
 
-    // Aggregate data per user
     const userData = new Map<
       number,
       {
@@ -193,8 +184,8 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
 
     const data = Array.from(userData.values()).sort((a, b) => b.totalTimeMs - a.totalTimeMs);
 
+    // generate CSV or JSON
     if (format === "csv") {
-      // Generate CSV
       const headers = ["User ID", "Name", "Username", "Total Time (ms)", "Total Time (formatted)"];
       const rows = data.map((user) => [
         user.userId,
@@ -207,6 +198,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
         "\n",
       );
 
+      // download
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -217,7 +209,6 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } else {
-      // Generate JSON
       const json = JSON.stringify(
         {
           organisation: selectedOrganisation.Organisation.name,
@@ -232,6 +223,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
         2,
       );
 
+      // download
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -894,7 +886,6 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <Icon icon="calendar" className="size-4 mr-1" />
                               From: {fromDate.toLocaleDateString()}
                             </Button>
                           </PopoverTrigger>
@@ -903,24 +894,21 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                               mode="single"
                               selected={fromDate}
                               onSelect={(date) => date && setFromDate(date)}
-                              initialFocus
+                              autoFocus
                             />
                           </PopoverContent>
                         </Popover>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <Icon icon="download" className="size-4 mr-1" />
                               Export
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onSelect={() => downloadTimeTrackingData("csv")}>
-                              <Icon icon="fileSpreadsheet" className="size-4 mr-2" />
                               Download CSV
                             </DropdownMenuItem>
                             <DropdownMenuItem onSelect={() => downloadTimeTrackingData("json")}>
-                              <Icon icon="fileJson" className="size-4 mr-2" />
                               Download JSON
                             </DropdownMenuItem>
                           </DropdownMenuContent>

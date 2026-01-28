@@ -21,13 +21,12 @@ export default async function organisationMemberTimeTracking(req: AuthedRequest)
 
     const { organisationId, fromDate } = parsed.data;
 
-    // Check organisation exists
+    // check organisation exists
     const organisation = await getOrganisationById(organisationId);
     if (!organisation) {
         return errorResponse(`organisation with id ${organisationId} not found`, "ORG_NOT_FOUND", 404);
     }
 
-    // Check user is admin or owner of the organisation
     const memberRole = await getOrganisationMemberRole(organisationId, req.userId);
     if (!memberRole) {
         return errorResponse("you are not a member of this organisation", "NOT_MEMBER", 403);
@@ -38,11 +37,8 @@ export default async function organisationMemberTimeTracking(req: AuthedRequest)
         return errorResponse("you must be an owner or admin to view member time tracking", "FORBIDDEN", 403);
     }
 
-    // Get timed sessions for all organisation members
     const sessions = await getOrganisationMemberTimedSessions(organisationId, fromDate);
 
-    // Enrich with calculated times
-    // timestamps come from the database as strings, need to convert to Date objects for calculation
     const enriched = sessions.map((session) => {
         const timestamps = session.timestamps.map((t) => new Date(t));
         return {
@@ -51,7 +47,7 @@ export default async function organisationMemberTimeTracking(req: AuthedRequest)
             issueId: session.issueId,
             issueNumber: session.issueNumber,
             projectKey: session.projectKey,
-            timestamps: session.timestamps, // Return original strings for JSON serialization
+            timestamps: session.timestamps,
             endedAt: session.endedAt,
             createdAt: session.createdAt,
             workTimeMs: calculateWorkTimeMs(timestamps),
