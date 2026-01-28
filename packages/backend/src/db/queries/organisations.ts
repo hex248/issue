@@ -152,3 +152,13 @@ export async function getUserOrganisationCount(userId: number): Promise<number> 
         .where(eq(OrganisationMember.userId, userId));
     return result?.count ?? 0;
 }
+
+export async function getOrganisationOwner(organisationId: number) {
+    const [owner] = await db
+        .select({ userId: OrganisationMember.userId })
+        .from(OrganisationMember)
+        .where(
+            and(eq(OrganisationMember.organisationId, organisationId), eq(OrganisationMember.role, "owner")),
+        );
+    return owner;
+}

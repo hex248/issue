@@ -58,7 +58,7 @@ import {
 } from "@/lib/query/hooks";
 import { queryKeys } from "@/lib/query/keys";
 import { apiClient } from "@/lib/server";
-import { capitalise, formatDuration, unCamelCase } from "@/lib/utils";
+import { capitalise, cn, formatDuration, unCamelCase } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 
 const FREE_TIER_LIMITS = {
@@ -943,36 +943,40 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                     </h2>
                     {isAdmin && (
                       <div className="flex items-center gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              From: {fromDate.toLocaleDateString()}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="end">
-                            <Calendar
-                              mode="single"
-                              selected={fromDate}
-                              onSelect={(date) => date && setFromDate(date)}
-                              autoFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              Export
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => downloadTimeTrackingData("csv")}>
-                              Download CSV
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => downloadTimeTrackingData("json")}>
-                              Download JSON
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {isPro && (
+                          <>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  From: {fromDate.toLocaleDateString()}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="end">
+                                <Calendar
+                                  mode="single"
+                                  selected={fromDate}
+                                  onSelect={(date) => date && setFromDate(date)}
+                                  autoFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  Export
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => downloadTimeTrackingData("csv")}>
+                                  Download CSV
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => downloadTimeTrackingData("json")}>
+                                  Download JSON
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -990,7 +994,7 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            {isAdmin && (
+                            {isAdmin && isPro && (
                               <span className="text-sm font-mono text-muted-foreground mr-2">
                                 {formatDuration(member.totalTimeMs)}
                               </span>
@@ -1518,6 +1522,14 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
               <TabsContent value="features">
                 <div className="border p-2 min-w-0 overflow-hidden">
                   <h2 className="text-xl font-600 mb-2">Features</h2>
+                  {!isPro && (
+                    <div className="mb-3 p-2 bg-muted/50 rounded text-sm text-muted-foreground">
+                      Feature toggling is only available on Pro.{" "}
+                      <Link to="/plans" className="text-personality hover:underline">
+                        Upgrade to customize features.
+                      </Link>
+                    </div>
+                  )}
                   <div className="flex flex-col gap-2 w-full">
                     {Object.keys(DEFAULT_FEATURES).map((feature) => (
                       <div key={feature} className="flex items-center gap-2 p-1">
@@ -1539,9 +1551,12 @@ function Organisations({ trigger }: { trigger?: ReactNode }) {
                             );
                             await invalidateOrganisations();
                           }}
+                          disabled={!isPro}
                           color={"#ff0000"}
                         />
-                        <span className={"text-sm"}>{unCamelCase(feature)}</span>
+                        <span className={cn("text-sm", !isPro && "text-muted-foreground")}>
+                          {unCamelCase(feature)}
+                        </span>
                       </div>
                     ))}
                   </div>

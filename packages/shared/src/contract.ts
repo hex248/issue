@@ -177,6 +177,7 @@ export const apiContract = c.router({
         responses: {
             200: z.object({ avatarURL: z.string() }),
             400: ApiErrorSchema,
+            403: ApiErrorSchema,
         },
         headers: csrfHeaderSchema,
     },

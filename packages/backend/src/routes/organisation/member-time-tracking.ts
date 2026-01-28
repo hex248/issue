@@ -5,6 +5,8 @@ import {
     getOrganisationById,
     getOrganisationMemberRole,
     getOrganisationMemberTimedSessions,
+    getOrganisationOwner,
+    getUserById,
 } from "../../db/queries";
 import { errorResponse, parseQueryParams } from "../../validation";
 
@@ -37,22 +39,30 @@ export default async function organisationMemberTimeTracking(req: AuthedRequest)
         return errorResponse("you must be an owner or admin to view member time tracking", "FORBIDDEN", 403);
     }
 
+    // check if organisation owner has pro subscription
+    const owner = await getOrganisationOwner(organisationId);
+    const ownerUser = owner ? await getUserById(owner.userId) : null;
+    const isPro = ownerUser?.plan === "pro";
+
     const sessions = await getOrganisationMemberTimedSessions(organisationId, fromDate);
 
     const enriched = sessions.map((session) => {
         const timestamps = session.timestamps.map((t) => new Date(t));
+        const actualWorkTimeMs = calculateWorkTimeMs(timestamps);
+        const actualBreakTimeMs = calculateBreakTimeMs(timestamps);
+
         return {
             id: session.id,
             userId: session.userId,
             issueId: session.issueId,
             issueNumber: session.issueNumber,
             projectKey: session.projectKey,
-            timestamps: session.timestamps,
-            endedAt: session.endedAt,
-            createdAt: session.createdAt,
-            workTimeMs: calculateWorkTimeMs(timestamps),
-            breakTimeMs: calculateBreakTimeMs(timestamps),
-            isRunning: session.endedAt === null && isTimerRunning(timestamps),
+            timestamps: isPro ? session.timestamps : [],
+            endedAt: isPro ? session.endedAt : null,
+            createdAt: isPro ? session.createdAt : null,
+            workTimeMs: isPro ? actualWorkTimeMs : 0,
+            breakTimeMs: isPro ? actualBreakTimeMs : 0,
+            isRunning: isPro ? session.endedAt === null && isTimerRunning(timestamps) : false,
         };
     });
 

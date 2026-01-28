@@ -14,4 +14,5 @@ export const FREE_TIER_LIMITS = {
     projectsPerOrganisation: 1,
     issuesPerOrganisation: 100,
     membersPerOrganisation: 5,
+    sprintsPerProject: 5,
 } as const;
