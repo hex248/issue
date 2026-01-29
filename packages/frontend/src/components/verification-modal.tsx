@@ -68,7 +68,7 @@ export function VerificationModal({ open, onOpenChange }: VerificationModalProps
                 autoFocus
                 className="gap-2"
               >
-                <InputOTPGroup className="gap-2">
+                <InputOTPGroup>
                   <InputOTPSlot index={0} className="w-14 h-16 text-2xl" />
                   <InputOTPSlot index={1} className="w-14 h-16 text-2xl" />
                   <InputOTPSlot index={2} className="w-14 h-16 text-2xl" />
