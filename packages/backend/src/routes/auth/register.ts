@@ -1,8 +1,10 @@
 import { RegisterRequestSchema } from "@sprint/shared";
 import type { BunRequest } from "bun";
 import { buildAuthCookie, generateToken, hashPassword } from "../../auth/utils";
-import { createSession, createUser, getUserByUsername } from "../../db/queries";
+import { createSession, createUser, createVerificationCode, getUserByUsername } from "../../db/queries";
 import { getUserByEmail } from "../../db/queries/users";
+import { VerificationCode } from "../../emails";
+import { sendEmailWithRetry } from "../../lib/email/service";
 import { errorResponse, parseJsonBody } from "../../validation";
 
 export default async function register(req: BunRequest) {
@@ -36,6 +38,19 @@ export default async function register(req: BunRequest) {
         return errorResponse("failed to create session", "SESSION_ERROR", 500);
     }
 
+    const verification = await createVerificationCode(user.id);
+
+    try {
+        await sendEmailWithRetry({
+            to: user.email,
+            subject: "Verify your Sprint account",
+            template: VerificationCode({ code: verification.code }),
+        });
+    } catch (error) {
+        console.error("Failed to send verification email:", error);
+        // don't fail registration if email fails - user can resend
+    }
+
     const token = generateToken(session.id, user.id);
 
     return new Response(
@@ -46,6 +61,7 @@ export default async function register(req: BunRequest) {
                 username: user.username,
                 avatarURL: user.avatarURL,
                 iconPreference: user.iconPreference,
+                emailVerified: user.emailVerified,
             },
             csrfToken: session.csrfToken,
         }),

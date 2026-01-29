@@ -2,7 +2,6 @@
 
 import { USER_EMAIL_MAX_LENGTH, USER_NAME_MAX_LENGTH, USER_USERNAME_MAX_LENGTH } from "@sprint/shared";
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import Avatar from "@/components/avatar";
 import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
@@ -26,9 +25,7 @@ export default function LogInForm({
   showWarning: boolean;
   setShowWarning: (value: boolean) => void;
 }) {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { setUser } = useSession();
+  const { setUser, setEmailVerified } = useSession();
 
   const [loginDetailsOpen, setLoginDetailsOpen] = useState(false);
 
@@ -59,8 +56,7 @@ export default function LogInForm({
           const data = await res.json();
           setCsrfToken(data.csrfToken);
           setUser(data.user);
-          const next = searchParams.get("next") || "/issues";
-          navigate(next, { replace: true });
+          setEmailVerified(data.user.emailVerified);
         }
         // unauthorized
         else if (res.status === 401) {
@@ -98,8 +94,7 @@ export default function LogInForm({
           const data = await res.json();
           setCsrfToken(data.csrfToken);
           setUser(data.user);
-          const next = searchParams.get("next") || "/issues";
-          navigate(next, { replace: true });
+          setEmailVerified(data.user.emailVerified);
         }
         // bad request (probably a bad user input)
         else if (res.status === 400) {

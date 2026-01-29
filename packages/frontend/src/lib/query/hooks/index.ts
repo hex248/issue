@@ -7,3 +7,4 @@ export * from "@/lib/query/hooks/sprints";
 export * from "@/lib/query/hooks/subscriptions";
 export * from "@/lib/query/hooks/timers";
 export * from "@/lib/query/hooks/users";
+export * from "@/lib/query/hooks/verification";

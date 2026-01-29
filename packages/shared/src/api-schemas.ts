@@ -60,11 +60,20 @@ export const AuthResponseSchema = z.object({
         username: z.string(),
         avatarURL: z.string().nullable(),
         iconPreference: z.enum(["lucide", "pixel", "phosphor"]),
+        emailVerified: z.boolean(),
     }),
     csrfToken: z.string(),
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// email verification schemas
+
+export const VerifyEmailRequestSchema = z.object({
+    code: z.string().length(6, "Verification code must be 6 digits"),
+});
+
+export type VerifyEmailRequest = z.infer<typeof VerifyEmailRequestSchema>;
 
 // issue schemas
 

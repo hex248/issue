@@ -1,4 +1,4 @@
-import { boolean, integer, json, pgTable, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, json, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import {
@@ -62,6 +62,8 @@ export const User = pgTable("User", {
     avatarURL: varchar({ length: 512 }),
     iconPreference: varchar({ length: 10 }).notNull().default("pixel").$type<IconStyle>(),
     plan: varchar({ length: 32 }).notNull().default("free"),
+    emailVerified: boolean().notNull().default(false),
+    emailVerifiedAt: timestamp({ withTimezone: false }),
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
@@ -195,7 +197,6 @@ export const IssueComment = pgTable("IssueComment", {
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
-// Zod schemas
 export const UserSelectSchema = createSelectSchema(User);
 export const UserInsertSchema = createInsertSchema(User);
 
@@ -226,7 +227,6 @@ export const SessionInsertSchema = createInsertSchema(Session);
 export const TimedSessionSelectSchema = createSelectSchema(TimedSession);
 export const TimedSessionInsertSchema = createInsertSchema(TimedSession);
 
-// Types
 export type UserRecord = z.infer<typeof UserSelectSchema>;
 export type UserInsert = z.infer<typeof UserInsertSchema>;
 
@@ -259,8 +259,6 @@ export type SessionInsert = z.infer<typeof SessionInsertSchema>;
 
 export type TimedSessionRecord = z.infer<typeof TimedSessionSelectSchema>;
 export type TimedSessionInsert = z.infer<typeof TimedSessionInsertSchema>;
-
-// Responses
 
 export type IssueResponse = {
     Issue: IssueRecord;
@@ -299,7 +297,6 @@ export type TimerState = {
     endedAt: string | null;
 } | null;
 
-// Subscription table - tracks user subscriptions
 export const Subscription = pgTable("Subscription", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer()
@@ -319,7 +316,6 @@ export const Subscription = pgTable("Subscription", {
     updatedAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
-// Payment history table
 export const Payment = pgTable("Payment", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     subscriptionId: integer()
@@ -332,16 +328,53 @@ export const Payment = pgTable("Payment", {
     createdAt: timestamp({ withTimezone: false }).defaultNow(),
 });
 
-// Zod schemas for Subscription and Payment
 export const SubscriptionSelectSchema = createSelectSchema(Subscription);
 export const SubscriptionInsertSchema = createInsertSchema(Subscription);
 
 export const PaymentSelectSchema = createSelectSchema(Payment);
 export const PaymentInsertSchema = createInsertSchema(Payment);
 
-// Types for Subscription and Payment
 export type SubscriptionRecord = z.infer<typeof SubscriptionSelectSchema>;
 export type SubscriptionInsert = z.infer<typeof SubscriptionInsertSchema>;
 
 export type PaymentRecord = z.infer<typeof PaymentSelectSchema>;
 export type PaymentInsert = z.infer<typeof PaymentInsertSchema>;
+
+export const EmailVerification = pgTable("EmailVerification", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer()
+        .notNull()
+        .references(() => User.id, { onDelete: "cascade" }),
+    code: varchar({ length: 6 }).notNull(),
+    attempts: integer().notNull().default(0),
+    maxAttempts: integer().notNull().default(5),
+    expiresAt: timestamp({ withTimezone: false }).notNull(),
+    verifiedAt: timestamp({ withTimezone: false }),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+});
+
+export const EmailVerificationSelectSchema = createSelectSchema(EmailVerification);
+export const EmailVerificationInsertSchema = createInsertSchema(EmailVerification);
+
+export type EmailVerificationRecord = z.infer<typeof EmailVerificationSelectSchema>;
+export type EmailVerificationInsert = z.infer<typeof EmailVerificationInsertSchema>;
+
+export const EmailJob = pgTable("EmailJob", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer()
+        .notNull()
+        .references(() => User.id, { onDelete: "cascade" }),
+    type: varchar({ length: 64 }).notNull(),
+    scheduledFor: timestamp({ withTimezone: false }).notNull(),
+    sentAt: timestamp({ withTimezone: false }),
+    failedAt: timestamp({ withTimezone: false }),
+    errorMessage: text(),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp({ withTimezone: false }).defaultNow(),
+});
+
+export const EmailJobSelectSchema = createSelectSchema(EmailJob);
+export const EmailJobInsertSchema = createInsertSchema(EmailJob);
+
+export type EmailJobRecord = z.infer<typeof EmailJobSelectSchema>;
+export type EmailJobInsert = z.infer<typeof EmailJobInsertSchema>;

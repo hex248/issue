@@ -649,6 +649,30 @@ export const apiContract = c.router({
             500: ApiErrorSchema,
         },
     },
+
+    authVerifyEmail: {
+        method: "POST",
+        path: "/auth/verify-email",
+        body: z.object({ code: z.string() }),
+        responses: {
+            200: SuccessResponseSchema,
+            400: ApiErrorSchema,
+            401: ApiErrorSchema,
+            404: ApiErrorSchema,
+        },
+        headers: csrfHeaderSchema,
+    },
+    authResendVerification: {
+        method: "POST",
+        path: "/auth/resend-verification",
+        body: emptyBodySchema,
+        responses: {
+            200: SuccessResponseSchema,
+            400: ApiErrorSchema,
+            401: ApiErrorSchema,
+        },
+        headers: csrfHeaderSchema,
+    },
 });
 
 export type ApiContract = typeof apiContract;

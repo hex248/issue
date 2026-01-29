@@ -2,6 +2,8 @@ import authLogin from "./auth/login";
 import authLogout from "./auth/logout";
 import authMe from "./auth/me";
 import authRegister from "./auth/register";
+import authResendVerification from "./auth/resend-verification";
+import authVerifyEmail from "./auth/verify-email";
 import issueById from "./issue/by-id";
 import issueCreate from "./issue/create";
 import issueDelete from "./issue/delete";
@@ -57,6 +59,8 @@ export const routes = {
     authLogin,
     authLogout,
     authMe,
+    authVerifyEmail,
+    authResendVerification,
 
     userByUsername,
     userUpdate,

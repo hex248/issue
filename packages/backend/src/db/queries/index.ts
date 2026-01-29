@@ -1,3 +1,4 @@
+export * from "./email-verification";
 export * from "./issue-comments";
 export * from "./issues";
 export * from "./organisations";

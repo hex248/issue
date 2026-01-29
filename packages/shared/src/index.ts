@@ -63,6 +63,7 @@ export type {
     UserByUsernameQuery,
     UserResponse,
     UserUpdateRequest,
+    VerifyEmailRequest,
 } from "./api-schemas";
 // API schemas
 export {
@@ -133,6 +134,7 @@ export {
     UserByUsernameQuerySchema,
     UserResponseSchema,
     UserUpdateRequestSchema,
+    VerifyEmailRequestSchema,
 } from "./api-schemas";
 export {
     ISSUE_COMMENT_MAX_LENGTH,
@@ -153,6 +155,10 @@ export {
 export type { ApiContract } from "./contract";
 export { apiContract } from "./contract";
 export type {
+    EmailJobInsert,
+    EmailJobRecord,
+    EmailVerificationInsert,
+    EmailVerificationRecord,
     IconStyle,
     IssueAssigneeInsert,
     IssueAssigneeRecord,
@@ -191,6 +197,12 @@ export {
     DEFAULT_SPRINT_COLOUR,
     DEFAULT_STATUS_COLOUR,
     DEFAULT_STATUS_COLOURS,
+    EmailJob,
+    EmailJobInsertSchema,
+    EmailJobSelectSchema,
+    EmailVerification,
+    EmailVerificationInsertSchema,
+    EmailVerificationSelectSchema,
     Issue,
     IssueAssignee,
     IssueAssigneeInsertSchema,

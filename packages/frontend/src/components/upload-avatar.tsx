@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/avatar";
-import { useAuthenticatedSession } from "@/components/session-provider";
+import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Label } from "@/components/ui/label";
@@ -56,7 +56,7 @@ export function UploadAvatar({
   skipOrgCheck?: boolean;
   className?: string;
 }) {
-  const { user } = useAuthenticatedSession();
+  const { user } = useSession();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +68,7 @@ export function UploadAvatar({
     if (!file) return;
 
     // check for animated GIF for free users
-    if (user.plan !== "pro" && file.type === "image/gif") {
+    if (user?.plan !== "pro" && file.type === "image/gif") {
       const isAnimated = await isAnimatedGIF(file);
       if (isAnimated) {
         setError("Animated avatars are only available on Pro. Upgrade to upload animated avatars.");

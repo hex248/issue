@@ -41,6 +41,8 @@ const main = async () => {
             "/auth/login": withGlobal(routes.authLogin),
             "/auth/logout": withGlobalAuthed(withAuth(withCSRF(routes.authLogout))),
             "/auth/me": withGlobalAuthed(withAuth(routes.authMe)),
+            "/auth/verify-email": withGlobalAuthed(withAuth(withCSRF(routes.authVerifyEmail))),
+            "/auth/resend-verification": withGlobalAuthed(withAuth(withCSRF(routes.authResendVerification))),
 
             "/user/by-username": withGlobalAuthed(withAuth(routes.userByUsername)),
             "/user/update": withGlobalAuthed(withAuth(withCSRF(routes.userUpdate))),
